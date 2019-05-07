@@ -1,9 +1,33 @@
 'use strict';
 
-/** @type Egg.EggPlugin */
-module.exports = {
-  // had enabled by egg
-  // static: {
+// had enabled by egg
+// exports.static = true;
+  //参数验证插件
+  exports.validate = {
+    enable: true,
+    package: 'egg-validate',
+  };
+  // exports.cors = {
   //   enable: true,
+  //   package: 'egg-cors',
+  // };
+  // exports.mongo = {
+  //   enable: true,
+  //   package: 'egg-mongo-native'
   // }
-};
+  // exports.cluster = {
+  //   enable: true,
+  //   package: 'egg-cluster'
+  // }
+  exports.mysql = {
+    enable: true,
+    package: 'egg-mysql'
+  }
+  exports.redis = {
+    enable: true,
+    package: 'egg-redis'
+  }
+  exports.redis = {
+    enable: true,
+    package: 'egg-redis'
+  }
