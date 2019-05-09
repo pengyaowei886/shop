@@ -17,8 +17,31 @@ module.exports = appInfo => {
 
     // add your middleware config here
     config.middleware = [];
-    
+
+    // //mysql配置
+    // config.mysql = {
+    //     // database configuration
+    //     client: {
+    //         host: '154.48.228.16',
+    //         port: '3306',
+    //         user: 'root',
+    //         password: '159370',
+    //         database: 'shop',
+    //     }
+    // };
     //redis
+    config.mongo = {
+        clients: {
+          sss: {
+            host:'154.48.228.16',
+            port: 27019,
+            name: 'sss',
+            user: 'sss',
+            password: 'sss159370',
+            options: {useNewUrlParser: true},
+          }
+        }
+      };
     config.redis = {
         clients: {
             customer: {
@@ -37,25 +60,17 @@ module.exports = appInfo => {
                 host: '154.48.228.16',
                 port: '6379',
                 password: '',
-                db: 2,
+                db: 2
             },
         },
     }
+    config.cluster = {
+        listen: {
+            port: 7001,
+            hostname: '127.0.0.1'
+        },
 
-
-    config.mongo = {
-        clients: {
-          SSS: {
-            host: '154.48.228.16',
-            port: '27019',
-            name: 'sss',
-            user: 'sss',
-            password: 'sss159370',
-            options: {useNewUrlParser: true},
-          }
-        }
-      };
-
+    };
     // add your user config here
     const userConfig = {
         // myAppName: 'egg',

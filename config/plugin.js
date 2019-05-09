@@ -11,22 +11,11 @@
   //   enable: true,
   //   package: 'egg-cors',
   // };
-  // exports.mongo = {
-  //   enable: true,
-  //   package: 'egg-mongo-native'
-  // }
-  // exports.cluster = {
-  //   enable: true,
-  //   package: 'egg-cluster'
-  // }
-  exports.mysql = {
+  exports.mongo = {
     enable: true,
-    package: 'egg-mysql'
+    package: 'egg-mongo-native'
   }
-  exports.redis = {
-    enable: true,
-    package: 'egg-redis'
-  }
+
   exports.redis = {
     enable: true,
     package: 'egg-redis'
