@@ -7,10 +7,10 @@
     enable: true,
     package: 'egg-validate',
   };
-  // exports.cors = {
-  //   enable: true,
-  //   package: 'egg-cors',
-  // };
+  exports.cors = {
+    enable: true,
+    package: 'egg-cors',
+  };
   exports.mongo = {
     enable: true,
     package: 'egg-mongo-native'
@@ -20,3 +20,11 @@
     enable: true,
     package: 'egg-redis'
   }
+  exports.mysql = {
+    enable: true,
+    package: 'egg-mysql'
+  }
+  // exports.io = {
+  //   enable: true,
+  //   package: 'egg-socket.io'
+  // };

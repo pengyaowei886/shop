@@ -42,6 +42,25 @@ module.exports = appInfo => {
           }
         }
       };
+      config.mysql = {
+        // 单数据库信息配置
+        client: {
+          // host
+          host: '154.48.228.16',
+          // 端口号
+          port: '3306',
+          // 用户名
+          user: 'root',
+          // 密码
+          password: '159370',
+          // 数据库名
+          database: 'shop',
+        },
+        // 是否加载到 app 上，默认开启
+        app: true,
+        // 是否加载到 agent 上，默认关闭
+        agent: false,
+      };
     config.redis = {
         clients: {
             customer: {
@@ -74,6 +93,8 @@ module.exports = appInfo => {
     // add your user config here
     const userConfig = {
         // myAppName: 'egg',
+        appid:"", //appid
+        appsecret:"" //秘钥
     };
     return {
         ...config,
