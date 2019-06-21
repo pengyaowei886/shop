@@ -24,5 +24,6 @@ class CounterService extends Service {
         let retval=item.value.seq;
         return retval;
     }
+    
 }
 module.exports = CounterService;

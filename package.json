@@ -7,6 +7,7 @@
     "declarations": true
   },
   "dependencies": {
+    "await-stream-ready": "^1.0.1",
     "crypto": "^1.0.1",
     "egg": "^2.15.1",
     "egg-cluster": "^1.23.2",
@@ -17,8 +18,7 @@
     "egg-scripts": "^2.11.0",
     "egg-security": "^2.5.0",
     "egg-socket.io": "^4.1.5",
-    "egg-validate": "^2.0.2",
-    "validate": "^4.5.1"
+    "egg-validate": "^2.0.2"
   },
   "devDependencies": {
     "autod": "^3.0.1",
@@ -35,7 +35,7 @@
   "scripts": {
     "start": "egg-scripts start --daemon --title=egg-server-shop",
     "stop": "egg-scripts stop --title=egg-server-shop",
-    "dev": "egg-bin dev --port 7001 --host 127.0.0.1 --sticky",
+    "dev": "egg-bin dev --port 7001 --host 127.0.0.1 ",
     "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",

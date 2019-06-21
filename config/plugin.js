@@ -11,10 +11,10 @@
     enable: true,
     package: 'egg-cors',
   };
-  exports.mongo = {
-    enable: true,
-    package: 'egg-mongo-native'
-  }
+  // exports.mongo = {
+  //   enable: true,
+  //   package: 'egg-mongo-native'
+  // }
 
   exports.redis = {
     enable: true,
@@ -24,7 +24,3 @@
     enable: true,
     package: 'egg-mysql'
   }
-  // exports.io = {
-  //   enable: true,
-  //   package: 'egg-socket.io'
-  // };

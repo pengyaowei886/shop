@@ -89,5 +89,47 @@ class UserService extends Service {
 
 
     }
+    /**
+ *  小程序登陆
+ * 
+ * */
+    async LoginCode(code, userInfo) {//接收客户端发送过来的信息，其中包括code和appid
+        /*
+        * 首先读取本地 3_rdSession 是否存在，如果存在。判断是否过期。过期再生成一个存放本地（前端做）
+        * 如果不存在 往下走
+        */
+        let handerThis = this;
+        const { ctx, app } = handerThis;
+        const mysql = this.app.mysql;
+        let databack = 0;
+        let code = userInfo.code;
+        //console.log("code:",code);
+        let appid = app.config.app.game.game_appid;
+        let secret = app.config.app.game.game_appid;
+        let r_url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appid + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code";
+        let res1 = await ctx.curl(r_url, {
+            method: "GET",
+            contentType: "json",
+            dataType: "json"
+        });
+        //用户服务器返回的数值
+        //console.log("微信返回的信息：",res1.body);
+        let session_key = JSON.parse(res1.body).session_key;//session_key
+        let open_id = JSON.parse(res1.body).open_id;//open_id
+        /*
+         ** 拿到session_key和open_id，3_rdSession（随机生成）为key，session_key和open_id为value 存入微信小游戏缓存目录，下次登录直接读取，要设置有效期
+         */
+
+        //解密用户信息
+        let signature2 = sha1(body.userInfo.rawData + session_key);
+        if (body.userInfo.signature != signature2) {
+            return res.json("数据签名校验失败");
+        }
+        // 解密
+        let pc = new WXBizDataCrypt(appid, sessionkeyList[i]);
+        let data = pc.decryptData(body.userInfo.encryptedData, body.userInfo.iv);
+        //待补充
+        await mysql.insert('user',{openid:open_id,data:data});
+    }
 }
 module.exports = UserService;
