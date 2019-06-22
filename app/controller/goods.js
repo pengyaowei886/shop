@@ -15,11 +15,14 @@ class GoodsController extends Controller {
                     type: 'string', required: false, allowEmpty: false
                 },
                 skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: false, allowEmpty: false
+                    type: 'string', required: true, allowEmpty: false
                 },
                 limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: false, allowEmpty: false
+                    type: 'string', required: true, allowEmpty: false
                 },
+                class: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
             }, ctx.query);
         } catch (e) {
             ctx.logger.warn(e);
@@ -36,7 +39,8 @@ class GoodsController extends Controller {
             const { ctx, service } = handerThis;
             let skip = Number(ctx.query.skip);
             let limit = Number(ctx.query.limit);
-            let data = await service.goods.query_goods(limit, skip, ctx.query.name);
+            let  class_class = Number(ctx.query.class);
+            let data = await service.goods.query_goods(limit, skip, ctx.query.name,class_class);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
