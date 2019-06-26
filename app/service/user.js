@@ -129,7 +129,50 @@ class UserService extends Service {
         let pc = new WXBizDataCrypt(appid, sessionkeyList[i]);
         let data = pc.decryptData(body.userInfo.encryptedData, body.userInfo.iv);
         //待补充
-        await mysql.insert('user',{openid:open_id,data:data});
+        await mysql.insert('user', { openid: open_id, data: data });
+    }
+    //用户编辑收藏
+    async exit_collation() {
+        const mysql = this.app.mysql;
+        let return_data = {};
+        if (action == "insert") {
+
+            let result = await mysql.insert('collation', {
+                'goods_id': params.goods_id, "status": 1, ctime: new Date()
+            })
+            if (result.affectedRows === 1) {
+
+                return return_data;
+
+            } else {
+                throw new Error("增加失败");
+            }
+        }
+        if (action == "delete") {
+            let rows = {
+                'id': params.id}
+            let result = await mysql.delete('goods', rows);
+            if (result.affectedRows === params.id.length) {
+                return return_data;
+            } else {
+                throw new Error("取消收藏失败");
+            }
+        }
+    }
+    //用户查看收藏列表 
+    async query_collation() {
+        let handerThis = this;
+        const { ctx, app } = handerThis;
+        const mysql = this.app.mysql;
+
+   let sql = "select g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g left join collation c on g.goods_id = c.goods_id " ;
+     
+        let result = await mysql.query(sql, args);
+        if (result.length >= 1) {
+            return result;
+        } else {
+            throw new Error("空数据");
+        }
     }
 }
 module.exports = UserService;

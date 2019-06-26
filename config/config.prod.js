@@ -17,6 +17,11 @@ module.exports = appInfo => {
 
     // add your middleware config here
     config.middleware = [];
+    config.cors = {
+        allowMethods: 'GET,POST,PUT,DELETE,OPTIONS',
+        credentials: true,
+        origin: '*'
+    }
 
     // //mysql配置
     // config.mysql = {
@@ -29,59 +34,49 @@ module.exports = appInfo => {
     //         database: 'shop',
     //     }
     // };
-    //redis
-    config.mongo = {
-        clients: {
-          sss: {
-            host:'154.48.228.16',
-            port: 27019,
-            name: 'sss',
-            user: 'sss',
-            password: 'sss159370',
-            options: {useNewUrlParser: true},
-          }
-        }
-      };
-      config.mysql = {
+
+
+    config.mysql = {
         // 单数据库信息配置
         client: {
-          // host
-          host: '154.48.228.16',
-          // 端口号
-          port: '3306',
-          // 用户名
-          user: 'root',
-          // 密码
-          password: '159370',
-          // 数据库名
-          database: 'shop',
+            // host
+            host: '129.28.167.17',
+            // 端口号
+            port: '3306',
+            // 用户名
+            user: 'root',
+            // 密码
+            password: 'zlptpyw',
+            // 数据库名
+            database: 'zlpt',
         },
         // 是否加载到 app 上，默认开启
         app: true,
         // 是否加载到 agent 上，默认关闭
         agent: false,
-      };
+    };
+
     config.redis = {
         clients: {
             customer: {
-                host: '154.48.228.16',
+                host: '129.28.167.17',
                 port: '6379',
-                password: '',
+                password: 'zlpt123456',
                 db: 0,
             },
             business: {
-                host: '154.48.228.16',
+                host: '129.28.167.17',
                 port: '6379',
-                password: '',
+                password: 'zlpt123456',
                 db: 1,
             },
             boss: {
-                host: '154.48.228.16',
+                host: '129.28.167.17',
                 port: '6379',
-                password: '',
-                db: 2
-            },
-        },
+                password: 'zlpt123456',
+                db: 2,
+            }
+        }
     }
     config.cluster = {
         listen: {
@@ -93,11 +88,12 @@ module.exports = appInfo => {
     // add your user config here
     const userConfig = {
         // myAppName: 'egg',
-        appid:"", //appid
-        appsecret:"" //秘钥
+        appid: "", //appid
+        appsecret: "" //秘钥
     };
     return {
         ...config,
         ...userConfig,
+
     };
 };
