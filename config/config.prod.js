@@ -17,6 +17,14 @@ module.exports = appInfo => {
 
     // add your middleware config here
     config.middleware = [];
+    config.security = {
+        xframe: {
+          enable: false,
+        },
+        csrf: {
+          enable: false,
+        }
+      };
     config.cors = {
         allowMethods: 'GET,POST,PUT,DELETE,OPTIONS',
         credentials: true,
@@ -81,7 +89,7 @@ module.exports = appInfo => {
     config.cluster = {
         listen: {
             port: 7001,
-            hostname: '127.0.0.1'
+            hostname: '172.30.0.2'
         },
 
     };
