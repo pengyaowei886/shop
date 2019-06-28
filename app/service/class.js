@@ -3,9 +3,9 @@ const Service = require('egg').Service;
 class ClassService extends Service {
 
     //查询分类列表
-    async query_goods() {
+    async query_class() {
         const mysql = this.app.mysql;
-        let result = await mysql.select('class', { where: { status: 1 }, columns: ['id', 'name', 'ctime'] });
+        let result = await mysql.select('class', { where: { status: 1 }, columns: ['id', 'name'] });
         if (result.length >= 1) {
             return result;
         } else {

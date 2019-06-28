@@ -22,13 +22,23 @@ class AdminService extends Service {
     async edit_admin(action, params, admin) {
         const mysql = this.app.mysql;
         let return_data = {};
+        const redis = this.app.redis.get('admin');
         //增加管理员
         if (action == "insert") {
+
             let result = await mysql.insert('admin', {
                 'name': params.name, 'password': params.password,
                 'phone': params.phone, ctime: new Date(), 'utime': null, handler: admin.name, status: 1
             })
             if (result.affectedRows === 1) {
+                let admin_result = await mysql.query("select @@IDENTITY ");
+                let admin_id = admin_result[0]["@@IDENTITY"];
+                await redis.set(`role:${admin_id}:order:query`, 0);
+                await redis.set(`role:${admin_id}:order:edit`, 0);
+                await redis.set(`role:${admin_id}:goods:query`, 0);
+                await redis.set(`role:${admin_id}:goods:edit`, 0);
+                await redis.set(`role:${admin_id}:join_goods:query`, 0);
+                await redis.set(`role:${admin_id}:join_goods:edit`, 0);
                 return return_data;
             } else {
                 throw new Error("增加失败");
@@ -51,6 +61,37 @@ class AdminService extends Service {
             } else {
                 throw new Error("删除失败");
             }
+        }
+    }
+    //查看权限列表
+    async query_admin_role(admin) {
+
+        let handerThis = this;
+        const { ctx, app } = handerThis;
+        const redis = this.app.redis.get('admin');
+        let data = {
+            order: {} ,
+            goods: {},
+            join_goods: {}
+        };
+    console.log('aaaaa');
+        data.order.query = await redis.get(`role:${admin.id}:order:query`);
+        data.order.edit = await redis.get(`role:${admin.id}:order:edit`);
+        data.goods.query = await redis.get(`role:${admin.id}:goods:query`);
+        data.goods.edit = await redis.get(`role:${admin.id}:goods:edit`);
+        data.join_goods.read = await redis.get(`role:${admin.id}:join_goods:query`);
+        data.join_goods.edit = await redis.get(`role:${admin.id}:join_goods:edit`);
+        return data;
+    }
+    //编辑管理员权限
+    async edit_admin_role(role, action, admin) {
+        let handerThis = this;
+        const { ctx, app } = handerThis;
+        const redis = this.app.redis.get('admin');
+        let data = {};
+        let result = await redis.set(`role:${admin.id}:${role}:${action}`, 1);
+        if (result === "OK") {
+            return data;
         }
     }
 

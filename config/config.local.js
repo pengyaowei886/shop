@@ -34,13 +34,13 @@ module.exports = appInfo => {
   //redis
   config.redis = {
     clients: {
-      customer: {
+      user: {
         host: '129.28.167.17',
         port: '6379',
         password: 'zlpt123456',
         db: 0,
       },
-      business: {
+      admin: {
         host: '129.28.167.17',
         port: '6379',
         password: 'zlpt123456',

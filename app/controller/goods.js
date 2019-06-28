@@ -46,6 +46,24 @@ class GoodsController extends Controller {
             return handerThis.error('HANDLE_ERROR', error['message']);
         }
     }
+    //查看明星商品列表
+    async   query_hot_goods() {
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        //参数校验
+
+        //逻辑判断
+        try {
+            let handerThis = this;
+            const { ctx, service } = handerThis;
+
+            let data = await service.goods.query_hot_goods();
+            return handerThis.succ(data);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+        }
+    }
     //查看商品具体信息
     async   query_goods_info() {
 
