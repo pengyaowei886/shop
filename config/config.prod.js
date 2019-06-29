@@ -11,7 +11,7 @@ module.exports = appInfo => {
      * @type {Egg.EggAppConfig}
      **/
     const config = exports = {};
-
+    const userConfig = exports = {};
     // use for cookie sign key, should change to your own and keep security
     config.keys = appInfo.name + '_1557129655272_1836';
 
@@ -95,12 +95,12 @@ module.exports = appInfo => {
     };
     // add your user config here
     // add your user config here
-    const userConfig = {
+    userConfig.info= {
         // myAppName: 'egg',
         appid: "", //appid
         appsecret: "" ,
         web:"http://129.28.167.17:7001/"//秘钥
-     }=exports;
+     } 
     return {
         ...config,
         ...userConfig,
