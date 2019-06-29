@@ -10,7 +10,7 @@ class Goodsservice extends Service {
     //用户查询商品列表
     async query_goods(limit, skip, name, class_class) {
         const mysql = this.app.mysql;
-        let sql = "select id,pic,head_pic,sell_price,real_price,introduce,repertory from goods where kind =1 and  status =1  " ;
+        let sql = "select id,pic,head_pic,sell_price,real_price,introduce,repertory from goods where kind =1 and  status =1  ";
         if (name) {
             if (class_class) {
                 sql += " and class = " + mysql.escape(class_class) + "introduce like " +
@@ -60,7 +60,7 @@ class Goodsservice extends Service {
                 where: { goods_id: id }, columns: ['spec', 'price',
                     'repertory']
             });
-            if (specs.length<1) {
+            if (specs.length < 1) {
                 result[0].specs = null;
                 return result;
             } else {
@@ -69,6 +69,48 @@ class Goodsservice extends Service {
             }
         }
     }
+    //用户查询拼团商品列表
+    async query_join_goods(limit, skip, name) {
+        const mysql = this.app.mysql;
+        let sql = "select id,head_pic,real_price,join_price,leader_price,join_number,introduce from goods where kind =2 and  status =1  ";
+        if (name) {
+            sql += " and introduce like " +
+                mysql.escape("%" + name + "%") + " order by ctime  desc  limit ?  offset ? ";
+        }
+        let args = [limit, skip];
+        let result = await mysql.query(sql, args);
+        if (result.length >= 1) {
+            return result;
+        } else {
+            throw new Error("空数据");
+        }
+    }
+  //用户查看拼团商品具体详情
+  async query_join_goods_info(id) {
+    const mysql = this.app.mysql;
+    //先查商品信息
+    let result = await mysql.select('goods', {
+        where: { id: id,status:1 }, columns: ['introduce', 'real_price', 'sell_price', "join_xianjing","effectiv_time",
+        'join_price', 'succ_volume',"leader_price","join_number",
+            'repertory', 'pic', 'head_pic']
+    });
+    if (result.length < 0) {
+        throw new Error("查询商品信息失败");
+    } else {
+        //再查商品规格信息 
+        let specs = await mysql.select('specs', {
+            where: { goods_id: id }, columns: ['spec', 'price',
+                'repertory']
+        });
+        if (specs.length < 1) {
+            result[0].specs = null;
+            return result;
+        } else {
+            result[0].specs = specs;
+            return result;
+        }
+    }
+}
     //用户查看商品评价
     async  query_goods_evaluate(id) {
         const mysql = this.app.mysql;

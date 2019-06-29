@@ -26,20 +26,12 @@ module.exports = app => {
     //查询推荐商品
     router.get('/zlpt/app/goods/hot/query', controller.goods.query_hot_goods);
     //查看商品具体属性
-    router.get('/zlpt/app/goods/info', controller.goods.query_goods_info);
-  
-  
-
-
-    // //*******************       拼团商品 ***********************/
-    // //查看拼团商品列表
-    // router.get('/zlpt/web/join_goods/query', controller.goods.query_join_goods);
-    // //查看拼团商品具体详情
-    // router.get('/zlpt/web/join_goods/info', controller.goods.query_join_goods_info);
-    // //编辑拼团商品
-    // router.post('/zlpt/web/join_goods/edit', controller.goods.edit_join_goods);
-    // //编辑商品规格(两种商品都适用)
-    // router.post('/zlpt/web/goods/spec', controller.goods.edit_goods_spec);
+    router.get('/zlpt/app/goods/info', controller.goods.query_goods_info);  
+    //查看拼团商品列表
+    router.get('/zlpt/app/join_goods/query', controller.goods.query_join_goods);
+    //查看拼团商品具体详情
+    router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
+ 
 
 
     // //*******************       用户 ***********************/
