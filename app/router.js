@@ -19,20 +19,16 @@ module.exports = app => {
 
     //查询轮播图
     router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);
-    // //编辑轮播图
-    // router.post('/zlpt/web/rotate_map/edit', controller.admin.rotate_map_edit);
-
-    // //*******************       商城商品 ***********************/
     //查看商品列表（名称，分类检索）
     router.get('/zlpt/app/goods/query', controller.goods.query_goods);
     //查询分类 
     router.get('/zlpt/app/class/query', controller.class.query_class);
     //查询推荐商品
     router.get('/zlpt/app/goods/hot/query', controller.goods.query_hot_goods);
-    // //查看商品具体属性
-    // router.get('/zlpt/web/goods/info', controller.goods.query_goods_info);
-    // //编辑商品
-    // router.post('/zlpt/web/goods/edit', controller.goods.edit_goods);
+    //查看商品具体属性
+    router.get('/zlpt/app/goods/info', controller.goods.query_goods_info);
+  
+  
 
 
     // //*******************       拼团商品 ***********************/

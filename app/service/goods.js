@@ -10,18 +10,18 @@ class Goodsservice extends Service {
     //用户查询商品列表
     async query_goods(limit, skip, name, class_class) {
         const mysql = this.app.mysql;
-        let sql = "select id,pic,head_pic,price,class,introduce,repertory,from goods where is_recommend=1 and  status =1  and  class=" + mysql.escape(class_class);
+        let sql = "select id,pic,head_pic,sell_price,real_price,introduce,repertory from goods where kind =1 and  status =1  " ;
         if (name) {
             if (class_class) {
                 sql += " and class = " + mysql.escape(class_class) + "introduce like " +
-                    mysql.escape("%" + name + "%") + "group by is_recommend order by is_recommend desc , ctime  desc  limit ?  offset ? ";
+                    mysql.escape("%" + name + "%") + " order by  ctime  desc  limit ?  offset ? ";
             } else {
                 sql += " and introduce like " +
-                    mysql.escape("%" + name + "%") + " group by is_recommend order by is_recommend desc, ctime  desc  limit ?  offset ? ";
+                    mysql.escape("%" + name + "%") + " order by ctime  desc  limit ?  offset ? ";
             }
         } else {
             if (class_class) {
-                sql += " and class = " + mysql.escape(class_class) + " group by is_recommend order by is_recommend desc ,ctime  desc  limit ?  offset ? ";
+                sql += " and class =  " + mysql.escape(class_class) + "  order by ctime  desc   limit ?  offset ? ";
             }
         }
         let args = [limit, skip];
@@ -60,11 +60,12 @@ class Goodsservice extends Service {
                 where: { goods_id: id }, columns: ['spec', 'price',
                     'repertory']
             });
-            if (specs) {
-                result[0].specs = specs;
+            if (specs.length<1) {
+                result[0].specs = null;
                 return result;
             } else {
-                throw new Error("查询商品规格失败");
+                result[0].specs = specs;
+                return result;
             }
         }
     }
