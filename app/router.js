@@ -15,35 +15,20 @@ module.exports = app => {
     //请求短信验证码
     router.get('/zlpt/tools/duanxin', controller.user.req_dx);
 
-    //商家api****************************商家api
 
-    //*******************      管理员 ***********************/
 
-    // //管理员登陆
-    // router.get('/zlpt/web/admin/login', controller.admin.login);
-    // //查看管理员
-    // router.get('/zlpt/web/admin/query', controller.admin.query_admin);
-    // //编辑管理员
-    // router.post('/zlpt/web/admin/edit', controller.admin.edit_admin);
-    // //查询权限列表
-    // router.get('/zlpt/web/admin/role/query', controller.admin.query_admin_role);
-    // //为其他管理员授权
-    // router.post('/zlpt/web/admin/role/edit', controller.admin.edit_admin_role);
-
-    // //*******************       轮播图 ***********************/
-
-    // //查询轮播图
-    // router.get('/zlpt/web/rotate_map/query', controller.admin.query_rotate_map);
+    //查询轮播图
+    router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);
     // //编辑轮播图
     // router.post('/zlpt/web/rotate_map/edit', controller.admin.rotate_map_edit);
 
     // //*******************       商城商品 ***********************/
     //查看商品列表（名称，分类检索）
-    router.get('/zlpt/web/goods/query', controller.goods.business_query_goods);
-       //查询分类 
-       router.get('/zlpt/app/class/query', controller.class.query_class);
-       //查询推荐商品
-       router.get('/zlpt/app/goods/hot/query', controller.goods.query_hot_goods);
+    router.get('/zlpt/app/goods/query', controller.goods.query_goods);
+    //查询分类 
+    router.get('/zlpt/app/class/query', controller.class.query_class);
+    //查询推荐商品
+    router.get('/zlpt/app/goods/hot/query', controller.goods.query_hot_goods);
     // //查看商品具体属性
     // router.get('/zlpt/web/goods/info', controller.goods.query_goods_info);
     // //编辑商品
@@ -78,7 +63,7 @@ module.exports = app => {
 
 
     //*******************       商品分类 ***********************/
- 
+
     // //编辑分类
     // router.get('/zlpt/app/class/exit', controller.class.exit_class);
 

@@ -131,6 +131,19 @@ class UserService extends Service {
         //待补充
         await mysql.insert('user', { openid: open_id, data: data });
     }
+    //查询轮播图
+    async query_rotate_map() {
+        const mysql = this.app.mysql;
+        let result = await mysql.select('rotate_map', {
+            where: { status: 1 }, columns: ['id', 'url', 'pic'],
+            orders: [['ctime', 'desc']]
+        });
+        if (result.length >= 1) {
+            return result;
+        } else {
+            throw new Error("空数据");
+        }
+    }
     //用户编辑收藏
     async exit_collation() {
         const mysql = this.app.mysql;
@@ -150,7 +163,8 @@ class UserService extends Service {
         }
         if (action == "delete") {
             let rows = {
-                'id': params.id}
+                'id': params.id
+            }
             let result = await mysql.delete('goods', rows);
             if (result.affectedRows === params.id.length) {
                 return return_data;
@@ -165,8 +179,8 @@ class UserService extends Service {
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
 
-   let sql = "select g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g left join collation c on g.goods_id = c.goods_id " ;
-     
+        let sql = "select g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g left join collation c on g.goods_id = c.goods_id ";
+
         let result = await mysql.query(sql, args);
         if (result.length >= 1) {
             return result;

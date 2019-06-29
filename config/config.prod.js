@@ -94,11 +94,13 @@ module.exports = appInfo => {
 
     };
     // add your user config here
+    // add your user config here
     const userConfig = {
         // myAppName: 'egg',
         appid: "", //appid
-        appsecret: "" //秘钥
-    };
+        appsecret: "" ,
+        web:"http://129.28.167.17:7001/"//秘钥
+     }=exports;
     return {
         ...config,
         ...userConfig,
