@@ -30,7 +30,7 @@ class ToolsController extends Controller {
             .toLocaleLowerCase();
         //文件生成绝对路径
         //当然这里这样市不行的，因为你还要判断一下是否存在文件路径
-        const target = path.join(this.config.baseDir, 'public/goods', filename);
+        const target = path.join(this.config.baseDir, 'app/public/goods', filename);
         //生成一个文件写入 文件流
         const writeStream = fs.createWriteStream(target);
         try {

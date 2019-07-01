@@ -31,21 +31,21 @@ module.exports = app => {
     router.get('/zlpt/app/join_goods/query', controller.goods.query_join_goods);
     //查看拼团商品具体详情
     router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
- 
-
+    //查看用户具体信息
+    router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+    //查询用户收获地址
+    router.get('/zlpt/web/user/address/query', controller.user.query_user_info);
 
     // //*******************       用户 ***********************/
     // //查看用户列表（按条件检索）
     // router.get('/zlpt/web/user/query', controller.admin.query_user);
-    // //查看用户具体信息
-    // router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+ 
     // //编辑用户
     // router.post('/zlpt/web/user/edit', controller.admin.user_info_edit);
 
 
     // //*******************       收获地址 ***********************/
-    // //查询用户收获地址
-    // router.get('/zlpt/web/user/address/query', controller.user.query_user_info);
+
     // //编辑用户收获地址
     // router.post('/zlpt/web/user/address/edit', controller.user.user_info_edit);
 

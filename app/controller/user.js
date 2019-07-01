@@ -115,41 +115,62 @@ class UserController extends Controller {
     }
   }
 
-     /**
-     *   /查看轮播图(根据分类查询)
-     */
-    async   query_rotate_map() {
+  /**
+  *   /查看轮播图(根据分类查询)
+  */
+  async   query_rotate_map() {
 
+    let handerThis = this;
+    const { ctx, app, service } = handerThis;
+    //参数校验
+    try {
+      //使用插件进行验证 validate    
+      ctx.validate({
+        kind: {//字符串 必填 不允许为空字符串 
+          type: 'string', required: true, allowEmpty: false
+        }
+      }, ctx.request.query);
+    } catch (e) {
+      ctx.logger.warn(e);
+      let logContent = e.code + ' ' + e.message + ',';
+      for (let i in e.errors) {
+        logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+      }
+      return handerThis.error('PARAMETERS_ERROR', logContent);
+    }
+
+    //逻辑判断
+    try {
       let handerThis = this;
-      const { ctx, app, service } = handerThis;
-      //参数校验
-      try {
-          //使用插件进行验证 validate    
-          ctx.validate({
-              kind: {//字符串 必填 不允许为空字符串 
-                  type: 'string', required: true, allowEmpty: false
-              }
-          }, ctx.request.query);
-      } catch (e) {
-          ctx.logger.warn(e);
-          let logContent = e.code + ' ' + e.message + ',';
-          for (let i in e.errors) {
-              logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
-          }
-          return handerThis.error('PARAMETERS_ERROR', logContent);
-      }
-
-      //逻辑判断
-      try {
-          let handerThis = this;
-          const { ctx, service } = handerThis;
-          let kind = Number(ctx.query.kind);
-          let data = await service.user.query_rotate_map(kind);
-          return handerThis.succ(data);
-      } catch (error) {
-          return handerThis.error('HANDLE_ERROR', error['message']);
-      }
+      const { ctx, service } = handerThis;
+      let kind = Number(ctx.query.kind);
+      let data = await service.user.query_rotate_map(kind);
+      return handerThis.succ(data);
+    } catch (error) {
+      return handerThis.error('HANDLE_ERROR', error['message']);
+    }
   }
 
+//用户查看我的收藏
+  async query_collaction(){
+    let handerThis = this;
+    const { ctx, app, service } = handerThis;
+
+
+    //逻辑判断
+    try {
+      let handerThis = this;
+      const { ctx, service } = handerThis;
+      let uid =ctx.session.user.id;
+      let data = await service.user.query_collection(uid);
+      return handerThis.succ(data);
+    } catch (error) {
+      return handerThis.error('HANDLE_ERROR', error['message']);
+    }
+  }
+//用户编辑我的收藏
+async edit_collaction(){
+
+}
 }
 module.exports = UserController;

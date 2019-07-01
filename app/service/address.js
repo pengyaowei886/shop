@@ -66,7 +66,7 @@ class AddressService extends Service {
                     throw new Error("编辑失败");
                 }
             }
-            if (action == "update") {
+            if (action == "delete") {
                 let rows = { id: params.id, status: 0, utime: new Date() }
                 let result = await mysql.update('address', rows);
                 if (result.affectedRows === 1) {

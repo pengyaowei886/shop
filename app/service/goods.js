@@ -49,23 +49,25 @@ class Goodsservice extends Service {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', 'real_price', 'sell_price', 'class', 'succ_volume',
+            where: { id: id }, columns: ['introduce', 'real_price', 'sell_price', 'specs_name', 'succ_volume',
                 'repertory', 'pic', 'head_pic']
         });
-        if (result.length < 0) {
+        if (result.length < 1) {
             throw new Error("查询商品信息失败");
         } else {
-            //再查商品规格信息 
-            let specs = await mysql.select('specs', {
-                where: { goods_id: id }, columns: ['spec', 'price',
-                    'repertory']
-            });
-            if (specs.length < 1) {
+            //判断是否多重规格
+            if (result[0].specs_name == null) {
                 result[0].specs = null;
                 return result;
             } else {
+                //再查商品规格信息 
+                let specs = await mysql.select('specs', {
+                    where: { goods_id: id }, columns: ['id', 'spec', 'price',
+                        'repertory']
+                });
                 result[0].specs = specs;
                 return result;
+
             }
         }
     }
@@ -85,32 +87,32 @@ class Goodsservice extends Service {
             throw new Error("空数据");
         }
     }
-  //用户查看拼团商品具体详情
-  async query_join_goods_info(id) {
-    const mysql = this.app.mysql;
-    //先查商品信息
-    let result = await mysql.select('goods', {
-        where: { id: id,status:1 }, columns: ['introduce', 'real_price', 'sell_price', "join_xianjing","effectiv_time",
-        'join_price', 'succ_volume',"leader_price","join_number",
-            'repertory', 'pic', 'head_pic']
-    });
-    if (result.length < 0) {
-        throw new Error("查询商品信息失败");
-    } else {
-        //再查商品规格信息 
-        let specs = await mysql.select('specs', {
-            where: { goods_id: id }, columns: ['spec', 'price',
-                'repertory']
+    //用户查看拼团商品具体详情
+    async query_join_goods_info(id) {
+        const mysql = this.app.mysql;
+        //先查商品信息
+        let result = await mysql.select('goods', {
+            where: { id: id, status: 1 }, columns: ['introduce', 'real_price', 'sell_price', "join_xianjing", "effectiv_time",
+                'join_price', 'succ_volume', "leader_price", "join_number", "specs",
+                'repertory', 'pic', 'head_pic']
         });
-        if (specs.length < 1) {
-            result[0].specs = null;
-            return result;
+        if (result.length < 1) {
+            throw new Error("查询商品信息失败");
         } else {
-            result[0].specs = specs;
-            return result;
+            //再查商品规格信息 
+            let specs = await mysql.select('specs', {
+                where: { goods_id: id }, columns: ['id', 'spec', 'price',
+                    'repertory']
+            });
+            if (specs.length < 1) {
+                result[0].specs = null;
+                return result;
+            } else {
+                result[0].specs = specs;
+                return result;
+            }
         }
     }
-}
     //用户查看商品评价
     async  query_goods_evaluate(id) {
         const mysql = this.app.mysql;
