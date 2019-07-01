@@ -31,10 +31,27 @@ module.exports = app => {
     router.get('/zlpt/app/join_goods/query', controller.goods.query_join_goods);
     //查看拼团商品具体详情
     router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
-    //查看用户具体信息
-    router.get('/zlpt/web/user/info', controller.admin.query_user_info);
-    //查询用户收获地址
-    router.get('/zlpt/web/user/address/query', controller.user.query_user_info);
+
+    // //查看用户具体信息
+    // router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+    // //查询用户收获地址
+    // router.get('/zlpt/web/user/address/query', controller.user.query_user_address);
+
+       //用户查看我的收藏
+    // router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
+    // //用户编辑我的收藏
+    // router.post('/zlpt/app/user/collation/query', controller.user.exit_collation);
+    // //用户查看我的购物车
+    // router.get('/zlpt/app/user/trolley/query', controller.user.query_trolley);
+    // //用户编辑购物车
+    // router.post('/zlpt/app/user/trolley/query', controller.user.exit_trolley);
+    // //用户查看我的浏览历史
+    // router.get('/zlpt/app/user/history/query', controller.user.query_history);
+    // //用户查看我的评价
+    // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);
+    // //用户发表评价
+    // router.post('/zlpt/app/user/evaluate/exit', controller.user.exit_evaluate);
+
 
     // //*******************       用户 ***********************/
     // //查看用户列表（按条件检索）
@@ -89,20 +106,7 @@ module.exports = app => {
 
     //用户获得拼团所用金币
 
-    //用户查看我的收藏
-    // router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
-    // //用户编辑我的收藏
-    // router.post('/zlpt/app/user/collation/query', controller.user.exit_collation);
-    // //用户查看我的购物车
-    // router.get('/zlpt/app/user/trolley/query', controller.user.query_trolley);
-    // //用户编辑购物车
-    // router.post('/zlpt/app/user/trolley/query', controller.user.exit_trolley);
-    // //用户查看我的浏览历史
-    // router.get('/zlpt/app/user/history/query', controller.user.query_history);
-    // //用户查看我的评价
-    // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);
-    // //用户发表评价
-    // router.post('/zlpt/app/user/evaluate/exit', controller.user.exit_evaluate);
+ 
     //用户请求购买商品
 
     //用户完成购买商品
