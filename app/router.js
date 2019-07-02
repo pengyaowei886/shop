@@ -37,10 +37,10 @@ module.exports = app => {
     // //查询用户收获地址
     // router.get('/zlpt/web/user/address/query', controller.user.query_user_address);
 
-       //用户查看我的收藏
-    // router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
-    // //用户编辑我的收藏
-    // router.post('/zlpt/app/user/collation/query', controller.user.exit_collation);
+    // 用户查看我的收藏
+    router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
+    //用户编辑我的收藏
+    router.post('/zlpt/app/user/collation/edit', controller.user.edit_collation);
     // //用户查看我的购物车
     // router.get('/zlpt/app/user/trolley/query', controller.user.query_trolley);
     // //用户编辑购物车

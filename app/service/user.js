@@ -145,13 +145,12 @@ class UserService extends Service {
         }
     }
     //用户编辑收藏
-    async exit_collation() {
+    async edit_collation(action, id, uid) {
         const mysql = this.app.mysql;
         let return_data = {};
         if (action == "insert") {
-
             let result = await mysql.insert('collation', {
-                'goods_id': params.goods_id, "status": 1, ctime: new Date()
+                'goods_id': id, "uid": uid, "status": 1, ctime: new Date()
             })
             if (result.affectedRows === 1) {
 
@@ -163,9 +162,9 @@ class UserService extends Service {
         }
         if (action == "delete") {
             let rows = {
-                'id': params.id
+                'id': id
             }
-            let result = await mysql.delete('goods', rows);
+            let result = await mysql.delete('collation', rows);
             if (result.affectedRows === params.id.length) {
                 return return_data;
             } else {
@@ -174,13 +173,14 @@ class UserService extends Service {
         }
     }
     //用户查看收藏列表 
-    async query_collation() {
+    async query_collation(uid) {
         let handerThis = this;
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
-
-        let sql = "select g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g left join collation c on g.goods_id = c.goods_id ";
-
+        let args = [];
+        let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g right join collation c on "
+            + " g.id = c.goods_id and c.status=1 and c.uid= ?";
+        args.push(uid);
         let result = await mysql.query(sql, args);
         if (result.length >= 1) {
             return result;
