@@ -145,12 +145,12 @@ class UserService extends Service {
         }
     }
     //用户编辑收藏
-    async edit_collation(action, id, uid) {
+    async edit_collation(action, id, kind, uid) {
         const mysql = this.app.mysql;
         let return_data = {};
         if (action == "insert") {
             let result = await mysql.insert('collation', {
-                'goods_id': id, "uid": uid, "status": 1, ctime: new Date()
+                'goods_id': id, "uid": uid, "status": 1, ctime: new Date(), kind: kind
             })
             if (result.affectedRows === 1) {
 
@@ -173,20 +173,34 @@ class UserService extends Service {
         }
     }
     //用户查看收藏列表 
-    async query_collation(uid) {
+    async query_collation(uid, kind) {
         let handerThis = this;
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
         let args = [];
-        let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g right join collation c on "
-            + " g.id = c.goods_id and c.status=1 and c.uid= ?";
-        args.push(uid);
-        let result = await mysql.query(sql, args);
-        if (result.length >= 1) {
+
+        if (kind == 1) { //普通商品
+
+            let result= await mysql.select('collation',{where:{kind:kind}});
+            
+            let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g right join collation c on "
+                + " g.id = c.goods_id and c.status=1 and c.uid= ?";
+            args.push(uid);
+            let result = await mysql.query(sql, args);
+
             return result;
         } else {
-            throw new Error("空数据");
+            let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from join_goods g right join collation c on "
+                + " g.id = c.goods_id and c.status=1 and c.uid= ?";
+            args.push(uid);
+            let result = await mysql.query(sql, args);
+            if (result.length >= 1) {
+                return result;
+            } else {
+                throw new Error("空数据");
+            }
         }
+
     }
 }
 module.exports = UserService;

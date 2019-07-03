@@ -7,31 +7,33 @@ class Goodsservice extends Service {
 
 
 
-    //用户查询商品列表
-    async query_goods(limit, skip, name, class_class) {
-        const mysql = this.app.mysql;
-        let sql = "select id,pic,head_pic,sell_price,real_price,introduce,repertory from goods where kind =1 and  status =1  ";
-        if (name) {
-            if (class_class) {
-                sql += " and class = " + mysql.escape(class_class) + "introduce like " +
-                    mysql.escape("%" + name + "%") + " order by  ctime  desc  limit ?  offset ? ";
-            } else {
-                sql += " and introduce like " +
-                    mysql.escape("%" + name + "%") + " order by ctime  desc  limit ?  offset ? ";
-            }
+  // 用户查询商品列表
+  async query_goods(limit, skip, name, class_class) {
+    const mysql = this.app.mysql;
+    //先查商品基本属性
+    let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id "+
+    " where g.status=1 and s.is_default=1 ";
+    if (name) {
+        if (class_class) {
+            sql += " and g.class = " + mysql.escape(class_class) + " and g.introduce like " +
+                mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
         } else {
-            if (class_class) {
-                sql += " and class =  " + mysql.escape(class_class) + "  order by ctime  desc   limit ?  offset ? ";
-            }
+            sql += " and g.introduce like " +
+                mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
         }
-        let args = [limit, skip];
-        let result = await mysql.query(sql, args);
-        if (result.length >= 1) {
-            return result;
-        } else {
-            throw new Error("空数据");
+    } else {
+        if (class_class) {
+            sql += " and g.class = " + mysql.escape(class_class) + " order by g.ctime  desc  limit ?  offset ? ";
         }
     }
+    let args = [limit, skip];
+    let result = await mysql.query(sql, args);
+    if (result.length >= 1) {
+        return result;
+    } else {
+        throw new Error("空数据");
+    }
+}
     //用户查询热卖商品列表
     async query_hot_goods() {
         const mysql = this.app.mysql;
@@ -49,35 +51,36 @@ class Goodsservice extends Service {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', 'real_price', 'sell_price', 'specs_name', 'succ_volume',
-                'repertory', 'pic', 'head_pic']
+            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume']
         });
-        if (result.length < 1) {
+        if (result.length < 0) {
             throw new Error("查询商品信息失败");
         } else {
-            //判断是否多重规格
-            if (result[0].specs_name == null) {
-                result[0].specs = null;
-                return result;
-            } else {
-                //再查商品规格信息 
-                let specs = await mysql.select('specs', {
-                    where: { goods_id: id }, columns: ['id', 'spec', 'price',
-                        'repertory']
-                });
+            //再查商品规格信息
+            let specs = await mysql.select('specs', {
+                where: { goods_id: id }, columns: ["id",'spec', 'sell_price','pic',"repertory"]
+            });
                 result[0].specs = specs;
                 return result;
-
-            }
         }
     }
     //用户查询拼团商品列表
-    async query_join_goods(limit, skip, name) {
+    async query_join_goods(limit, skip, name, is_recommend) {
         const mysql = this.app.mysql;
-        let sql = "select id,head_pic,real_price,join_price,leader_price,join_number,introduce from goods where kind =2 and  status =1  ";
+        let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.succ_volume,g.introduce " +
+            "from join_goods g left join join_specs s  on g.id= s.goods_id and g.status=1 and s.is_default=1 and s.status=1 ";
         if (name) {
-            sql += " and introduce like " +
-                mysql.escape("%" + name + "%") + " order by ctime  desc  limit ?  offset ? ";
+            if (is_recommend) {
+                sql += " and g.introduce like " + mysql.escape("%" + name + "%") + "and g.is_recommend =1" +
+                    " order by g.ctime  desc  limit ?  offset ? ";
+            } else {
+                sql += " and g.introduce like " +
+                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+            }
+        }else{
+            if (is_recommend) {
+                sql +=  "and g.is_recommend =1  order by g.ctime  desc  limit ?  offset ? ";
+            } 
         }
         let args = [limit, skip];
         let result = await mysql.query(sql, args);
@@ -91,17 +94,17 @@ class Goodsservice extends Service {
     async query_join_goods_info(id) {
         const mysql = this.app.mysql;
         //先查商品信息
-        let result = await mysql.select('goods', {
-            where: { id: id, status: 1 }, columns: ['introduce', 'real_price', 'sell_price', "join_xianjing", "effectiv_time",
-                'join_price', 'succ_volume', "leader_price", "join_number", "specs",
+        let result = await mysql.select('join_goods', {
+            where: { id: id, status: 1 }, columns: ['introduce',"effectiv_time","join_xianjin",
+                'succ_volume', "specs_name",
                 'repertory', 'pic', 'head_pic']
         });
         if (result.length < 1) {
             throw new Error("查询商品信息失败");
         } else {
             //再查商品规格信息 
-            let specs = await mysql.select('specs', {
-                where: { goods_id: id }, columns: ['id', 'spec', 'price',
+            let specs = await mysql.select('join_specs', {
+                where: { goods_id: id ,status:1 }, columns: ['id', 'spec', 'join_price',"join_number","leader_price",
                     'repertory']
             });
             if (specs.length < 1) {

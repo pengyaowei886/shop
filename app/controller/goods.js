@@ -114,6 +114,9 @@ class GoodsController extends Controller {
                 },
                 limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
+                },
+                is_recommend: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: false, allowEmpty: false
                 }
             }, ctx.query);
         } catch (e) {
@@ -131,7 +134,7 @@ class GoodsController extends Controller {
             const { ctx, service } = handerThis;
             let skip = Number(ctx.query.skip);
             let limit = Number(ctx.query.limit);
-            let data = await service.goods.query_join_goods(limit, skip, ctx.query.name);
+            let data = await service.goods.query_join_goods(limit, skip, ctx.query.name,ctx.query.is_recommend);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
