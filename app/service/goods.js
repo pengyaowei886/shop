@@ -7,33 +7,33 @@ class Goodsservice extends Service {
 
 
 
-  // 用户查询商品列表
-  async query_goods(limit, skip, name, class_class) {
-    const mysql = this.app.mysql;
-    //先查商品基本属性
-    let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id "+
-    " where g.status=1 and s.is_default=1 ";
-    if (name) {
-        if (class_class) {
-            sql += " and g.class = " + mysql.escape(class_class) + " and g.introduce like " +
-                mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+    // 用户查询商品列表
+    async query_goods(limit, skip, name, class_class) {
+        const mysql = this.app.mysql;
+        //先查商品基本属性
+        let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id " +
+            " where g.status=1 and s.is_default=1 ";
+        if (name) {
+            if (class_class) {
+                sql += " and g.class = " + mysql.escape(class_class) + " and g.introduce like " +
+                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+            } else {
+                sql += " and g.introduce like " +
+                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+            }
         } else {
-            sql += " and g.introduce like " +
-                mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+            if (class_class) {
+                sql += " and g.class = " + mysql.escape(class_class) + " order by g.ctime  desc  limit ?  offset ? ";
+            }
         }
-    } else {
-        if (class_class) {
-            sql += " and g.class = " + mysql.escape(class_class) + " order by g.ctime  desc  limit ?  offset ? ";
+        let args = [limit, skip];
+        let result = await mysql.query(sql, args);
+        if (result.length >= 1) {
+            return result;
+        } else {
+            throw new Error("空数据");
         }
     }
-    let args = [limit, skip];
-    let result = await mysql.query(sql, args);
-    if (result.length >= 1) {
-        return result;
-    } else {
-        throw new Error("空数据");
-    }
-}
     //用户查询热卖商品列表
     async query_hot_goods() {
         const mysql = this.app.mysql;
@@ -50,25 +50,36 @@ class Goodsservice extends Service {
     async query_goods_info(id) {
         const mysql = this.app.mysql;
         //先查商品信息
+       
         let result = await mysql.select('goods', {
             where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume']
         });
-        if (result.length < 0) {
-            throw new Error("查询商品信息失败");
-        } else {
+        
+        if (result.length >0) {
             //再查商品规格信息
             let specs = await mysql.select('specs', {
-                where: { goods_id: id }, columns: ["id",'spec', 'sell_price','pic',"repertory"]
+                where: { goods_id: id }, columns: ["id", 'spec', 'sell_price', 'pic', "repertory"]
             });
-                result[0].specs = specs;
-                return result;
+            // 再查收藏记录
+            let collation = await mysql.select('collation', {
+                where: { goods_id: id, kind: 1 }, columns: ["id"]
+            });
+            if (collation.length >= 1) { //已经收藏过
+                result[0].collation = 1;
+            } else {
+                result[0].collation = 0;
+            }
+            result[0].specs = specs;
+            return result;
+        }else{
+            throw new Error("没有这个商品ID");
         }
     }
     //用户查询拼团商品列表
     async query_join_goods(limit, skip, name, is_recommend) {
         const mysql = this.app.mysql;
         let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.succ_volume,g.introduce " +
-            "from join_goods g left join join_specs s  on g.id= s.goods_id and g.status=1 and s.is_default=1 and s.status=1 ";
+            "from join_goods g left join join_specs s  on g.id= s.goods_id  and g.status=1 and s.is_default=1 and s.status=1 ";
         if (name) {
             if (is_recommend) {
                 sql += " and g.introduce like " + mysql.escape("%" + name + "%") + "and g.is_recommend =1" +
@@ -77,10 +88,10 @@ class Goodsservice extends Service {
                 sql += " and g.introduce like " +
                     mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
             }
-        }else{
+        } else {
             if (is_recommend) {
-                sql +=  "and g.is_recommend =1  order by g.ctime  desc  limit ?  offset ? ";
-            } 
+                sql += "and g.is_recommend =1  order by g.ctime  desc  limit ?  offset ? ";
+            }
         }
         let args = [limit, skip];
         let result = await mysql.query(sql, args);
@@ -95,7 +106,7 @@ class Goodsservice extends Service {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('join_goods', {
-            where: { id: id, status: 1 }, columns: ['introduce',"effectiv_time","join_xianjin",
+            where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin",
                 'succ_volume', "specs_name",
                 'repertory', 'pic', 'head_pic']
         });
@@ -104,16 +115,19 @@ class Goodsservice extends Service {
         } else {
             //再查商品规格信息 
             let specs = await mysql.select('join_specs', {
-                where: { goods_id: id ,status:1 }, columns: ['id', 'spec', 'join_price',"join_number","leader_price",
+                where: { goods_id: id, status: 1 }, columns: ['id', 'spec', 'join_price', "join_number", "leader_price",
                     'repertory']
             });
-            if (specs.length < 1) {
-                result[0].specs = null;
-                return result;
+            let collation = await mysql.select('collation', {
+                where: { goods_id: id, kind: 2 }, columns: ["id"]
+            });
+            if (collation.length >= 1) { //已经收藏过
+                result[0].collation = 1;
             } else {
-                result[0].specs = specs;
-                return result;
+                result[0].collation = 0;
             }
+            result[0].specs = specs;
+            return result;
         }
     }
     //用户查看商品评价
