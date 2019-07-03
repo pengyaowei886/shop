@@ -145,24 +145,30 @@ class UserService extends Service {
         }
     }
     //用户编辑收藏
-    async edit_collation(action, id, kind, uid) {
+    async edit_collation(action, params) {
         const mysql = this.app.mysql;
         let return_data = {};
         if (action == "insert") {
-            let result = await mysql.insert('collation', {
-                'goods_id': id, "uid": uid, "status": 1, ctime: new Date(), kind: kind
+            let is_exist = await mysql.select('collation', {
+                where: { uid: params.uid, goods_id: params.id ,kind:params.kind}
             })
-            if (result.affectedRows === 1) {
-
-                return return_data;
-
+            if (is_exist.length >= 1) {
+                throw new Error("重复收藏");
             } else {
-                throw new Error("增加失败");
+                let result = await mysql.insert('collation', {
+                    'goods_id': params.id, "uid": params.uid, "status": 1, ctime: new Date(), kind: params.kind
+                })
+                if (result.affectedRows === 1) {
+                    return return_data;
+
+                } else {
+                    throw new Error("增加失败");
+                }
             }
         }
         if (action == "delete") {
             let rows = {
-                'id': id
+                'id': params.id
             }
             let result = await mysql.delete('collation', rows);
             if (result.affectedRows === params.id.length) {
@@ -181,24 +187,20 @@ class UserService extends Service {
 
         if (kind == 1) { //普通商品
 
-            let result= await mysql.select('collation',{where:{kind:kind}});
-            
-            let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from goods g right join collation c on "
-                + " g.id = c.goods_id and c.status=1 and c.uid= ?";
+            let sql = "select c.id, g.id,g.head_pic,g.introduce ,s.sell_price,g.status from  collation c left join goods g on "
+                + " g.id = c.goods_id  left join specs s on s.goods_id = c.goods_id    where   c.uid= ? and  c.kind=1 and  s.is_default=1";
+
             args.push(uid);
             let result = await mysql.query(sql, args);
 
             return result;
         } else {
-            let sql = "select c.id, g.id,g.head_pic,g.sell_price,g.introduce,g.status from join_goods g right join collation c on "
-                + " g.id = c.goods_id and c.status=1 and c.uid= ?";
+            let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.introduce,g.status from collation c  left join " +
+                "join_goods g  on g.id= c.goods_id  left join join_specs s on c.goods_id=s.goods_id where  c.uid= ? and  c.kind=2  and  s.is_default=1 ";
             args.push(uid);
             let result = await mysql.query(sql, args);
-            if (result.length >= 1) {
-                return result;
-            } else {
-                throw new Error("空数据");
-            }
+            return result;
+
         }
 
     }

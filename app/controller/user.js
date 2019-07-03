@@ -161,6 +161,9 @@ class UserController extends Controller {
     ctx.validate({
       uid: {//字符串 必填 不允许为空字符串 
         type: 'string', required: true, allowEmpty: false
+      },
+      kind: {//字符串 必填 不允许为空字符串 
+        type: 'string', required: true, allowEmpty: false
       }
     }, ctx.request.query);
   } catch (e) {
@@ -177,7 +180,8 @@ class UserController extends Controller {
       let handerThis = this;
       const { ctx, service } = handerThis;
       let uid =  Number(ctx.query.uid);
-      let data = await service.user.query_collation(uid);
+      let kind =  Number(ctx.query.kind);
+      let data = await service.user.query_collation(uid,kind);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);
@@ -194,12 +198,9 @@ class UserController extends Controller {
             action: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                 type: 'string', required: true, allowEmpty: false
             },
-            id:{
-                type: 'int', required: true, allowEmpty: false
-            },
-            uid:{
-              type: 'int', required: true, allowEmpty: false
-          }
+            params:{
+                type: 'object', required: true, allowEmpty: false
+            }
         }, ctx.request.body);
     } catch (e) {
         ctx.logger.warn(e);
@@ -214,9 +215,8 @@ class UserController extends Controller {
         let handerThis = this;
         const { ctx, service } = handerThis;
         let action = this.ctx.request.body.action;
-        let id = this.ctx.request.body.id;
-        let uid = this.ctx.request.body.uid;
-        let data = await service.user.edit_collation(action, id, uid);
+        let params = this.ctx.request.body.params;
+        let data = await service.user.edit_collation(action,params);
         return handerThis.succ(data);
     } catch (error) {
         return handerThis.error('HANDLE_ERROR', error['message']);
