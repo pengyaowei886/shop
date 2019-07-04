@@ -37,8 +37,8 @@ class Goodsservice extends Service {
     //用户查询热卖商品列表
     async query_hot_goods() {
         const mysql = this.app.mysql;
-        let sql = "select id,pic,head_pic,real_price,sell_price,introduce,succ_volume from goods" +
-            " where is_recommend=1 and  status =1 ";
+        let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id " +
+        " where g.status=1 and s.is_default=1 and is_recommend=1"
         let result = await mysql.query(sql);
         if (result.length >= 1) {
             return result;
