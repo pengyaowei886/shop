@@ -1,51 +1,59 @@
 const Service = require('egg').Service;
 class TrolleyService extends Service {
 
-    //查询分类列表
-    async query_trolley() {
-        const mysql = this.app.mysql;
-        let result = await mysql.select('class', { where: { status: 1 }, columns: ['id', 'name', 'ctime'] });
-        if (result.length >= 1) {
-            return result;
-        } else {
-            throw new Error("空数据");
-        }
+    //查询购物车
+    async query_trolley(uid) {
+
+        const redis = this.app.redis.get('trolley');
+        
+    
+        let result = await redis.hgetall(`trolley:${uid}`);
+        console.log(result);
+        // for(let i in result){
+        //     console.log("iiiiii"+i);
+        //    for(let j in result[i]){
+        //        console.log(j);
+        //        console.log(result[i][j]);
+        //    }
+        // }
+        return result;
     }
-    //编辑分类
-    async edit_trolley(action, params, admin) {
-        const mysql = this.app.mysql;
+    //编辑购物车
+    async edit_trolley(action, goods_id, spec_id, uid, params) {
+        const redis = this.app.redis.get('trolley');
         let return_data = {};
         if (action == "insert") {
-
-            let result = await mysql.insert('goods', {
-                'name': params.name, 'ctime': new Date(), utime: null, handler: admin.name
-            })
-            if (result.affectedRows === 1) {
-                return return_data;
-
+            //set 集合中存入hash键
+            let is_exist = await redis.hget(`trolley:${uid}`, `${goods_id}:${spec_id}`);
+            //购物车如果存在，数量+1；
+            if (is_exist) {
+                let arr = is_exist.split(";")
+                let append = Number( arr[4] )+ 1;
+                let str = "";
+                for (let i = 0; i < 4; i++) {
+                    str += arr[i] + ";";
+                }
+                str += append;
+                await redis.hmset(`trolley:${uid}`, `${goods_id}:${spec_id}`, str);
+                
             } else {
-                throw new Error("增加失败");
+                //不存在
+                await redis.hmset(`trolley:${uid}`, `${goods_id}:${spec_id}`,params+";1");
             }
+            return return_data;
         }
-        if (action == "update") {
-            let rows = {
-                'id': params.id, 'name': params.name, utime: new Date(), handler: admin.name
-            }
-            let result = await mysql.update('class', rows);
-            if (result.affectedRows === 1) {
-                return return_data;
+        if (action == "delete") {
+            let is_exist = await redis.hget(`trolley:${uid}`, `${goods_id}:${spec_id}`);
+            console.log(is_exist);
+            //购物车如果存在；
+            if (is_exist) {
+                let result = await redis.hdel(`trolley:${uid}`, `${goods_id}:${spec_id}`);
+                console.log(result);
             } else {
-                throw new Error("编辑失败");
+                //不存在
+                throw new Error("被删除的商品不存在");
             }
-        }
-        if (action == "update") {
-            let rows = { id: params.id, status: 0, utime: new Date(), handler: admin.name }
-            let result = await mysql.update('goods', rows);
-            if (result.affectedRows === 1) {
-                return return_data;
-            } else {
-                throw new Error("下架失败");
-            }
+            return return_data;
         }
     }
 }

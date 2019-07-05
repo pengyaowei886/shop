@@ -40,7 +40,7 @@ module.exports = appInfo => {
         password: 'zlpt123456',
         db: 0,
       },
-      admin: {
+      trolley: { //购物车
         host: '129.28.167.17',
         port: '6379',
         password: 'zlpt123456',

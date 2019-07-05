@@ -41,10 +41,10 @@ module.exports = app => {
     router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
     //用户编辑我的收藏
     router.post('/zlpt/app/user/collation/edit', controller.user.edit_collation);
-    // //用户查看我的购物车
-    // router.get('/zlpt/app/user/trolley/query', controller.user.query_trolley);
-    // //用户编辑购物车
-    // router.post('/zlpt/app/user/trolley/query', controller.user.exit_trolley);
+    //用户查看我的购物车
+    router.get('/zlpt/app/user/trolley/query', controller.trolley.query_trolley);
+    //用户编辑购物车
+    router.post('/zlpt/app/user/trolley/edit', controller.trolley.edit_trolley);
     // //用户查看我的浏览历史
     // router.get('/zlpt/app/user/history/query', controller.user.query_history);
     // //用户查看我的评价
