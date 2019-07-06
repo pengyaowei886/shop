@@ -52,7 +52,7 @@ class Goodsservice extends Service {
         //先查商品信息
        
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume']
+            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume',"details","video","goods_rotate"]
         });
         
         if (result.length >0) {
@@ -106,9 +106,9 @@ class Goodsservice extends Service {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('join_goods', {
-            where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin",
+            where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin","details","video","goods_rotate",
                 'succ_volume', "specs_name",
-                'repertory', 'pic', 'head_pic']
+                'repertory', 'pic', 'head_pic','good_romate']
         });
         if (result.length < 1) {
             throw new Error("查询商品信息失败");

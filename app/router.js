@@ -32,10 +32,10 @@ module.exports = app => {
     //查看拼团商品具体详情
     router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
 
-    // //查看用户具体信息
-    // router.get('/zlpt/web/user/info', controller.admin.query_user_info);
-    // //查询用户收获地址
-    // router.get('/zlpt/web/user/address/query', controller.user.query_user_address);
+    //查看用户具体信息
+    router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+    //查询用户收获地址
+    router.get('/zlpt/app/user/address/query', controller.address.query_address);
 
     // 用户查看我的收藏
     router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
@@ -47,30 +47,17 @@ module.exports = app => {
     router.post('/zlpt/app/user/trolley/edit', controller.trolley.edit_trolley);
     //用户查看我的浏览历史
     router.get('/zlpt/app/user/history/query', controller.user.query_history);
+     //用户编辑我的浏览历史
+    router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
     // //用户查看我的评价
     // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);
     // //用户发表评价
-    // router.post('/zlpt/app/user/evaluate/exit', controller.user.exit_evaluate);
+    // router.post('/zlpt/app/user/evaluate/exit', controller.user.edit_evaluate);
 
 
-    // //*******************       用户 ***********************/
-    // //查看用户列表（按条件检索）
-    // router.get('/zlpt/web/user/query', controller.admin.query_user);
- 
-    // //编辑用户
-    // router.post('/zlpt/web/user/edit', controller.admin.user_info_edit);
 
 
-    // //*******************       收获地址 ***********************/
-
-    // //编辑用户收获地址
-    // router.post('/zlpt/web/user/address/edit', controller.user.user_info_edit);
-
-
-    //*******************       商品分类 ***********************/
-
-    // //编辑分类
-    // router.get('/zlpt/app/class/exit', controller.class.exit_class);
+   
 
 
     //*******************       拼团商品订单 ***********************/
@@ -79,26 +66,6 @@ module.exports = app => {
     //*******************       商城商品订单 ***********************/
 
 
-
-
-
-
-
-    //用户api****************************用户api
-    /*******************       登陆和注册 ***********************/
-
-    // //用户完成注册（并验证短信验证码）
-    // router.post('/zlpt/app/user/register', controller.user.register);
-    // //用户登陆
-    // router.get('/zlpt/app/user/login', controller.user.login);
-    // //用户查看个人基本信息
-    // router.get('/zlpt/app/user/info', controller.user.query_user_info);
-    // //用户查看商品列表
-    // router.get('/zlpt/app/user/goods/info', controller.user.user_query_goods_info);
-    // //用户查看商品具体详情
-    // router.get('/zlpt/app/user/goods/info', controller.user.user_query_goods_info);
-
-    //用户查看拼团商品具体详情
 
     //用户发起拼团
 

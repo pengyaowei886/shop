@@ -135,7 +135,7 @@ class UserService extends Service {
     async query_rotate_map(kind) {
         const mysql = this.app.mysql;
         let result = await mysql.select('rotate_map', {
-            where: { status: 1,kind:kind }, columns: ['id', 'url', 'pic'],
+            where: { status: 1, kind: kind }, columns: ['id', 'url', 'pic'],
             orders: [['ctime', 'desc']]
         });
         if (result.length >= 1) {
@@ -150,7 +150,7 @@ class UserService extends Service {
         let return_data = {};
         if (action == "insert") {
             let is_exist = await mysql.select('collation', {
-                where: { uid: params.uid, goods_id: params.id ,kind:params.kind}
+                where: { uid: params.uid, goods_id: params.id, kind: params.kind }
             })
             if (is_exist.length >= 1) {
                 throw new Error("重复收藏");
@@ -203,6 +203,83 @@ class UserService extends Service {
 
         }
 
+    }
+    //用户查看浏览历史
+    async query_history(uid, kind) {
+        let handerThis = this;
+        const { ctx, app } = handerThis;
+        const mysql = this.app.mysql;
+        const redis = this.app.redis.get('history');
+
+        if (kind == 1) { //普通商品
+
+            let goods_id = await redis.lrange(`history:goods:${uid}`, 0, -1);
+            let result = await mysql.select('goods', { where: { id: goods_id }, columns: ['id', 'introduce', 'head_pic'] });
+            let price = await mysql.select('specs', { where: { goods_id: goods_id, is_default: 1 }, columns: ['goods_id', 'sell_price'] });
+            for (let i in result) {
+                for (let j in price) {
+                    if (result[i].id == price[j].goods_id) {
+                        result[i].sell_price = price[j].sell_price;
+                        break;
+                    }
+                }
+            }
+            return result;
+        } else {
+            let goods_id = await redis.lrange(`history:join_goods:${uid}`, 0, -1);
+            let result = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['id', 'introduce', 'head_pic'] });
+            let price = await mysql.select('join_specs', { where: { goods_id: goods_id, is_default: 1 }, columns: ['goods_id' ,'leader_price','join_number','join_price'] });
+            for (let i in result) {
+                for (let j in price) {
+                    if (result[i].id == price[j].goods_id) {
+                        result[i].join_number = price[j].join_number;
+                        result[i].leader_price = price[j].leader_price;
+                        result[i].join_price = price[j].join_price;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+    }
+    //编辑浏览记录
+    async edit_history(uid, goods_id, kind) {
+        const redis = this.app.redis.get('history');
+        let return_data = {};
+        let goods_type;
+        if (kind == 1) {
+            goods_type = "goods"
+        }
+        if (kind == 2) {
+            goods_type = "join_goods"
+        }
+        //先查链表长度
+        let length = await redis.llen(`history:${goods_type}:${uid}`);
+        //头元素
+        let head = await redis.lindex(`history:${goods_type}:${uid}`, 0);
+        if (head == goods_id) {
+            return return_data;
+        } else {
+            if (length < 30) {
+                //插入头部
+                await redis.lpush(`history:${goods_type}:${uid}`, goods_id);
+                return return_data;
+            } else {
+                //最早的记录出栈
+                await redis.rpop(`history:${goods_type}:${uid}`);
+                //最新记录进栈
+                await redis.lpush(`history:${goods_type}:${uid}`, goods_id);
+                return return_data;
+            }
+        }
+    }
+    //查询用户基本信息
+    async query_user_info(uid){
+        const mysql = this.app.mysql;
+        let result= await mysql.select('user',{
+            where:{id:id},columns:['head_pic','']
+        })
+        return result;
     }
 }
 module.exports = UserService;

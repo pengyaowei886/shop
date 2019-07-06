@@ -44,11 +44,9 @@ class TrolleyService extends Service {
         }
         if (action == "delete") {
             let is_exist = await redis.hget(`trolley:${uid}`, `${goods_id}:${spec_id}`);
-            console.log(is_exist);
             //购物车如果存在；
             if (is_exist) {
-                let result = await redis.hdel(`trolley:${uid}`, `${goods_id}:${spec_id}`);
-                console.log(result);
+                 await redis.hdel(`trolley:${uid}`, `${goods_id}:${spec_id}`);
             } else {
                 //不存在
                 throw new Error("被删除的商品不存在");
