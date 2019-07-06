@@ -222,5 +222,12 @@ class UserController extends Controller {
         return handerThis.error('HANDLE_ERROR', error['message']);
     }
   }
+  //用户查看浏览历史
+async query_history(){
+  
+}
+
+  //用户编辑历史
+
 }
 module.exports = UserController;

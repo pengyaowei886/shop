@@ -78,7 +78,7 @@ module.exports = appInfo => {
                 password: 'zlpt123456',
                 db: 1,
             },
-            boss: {
+            history: {
                 host: '129.28.167.17',
                 port: '6379',
                 password: 'zlpt123456',
