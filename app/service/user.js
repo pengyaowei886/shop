@@ -132,10 +132,10 @@ class UserService extends Service {
         await mysql.insert('user', { openid: open_id, data: data });
     }
     //查询轮播图
-    async query_rotate_map() {
+    async query_rotate_map(kind) {
         const mysql = this.app.mysql;
         let result = await mysql.select('rotate_map', {
-            where: { status: 1 }, columns: ['id', 'url', 'pic'],
+            where: { status: 1,kind:kind }, columns: ['id', 'url', 'pic'],
             orders: [['ctime', 'desc']]
         });
         if (result.length >= 1) {
