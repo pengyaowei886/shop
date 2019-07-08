@@ -32,8 +32,8 @@ module.exports = app => {
     //查看拼团商品具体详情
     router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
 
-    //查看用户具体信息
-    router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+    // //查看用户具体信息
+    // router.get('/zlpt/web/user/info', controller.admin.query_user_info);
     //查询用户收获地址
     router.get('/zlpt/app/user/address/query', controller.address.query_address);
 
@@ -50,8 +50,8 @@ module.exports = app => {
      //用户编辑我的浏览历史
     router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
 
-    //用户发起拼团
-    router.post('/zlpt/app/user/team/start', controller.t);
+    // //用户发起拼团
+    // router.post('/zlpt/app/user/team/start', controller.team);
     //用户确认拼团
 
     //用户支付拼团
@@ -61,6 +61,10 @@ module.exports = app => {
     //用户为自己的团支付剩余余额
 
     //用户查询拼团列表
+
+    //用户查询我的拼团
+
+
 
 
     // //用户查看我的评价
