@@ -49,6 +49,20 @@ module.exports = app => {
     router.get('/zlpt/app/user/history/query', controller.user.query_history);
      //用户编辑我的浏览历史
     router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
+
+    //用户发起拼团
+    router.post('/zlpt/app/user/team/start', controller.t);
+    //用户确认拼团
+
+    //用户支付拼团
+
+    //用户参加拼团
+
+    //用户为自己的团支付剩余余额
+
+    //用户查询拼团列表
+
+
     // //用户查看我的评价
     // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);
     // //用户发表评价

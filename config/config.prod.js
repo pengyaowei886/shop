@@ -89,7 +89,11 @@ module.exports = appInfo => {
     config.cluster = {
         listen: {
             port: 7001,
-            hostname: '172.30.0.2'
+            hostname: '172.30.0.2',
+            https:{
+                key:"C:/soft/workface/https/https.key",
+                cert:"C:/soft/workface/https/https.pem"
+            }
         },
 
     };
@@ -99,7 +103,7 @@ module.exports = appInfo => {
         // myAppName: 'egg',
         appid: "", //appid
         appsecret: "" ,
-        web:"http://129.28.167.17:7001/"//秘钥
+        web:"https://caoxianyoushun:7001/"//秘钥
      } 
     return {
         ...config,

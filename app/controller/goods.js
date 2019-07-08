@@ -174,6 +174,8 @@ class GoodsController extends Controller {
             return handerThis.error('HANDLE_ERROR', error['message']);
         }
     }
+
+    
     
 }
 module.exports = GoodsController;
