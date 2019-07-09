@@ -86,17 +86,17 @@ module.exports = appInfo => {
             }
         }
     }
-    config.cluster = {
-        listen: {
-            port: 443,
-            hostname: '172.30.0.2',
-            https:{
-                key:"C:/soft/workface/https/https.key",
-                cert:"C:/soft/workface/https/https.pem"
-            }
-        },
+    // config.cluster = {
+    //     listen: {
+    //         port: 443,
+    //         hostname: '172.30.0.2',
+    //         https:{
+    //             key:"C:/soft/workface/https/https.key",
+    //             cert:"C:/soft/workface/https/https.pem"
+    //         }
+    //     },
 
-    };
+    // };
     // add your user config here
     // add your user config here
     userConfig.info= {
