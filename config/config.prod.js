@@ -88,7 +88,7 @@ module.exports = appInfo => {
     }
     config.cluster = {
         listen: {
-            port: 7001,
+            port: 443,
             hostname: '172.30.0.2',
             https:{
                 key:"C:/soft/workface/https/https.key",
@@ -101,9 +101,10 @@ module.exports = appInfo => {
     // add your user config here
     userConfig.info= {
         // myAppName: 'egg',
-        appid: "", //appid
-        appsecret: "" ,
-        web:"https://caoxianyoushun:7001/"//秘钥
+        appid: "wxd83411d563dc2ac9", //appid
+        appsecret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
+        mch_id:"1543200511",//商户号
+        web:"https://caoxianyoushun.cn:7001/"//
      } 
     return {
         ...config,
