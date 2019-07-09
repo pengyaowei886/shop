@@ -16,7 +16,7 @@ class TeamService extends Service {
             data.join_price = repertory[0].join_price;
             data.join_xianjin = repertory[0].join_xianjin;
             data.introduce = goods_info[0].introduce;
-            data.head_pic = oods_info[0].head_pic;
+            data.head_pic = goods_info[0].head_pic;
             data.address = address;
             return data;
         } else {

@@ -87,10 +87,15 @@ module.exports = appInfo => {
   };
   config.info = {
     // myAppName: 'egg',
-    appid: "", //appid
-    appsecret: "", //秘钥
-    key: "9vApxLk5G3PAsJrM",//16位 对称公钥
-    iv: "FnJL7EDzjqWjcaY9" //偏移量
+      // myAppName: 'egg',
+      appid: "wxd83411d563dc2ac9", //appid
+      secret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
+      mch_id:"1543200511",//商户号
+      web:"https://caoxianyoushun.cn:8443/",
+      openid:"oKvMN5Ef0LijcwlVkiLEOtv4urfg",
+      business_secret:"FZ6gDEhUDOYQHtp4UtL2ksV4q0N7auNh",//商户支付密钥
+     key: "9vApxLk5G3PAsJrM",//16位 对称公钥
+     iv: "FnJL7EDzjqWjcaY9" //偏移量
   };
   return config;
 };

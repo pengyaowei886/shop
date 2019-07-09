@@ -3,6 +3,7 @@
 const Service = require('egg').Service;
 const crypto = require('crypto');
 
+// const WXBizDataCrypt = require('wxbizdatacrypt');
 class UserService extends Service {
 
     /**
@@ -14,6 +15,7 @@ class UserService extends Service {
     async register(phone, password, param) {
         let handerThis = this;
         const { ctx, app } = handerThis;
+
 
 
         const redis = this.app.redis.get('customer');
@@ -101,11 +103,11 @@ class UserService extends Service {
         let handerThis = this;
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
-        let databack = 0;
+        let databack = {};
         let code = userInfo.code;
         //console.log("code:",code);
-        let appid = app.config.app.game.game_appid;
-        let secret = app.config.app.game.game_appid;
+        let appid = this.app.config.info.appid;
+        let secret = this.app.config.info.secret;
         let r_url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appid + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code";
         let res1 = await ctx.curl(r_url, {
             method: "GET",
@@ -130,6 +132,8 @@ class UserService extends Service {
         let data = pc.decryptData(body.userInfo.encryptedData, body.userInfo.iv);
         //待补充
         await mysql.insert('user', { openid: open_id, data: data });
+
+        return databack;
     }
     //查询轮播图
     async query_rotate_map(kind) {
