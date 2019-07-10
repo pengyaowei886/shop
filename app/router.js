@@ -55,7 +55,7 @@ module.exports = app => {
     //用户确认拼团
 
     //用户支付拼团
-router.post('/zlpt/app/user/team/pay', controller.tools.join_pay);
+router.get('/zlpt/app/user/team/pay', controller.tools.join_pay);
 //支付拼团回调
 
     //用户参加拼团
