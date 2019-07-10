@@ -48,7 +48,7 @@ class ToolsController extends Controller {
         return handerThis.succ(data);
     }
 
-    async join_pay() {
+    async open_team_pay() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
         //参数校验
@@ -78,7 +78,7 @@ class ToolsController extends Controller {
             let code = ctx.request.query.code;
             let money =ctx.request.query.money;
             let ip=ctx.request.header.host;
-            let data = await service.tools.join_pay(code,money,ip);
+            let data = await service.tools.open_team_pay(code,money,ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
