@@ -29,6 +29,8 @@ class TeamService extends Service {
             throw new Error("库存为0");
         }
     }
+
+
     //用户确认开团
     async open_team(money, openid, ip) {
         let huidiao_url = "https://caoxianyoushun.cn:8443/";
@@ -36,47 +38,45 @@ class TeamService extends Service {
         let data = await this.ctx.service.tools.weixin_pay(huidiao_url, body_data, money, openid, ip);
         return data;
     }
-       //开团微信回调
-       async open_team_return(body) {
+    //开团微信回调
+    async open_team_return(body) {
         let reData = xml2js.parseString(body, function (error, res) {
-
             return res;
-             
-         });
-      
-            if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
+        });
+
+        if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
 
 
-                // 支付成功处理
+            // 支付成功处理
 
-                //生成 拼团信息
-                await mysql.insert('join_team', {
-                    uid: uid,
-                    order: order, //订单号
-                    goods_id: goods_id,
-                    spec: spec,
-                    gold: result[0].sum_price,//成团需要的积分
-                    now_gold: 0, //现有积分
-                    ctime: new Date(),
-                    status: 0 //成团中
-                });
+            //生成 拼团信息
+            await mysql.insert('join_team', {
+                uid: uid,
+                order: order, //订单号
+                goods_id: goods_id,
+                spec: spec,
+                gold: result[0].sum_price,//成团需要的积分
+                now_gold: 0, //现有积分
+                ctime: new Date(),
+                status: 0 //成团中
+            });
 
-                //生成积分消费记录
-                await mysql.insert('gold_record', {
-                    uid: uid,
-                    num: -gold,//预留
-                    source: 2, //开团消耗
-                    ctime: new Date(),
-                });
-                //扣除开团积分
-                let sql = "update  user set banlance = banlance - ? where id= ?";
-                let args = [gold, uid];
-                mysql.query(sql, args);
-                return true;
-            } else {
-                return false;
-            }
-      
+            //生成积分消费记录
+            await mysql.insert('gold_record', {
+                uid: uid,
+                num: -gold,//预留
+                source: 2, //开团消耗
+                ctime: new Date(),
+            });
+            //扣除开团积分
+            let sql = "update  user set banlance = banlance - ? where id= ?";
+            let args = [gold, uid];
+            mysql.query(sql, args);
+            return true;
+        } else {
+            return false;
+        }
+
 
     }
     //用户参加拼团
@@ -93,11 +93,46 @@ class TeamService extends Service {
             throw new Error('该团已拼成，请选择其他团')
         }
     }
+    //参团支付回调
+    async join_pay_return(body) {
+
+        let reData = xml2js.parseString(body, function (error, res) {
+
+            return res;
+
+        });
+
+        if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
+
+            // 支付成功处理
+
+            //更新 拼团信息
+            let join_sql = "update  join_team set now_gold = now_gold +? where id= ?";
+            let join_args = [gold, join_id];
+            await mysql.query(join_sql, join_args);
+
+            //生成积分消费记录
+            await mysql.insert('gold_record', {
+                uid: uid,
+                num: gold,//预留
+                source: 1, //参团赠送
+                ctime: new Date(),
+            });
+            //增加账号积分
+            let user_sql = "update  user set banlance = banlance + ? where id= ?";
+            let user_args = [user_sql, user_args];
+            mysql.query(sql, args);
+            return true;
+        } else {
+            return false;
+        }
+
+
+    }
 
 
 
 
-  
 
 
 

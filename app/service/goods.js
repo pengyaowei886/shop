@@ -87,9 +87,10 @@ class Goodsservice extends Service {
             sql += "and g.is_recommend =1";
         }
         if (class_class) {
-            sql += "and g.class_class = " + mysql.escape("%" + class_class + "%");
+            sql += "and g.class = " + mysql.escape("%" + class_class + "%");
 
         }
+
         sql += "order by g.ctime  desc  limit ?  offset ? ";
 
 
