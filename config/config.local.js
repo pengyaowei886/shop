@@ -93,7 +93,7 @@ module.exports = appInfo => {
       mch_id:"1543200511",//商户号
       web:"https://caoxianyoushun.cn:8443/",
       openid:"oKvMN5Ef0LijcwlVkiLEOtv4urfg",
-      business_secret:"FZ6gDEhUDOYQHtp4UtL2ksV4q0N7auNh",//商户支付密钥
+      business_secret:"GY32mgLScDLvLmJOfZFz74vmXorfULvr",//商户支付密钥
      key: "9vApxLk5G3PAsJrM",//16位 对称公钥
      iv: "FnJL7EDzjqWjcaY9" //偏移量
   };

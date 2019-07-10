@@ -104,7 +104,7 @@ module.exports = appInfo => {
         appid: "wxd83411d563dc2ac9", //appid
         appsecret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
         mch_id:"1543200511",//商户号
-        business_secret:"FZ6gDEhUDOYQHtp4UtL2ksV4q0N7auNh",
+        business_secret:"GY32mgLScDLvLmJOfZFz74vmXorfULvr",
         web:"https://caoxianyoushun.cn:8443/"//
      } 
     return {

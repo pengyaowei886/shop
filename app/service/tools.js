@@ -85,9 +85,10 @@ class ToolsService extends Service {
         //发起请求，获取微信支付的一些必要信息
         let result = await this.ctx.curl(reqUrl, {
             method: "POST",
-            headers: {
-                'content-type': 'application/xml'
-            },
+            // headers: {
+            //     'content-type': 'application/xml'
+            // },
+            // contentType:"xml",
             data: formData
         })
         xml2js.parseString(result.data, function (error, res) {
