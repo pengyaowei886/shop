@@ -47,7 +47,7 @@ class ToolsController extends Controller {
         let data = { url: url }
         return handerThis.succ(data);
     }
-
+//开团支付
     async open_team_pay() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
@@ -77,7 +77,8 @@ class ToolsController extends Controller {
             const { ctx, service } = handerThis;
             let code = ctx.request.query.code;
             let money =ctx.request.query.money;
-            let ip=ctx.request.header.host;
+            let ip= ctx.request.header.host;
+            console.log(ip);
             let data = await service.tools.open_team_pay(code,money,ip);
             return handerThis.succ(data);
         } catch (error) {
@@ -85,6 +86,20 @@ class ToolsController extends Controller {
             
         }
 
+    }
+    //开团支付成功回调
+    async open_pay_return(){
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        var body = ctx.request.body;
+
+        let data=await service.tools.open_pay_return(body);
+        if(data){
+            var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            ctx.body = message;
+        }else{
+
+        }
     }
     async  join_xianjin(){
 

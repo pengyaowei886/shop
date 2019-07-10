@@ -50,13 +50,13 @@ module.exports = app => {
      //用户编辑我的浏览历史
     router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
 
-    // //用户发起拼团
-    // router.post('/zlpt/app/user/team/start', controller.team);
+    //用户发准备发起拼团
+    router.post('/zlpt/app/user/team/start', controller.team);
     //用户确认拼团
 
     //用户支付拼团
-router.get('/zlpt/app/user/team/pay', controller.tools.open_team_pay);
-//支付拼团回调
+    router.get('/zlpt/app/user/team/pay', controller.tools.open_team_pay);
+    //支付拼团回调
 
     //用户参加拼团
 
@@ -65,6 +65,8 @@ router.get('/zlpt/app/user/team/pay', controller.tools.open_team_pay);
     //用户查询拼团列表
 
     //用户查询我的拼团
+
+    
 
 
 
@@ -97,8 +99,6 @@ router.get('/zlpt/app/user/team/pay', controller.tools.open_team_pay);
     //用户请求购买商品
 
     //用户完成购买商品
-
-    //用户佣金提现
 
     //用户请求退款
 

@@ -4,11 +4,139 @@ const md5 = require('md5');
 const xml2js = require('xml2js');
 class ToolsService extends Service {
 
-    //开团支付
-    async  open_team_pay(code, money, ip) {
+    
+    
+     //微信支付
+     async  weixin_pay(huidiao_url, body_data,money, openid,ip) {
 
 
+        let time = new Date().getTime();	//商户订单号
+        let nonce_str = randomStr(); //随机字符串
+        function createSign(obj) {	//签名算法（把所有的非空的参数，按字典顺序组合起来+key,然后md5加密，再把加密结果都转成大写的即可）
+            let stringA = 'appid=' + obj.appid + '&body=' + obj.body + '&mch_id=' + obj.mch_id + '&nonce_str=' + obj.nonce_str + '&notify_url=' + obj.notify_url + '&openid=' + obj.openid + '&out_trade_no=' + obj.out_trade_no + '&spbill_create_ip=' + obj.spbill_create_ip + '&total_fee=' + obj.total_fee + '&trade_type=' + obj.trade_type;
+            let stringSignTemp = stringA + '&key=' +obj.key;
+            stringSignTemp = md5(stringSignTemp);
+            let signValue = stringSignTemp.toUpperCase();
+            return signValue;
+        }
+        function randomStr() {	//产生一个随机字符串	
+            var str = "";
+            var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
+            for (var i = 1; i <= 32; i++) {
+                var random = Math.floor(Math.random() * arr.length);
+                str += arr[random];
+            }
+
+            return str;
+
+        }
+        let total_fee = Number(money) * 100;
+        let appid = this.app.config.info.appid;	//自己的小程序appid
+        let huidiao_url = huidiao_url;
+        let mch_id = this.app.config.info.mch_id;	//自己的商户号id
+        let body_data = "开团支付";
+        let openid = openid;//openid
+
+        let sign = createSign({	//签名
+            appid: appid,
+            body: body_data,
+            mch_id: mch_id,
+            nonce_str: nonce_str,
+            notify_url: huidiao_url, //回调地址  
+            openid: openid,
+            out_trade_no: time,
+            spbill_create_ip: ip,
+            total_fee: total_fee,
+            key: this.app.config.info.business_secret,
+            trade_type: 'JSAPI'
+        });
+        let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        let formData = `<xml>
+                            <appid>${appid}</appid>
+                            <body>${body_data}</body>
+							<mch_id>${mch_id}</mch_id>
+                            <nonce_str>${nonce_str}</nonce_str>
+                            <notify_url>${huidiao_url}</notify_url>
+                            <openid>${openid}</openid>
+                            <out_trade_no>${time}</out_trade_no>
+							<sign>${sign}</sign>
+                            <spbill_create_ip>${ip}</spbill_create_ip>
+							<total_fee>${total_fee}</total_fee>
+							<trade_type>JSAPI</trade_type>	
+                        </xml>`;
+
+        //发起请求，获取微信支付的一些必要信息
+        let result = await this.ctx.curl(reqUrl, {
+            method: "POST",
+            data: formData
+        })
+        let responseData = {};
+        xml2js.parseString(result.data, function (error, res) {
+            let reData = res.xml;
+            console.log(JSON.stringify(res));
+            if (reData.return_code[0] == 'SUCCESS') {
+                responseData = {
+                    timeStamp: new Date().getTime(),
+                    nonceStr: reData.nonce_str[0],
+                    package: reData.prepay_id[0],
+                    paySign: reData.sign[0]
+                }
+            } else {
+                throw new Error("获取签名失败")
+            }
+        })
+        return responseData;
+    }
+    
+   
+
+
+    //开团微信回调
+    async open_pay_return(body) {
+        let reData = xml2js.parseString(body, function (error, res) {
+
+            return res;
+             
+         });
+      
+            if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
+
+
+                // 支付成功处理
+
+                //生成 拼团信息
+                await mysql.insert('join_team', {
+                    uid: uid,
+                    order: order, //订单号
+                    goods_id: goods_id,
+                    spec: spec,
+                    gold: result[0].sum_price,//成团需要的积分
+                    now_gold: 0, //现有积分
+                    ctime: new Date(),
+                    status: 0 //成团中
+                });
+
+                //生成积分消费记录
+                await mysql.insert('gold_record', {
+                    uid: uid,
+                    num: -gold,//预留
+                    source: 2, //开团消耗
+                    ctime: new Date(),
+                });
+                //扣除开团积分
+                let sql = "update  user set banlance = banlance - ? where id= ?";
+                let args = [gold, uid];
+                mysql.query(sql, args);
+                return true;
+            } else {
+                return false;
+            }
+      
+
+    }
+    //参团支付 
+    async join_team_pay() {
         let time = new Date().getTime();	//商户订单号
         let nonce_str = randomStr(); //随机字符串
         function createSign(obj) {	//签名算法（把所有的非空的参数，按字典顺序组合起来+key,然后md5加密，再把加密结果都转成大写的即可）
@@ -34,7 +162,7 @@ class ToolsService extends Service {
         let appid = this.app.config.info.appid;	//自己的小程序appid
         let huidiao_url = 'https://caoxianyoushun.cn/zlpt/web/admin/query'
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
-        let body_data = "joinspedd";
+        let body_data = " 参团支付";
         let openid = this.app.config.info.openid;//openid
 
         let sign = createSign({	//签名
@@ -87,41 +215,41 @@ class ToolsService extends Service {
         })
         return responseData;
     }
-
-
-    //开团微信回调
-    async open_pay_return() {
-        //支付成功
-        if (true) {
-
-            //生成 拼团信息
-            await mysql.insert('join_team', {
-                uid: uid,
-                order: order,
-                goods_id: goods_id,
-                spec: spec,
-                gold: result[0].sum_price,
-                now_gold: 0,
-                spec_name: repertory[0].spec,
-                ctime: new Date(),
-                status: 0
-            })
-        }else{
-            //支付失败
-         throw new Error('支付失败');
-        }
-
-        //失败  参团的积分退回去
-
-
-
-    }
-    //参团支付 
-    async join_team_pay() {
-
-    }
     //参团支付回调
-    async join_pay_return() {
+    async join_pay_return(body) {
+        
+        let reData = xml2js.parseString(body, function (error, res) {
+
+           return res;
+            
+        });
+     
+            if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
+
+
+                // 支付成功处理
+
+                //更新 拼团信息
+                let join_sql = "update  join_team set now_gold = now_gold +? where id= ?";
+                let join_args = [gold, join_id];
+                await mysql.query(join_sql, join_args);
+
+                //生成积分消费记录
+                await mysql.insert('gold_record', {
+                    uid: uid,
+                    num: gold,//预留
+                    source: 1, //参团赠送
+                    ctime: new Date(),
+                });
+                //增加账号积分
+                let user_sql = "update  user set banlance = banlance + ? where id= ?";
+                let user_args = [user_sql, user_args];
+                mysql.query(sql, args);
+                return true;
+            } else {
+                return false;
+            }
+
 
     }
     //承包余额支付 
@@ -152,7 +280,7 @@ class ToolsService extends Service {
         });
 
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-	    let formData = `<xml>
+        let formData = `<xml>
 							<appid>${appid}</appid>
 							<mch_id>${mch_id}</mch_id>
 							<nonce_str>${nonce_str}</nonce_str>
@@ -188,7 +316,6 @@ class ToolsService extends Service {
                         package: reData.prepay_id[0],
                         paySign: reData.sign[0]
                     }
-
                     res.end(JSON.stringify(responseData))
 
                 })
@@ -202,6 +329,7 @@ class ToolsService extends Service {
     }
     //承包余额回调
     async join_yue_return() {
+
         //如果成功 修改订单状态
 
         //记录一下消费记录
