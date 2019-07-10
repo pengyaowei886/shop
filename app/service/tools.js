@@ -5,7 +5,7 @@ const xml2js = require('xml2js');
 class ToolsService extends Service {
 
     //开团支付
-    async  join_pay(code, money, ip) {
+    async  open_team_pay(code, money, ip) {
 
 
 
@@ -18,7 +18,6 @@ class ToolsService extends Service {
             let signValue = stringSignTemp.toUpperCase();
             return signValue
         }
-
         function randomStr() {	//产生一个随机字符串	
             var str = "";
             var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -52,20 +51,6 @@ class ToolsService extends Service {
             trade_type: 'JSAPI'
         });
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-		/*var reqData = {
-			appid: '',	//小程序appid
-			mch_id: '',	//商户号
-			nonce_str: nonce_str,	//随机字符串
-			sign: sign,	//签名
-			body: '微信支付，商品详细描述',	//商品描述
-			out_trade_no: time,	//商品订单号
-			total_fee: total_fee,	//商品价格
-			spbill_create_ip: '127.0.0.1',	//本地服务器地址
-			notify_url: 'https://www.kdsou.com/kdchange/service_bak/notify.php',	//通知地址
-			trade_type: 'JSAPI',	//交易类型，JSAPI为小程序交易类型
-			openid: openid,	//交易类型是JSAPI的话，此参数必传
-		}*/
-
         let formData = `<xml>
                             <appid>${appid}</appid>
                             <body>${body_data}</body>
@@ -83,13 +68,9 @@ class ToolsService extends Service {
         //发起请求，获取微信支付的一些必要信息
         let result = await this.ctx.curl(reqUrl, {
             method: "POST",
-            // headers: {
-            //     'content-type': 'application/xml'
-            // },
-            // contentType:"xml",
             data: formData
         })
-        let responseData={};
+        let responseData = {};
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
             console.log(JSON.stringify(res));
@@ -99,7 +80,7 @@ class ToolsService extends Service {
                     nonceStr: reData.nonce_str[0],
                     package: reData.prepay_id[0],
                     paySign: reData.sign[0]
-                } 
+                }
             } else {
                 throw new Error("获取签名失败")
             }
@@ -109,8 +90,8 @@ class ToolsService extends Service {
 
 
     //开团微信回调
-    async join_pay_return() {
-        //如果成功
+    async open_pay_return() {
+        //支付成功
         if (true) {
 
             //生成 拼团信息
@@ -125,6 +106,9 @@ class ToolsService extends Service {
                 ctime: new Date(),
                 status: 0
             })
+        }else{
+            //支付失败
+         throw new Error('支付失败');
         }
 
         //失败  参团的积分退回去
@@ -132,8 +116,15 @@ class ToolsService extends Service {
 
 
     }
+    //参团支付 
+    async join_team_pay() {
 
-    //承包余额支付
+    }
+    //参团支付回调
+    async join_pay_return() {
+
+    }
+    //承包余额支付 
     async  join_yue_pay(openid, order) {
 
         //先判断一下是否能进行余额支付
@@ -161,21 +152,7 @@ class ToolsService extends Service {
         });
 
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-		/*var reqData = {
-			appid: '',	//小程序appid
-			mch_id: '',	//商户号
-			nonce_str: nonce_str,	//随机字符串
-			sign: sign,	//签名
-			body: '微信支付，商品详细描述',	//商品描述
-			out_trade_no: time,	//商品订单号
-			total_fee: total_fee,	//商品价格
-			spbill_create_ip: '127.0.0.1',	//本地服务器地址
-			notify_url: 'https://www.kdsou.com/kdchange/service_bak/notify.php',	//通知地址
-			trade_type: 'JSAPI',	//交易类型，JSAPI为小程序交易类型
-			openid: openid,	//交易类型是JSAPI的话，此参数必传
-		}*/
-
-        let formData = `<xml>
+	    let formData = `<xml>
 							<appid>${appid}</appid>
 							<mch_id>${mch_id}</mch_id>
 							<nonce_str>${nonce_str}</nonce_str>
@@ -224,7 +201,7 @@ class ToolsService extends Service {
 
     }
     //承包余额回调
-    async join_pay_yue_return() {
+    async join_yue_return() {
         //如果成功 修改订单状态
 
         //记录一下消费记录
