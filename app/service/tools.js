@@ -79,7 +79,7 @@ class ToolsService extends Service {
 							<total_fee>${total_fee}</total_fee>
 							<trade_type>JSAPI</trade_type>	
                         </xml>`;
-        console.log(formData, 'xml格式')
+
         //发起请求，获取微信支付的一些必要信息
         let result = await this.ctx.curl(reqUrl, {
             method: "POST",
@@ -92,6 +92,7 @@ class ToolsService extends Service {
         let responseData={};
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
+            console.log(JSON.stringify(res));
             if (reData.return_code[0] == 'SUCCESS') {
                 responseData = {
                     timeStamp: new Date().getTime(),

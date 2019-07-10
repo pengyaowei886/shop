@@ -77,7 +77,7 @@ class ToolsController extends Controller {
             const { ctx, service } = handerThis;
             let code = ctx.request.query.code;
             let money =ctx.request.query.money;
-            let ip=ctx.request.header.host;
+            let ip="129.28.167.17";
             let data = await service.tools.join_pay(code,money,ip);
             return handerThis.succ(data);
         } catch (error) {
