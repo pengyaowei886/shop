@@ -79,19 +79,20 @@ class Goodsservice extends Service {
     async query_join_goods(limit, skip, name, class_class, is_recommend) {
         const mysql = this.app.mysql;
         let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.succ_volume,g.introduce " +
-            "from join_goods g left join join_specs s  on g.id= s.goods_id  and g.status=1 and s.is_default=1 and s.status=1 ";
+            "from join_goods g left join join_specs s  on g.id= s.goods_id  where  g.status=1 and s.is_default=1 and s.status=1 ";
         if (name) {
             sql += "and g.introduce like " + mysql.escape("%" + name + "%");
         }
         if (is_recommend) {
-            sql += "and g.is_recommend =1";
+            sql += "and g.is_recommend = 1 ";
         }
         if (class_class) {
-            sql += "and g.class = " + mysql.escape("%" + class_class + "%");
+            sql += "and g.class = " + mysql.escape( class_class );
 
         }
 
-        sql += "order by g.ctime  desc  limit ?  offset ? ";
+        sql += "  order by g.ctime  desc  limit ?  offset ? ";
+        console.log(sql)
 
 
         let args = [limit, skip];
