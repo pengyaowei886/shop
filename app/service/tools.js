@@ -51,8 +51,6 @@ class ToolsService extends Service {
             key: this.app.config.info.business_secret,
             trade_type: 'JSAPI'
         });
-        console.log(sign)
-
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 		/*var reqData = {
 			appid: '',	//小程序appid
@@ -91,21 +89,21 @@ class ToolsService extends Service {
             // contentType:"xml",
             data: formData
         })
+        let responseData={};
         xml2js.parseString(result.data, function (error, res) {
-            console.log(JSON.stringify(res), 'xml解析成json字符串')
             let reData = res.xml;
-            if (reData.return_code == "SUCCESS") {
-                let responseData = {
+            if (reData.return_code[0] == 'SUCCESS') {
+                responseData = {
                     timeStamp: new Date().getTime(),
                     nonceStr: reData.nonce_str[0],
                     package: reData.prepay_id[0],
                     paySign: reData.sign[0]
-                }
-                return responseData;
+                } 
             } else {
                 throw new Error("获取签名失败")
             }
         })
+        return responseData;
     }
 
 

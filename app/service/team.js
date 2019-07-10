@@ -81,7 +81,7 @@ class TeamService extends Service {
 
 
 
-
+//用户确认拼团订单
     async start_team_order(uid, goods_id, spec, address) {
         const mysql = this.app.mysql;
         let data = {};
@@ -106,6 +106,33 @@ class TeamService extends Service {
         })
         return data;
     }
+//用户参团
+async start_team_order(uid, team_id) {
+    const mysql = this.app.mysql;
+    let data = {};
+
+    //生成参团订单
+    let repertory = await mysql.insert('user_join', { columns: { id: spec, status: 1 },
+     columns: ['team_price', 'leader_price', 'join_xianjin', 'spec'] });
+    //生成预付款拼团订单
+
+    let order = new Date().getTime();//订单编号
+
+    await mysql.insert('join_order', {
+        uid: uid,
+        team: order,
+        goods_id: goods_id,
+        spec: spec,
+        leader_price: repertory[0].leader_price,
+        join_xianjin: repertory[0].join_xianjin,
+        spec_name: repertory[0].spec,
+        team_price:repertory[0].team_price,
+        address:address,
+        ctime: new Date(),
+        status: 0
+    })
+    return data;
+}
 
 
 }

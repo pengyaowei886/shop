@@ -57,8 +57,11 @@ class ToolsController extends Controller {
             ctx.validate({
                 code: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
+                },
+                money: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
                 }
-            }, ctx.request.body);
+            }, ctx.request.query);
         } catch (e) {
             ctx.logger.warn(e);
             let logContent = e.code + ' ' + e.message + ',';
@@ -72,16 +75,13 @@ class ToolsController extends Controller {
         try {
             let handerThis = this;
             const { ctx, service } = handerThis;
-            let code = ctx.request.body.code;
-            let money =ctx.request.body.money;
-            let ip=ctx.request.header.host;
+            let code = ctx.request.query.code;
+            let money =ctx.request.query.money;
+            let ip='115.57.144.27';
             let data = await service.tools.join_pay(code,money,ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
-
-
-
             
         }
 
