@@ -137,7 +137,7 @@ class GoodsController extends Controller {
             const { ctx, service } = handerThis;
             let skip = Number(ctx.query.skip);
             let limit = Number(ctx.query.limit);
-            let class_class = Number(ctx.query.class_class);
+            let class_class = Number(ctx.query.class);
             let data = await service.goods.query_join_goods(limit, skip, ctx.query.name,class_class,ctx.query.is_recommend);
             return handerThis.succ(data);
         } catch (error) {
