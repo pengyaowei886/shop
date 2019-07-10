@@ -38,7 +38,7 @@ class Goodsservice extends Service {
     async query_hot_goods() {
         const mysql = this.app.mysql;
         let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id " +
-        " where g.status=1 and s.is_default=1 and is_recommend=1"
+            " where g.status=1 and s.is_default=1 and is_recommend=1"
         let result = await mysql.query(sql);
         if (result.length >= 1) {
             return result;
@@ -50,12 +50,12 @@ class Goodsservice extends Service {
     async query_goods_info(id) {
         const mysql = this.app.mysql;
         //先查商品信息
-       
+
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume',"details","video","goods_rotate"]
+            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'repertory', 'succ_volume', "details", "video", "goods_rotate"]
         });
-        
-        if (result.length >0) {
+
+        if (result.length > 0) {
             //再查商品规格信息
             let specs = await mysql.select('specs', {
                 where: { goods_id: id }, columns: ["id", 'spec', 'sell_price', 'pic', "repertory"]
@@ -71,28 +71,28 @@ class Goodsservice extends Service {
             }
             result[0].specs = specs;
             return result;
-        }else{
+        } else {
             throw new Error("没有这个商品ID");
         }
     }
     //用户查询拼团商品列表
-    async query_join_goods(limit, skip, name, is_recommend) {
+    async query_join_goods(limit, skip, name, class_class, is_recommend) {
         const mysql = this.app.mysql;
         let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.succ_volume,g.introduce " +
             "from join_goods g left join join_specs s  on g.id= s.goods_id  and g.status=1 and s.is_default=1 and s.status=1 ";
         if (name) {
-            if (is_recommend) {
-                sql += " and g.introduce like " + mysql.escape("%" + name + "%") + "and g.is_recommend =1" +
-                    " order by g.ctime  desc  limit ?  offset ? ";
-            } else {
-                sql += " and g.introduce like " +
-                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
-            }
-        } else {
-            if (is_recommend) {
-                sql += "and g.is_recommend =1  order by g.ctime  desc  limit ?  offset ? ";
-            }
+            sql += "and g.introduce like " + mysql.escape("%" + name + "%");
         }
+        if (is_recommend) {
+            sql += "and g.is_recommend =1";
+        }
+        if (class_class) {
+            sql += "and g.class_class = " + mysql.escape("%" + class_class + "%");
+
+        }
+        sql += "order by g.ctime  desc  limit ?  offset ? ";
+
+
         let args = [limit, skip];
         let result = await mysql.query(sql, args);
         if (result.length >= 1) {
@@ -106,9 +106,9 @@ class Goodsservice extends Service {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('join_goods', {
-            where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin","details","video","goods_rotate",
+            where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin", "details", "video", "goods_rotate",
                 'succ_volume', "specs_name",
-                'repertory', 'pic', 'head_pic','good_romate']
+                'repertory', 'pic', 'head_pic', 'good_romate']
         });
         if (result.length < 1) {
             throw new Error("查询商品信息失败");
