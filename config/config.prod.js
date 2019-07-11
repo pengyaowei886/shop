@@ -100,12 +100,13 @@ module.exports = appInfo => {
     // add your user config here
     // add your user config here
     userConfig.info= {
-        // myAppName: 'egg',
         appid: "wxd83411d563dc2ac9", //appid
-        appsecret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
+        secret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
         mch_id:"1543200511",//商户号
-        business_secret:"GY32mgLScDLvLmJOfZFz74vmXorfULvr",
-        web:"https://caoxianyoushun.cn:8443/"//
+        business_secret:"GY32mgLScDLvLmJOfZFz74vmXorfULvr",//api密钥
+        web:"https://caoxianyoushun.cn:8443/",// 域名
+        key: "9vApxLk5G3PAsJrM",//16位 对称公钥
+        iv: "FnJL7EDzjqWjcaY9" //偏移量
      } 
     return {
         ...config,
