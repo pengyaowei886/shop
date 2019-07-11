@@ -144,8 +144,8 @@ class UserService extends Service {
             //插入数据库
             await mysql.insert('user', options);
             //  生成token
-            const key = Buffer.from(app.config.GOPAY.key, 'utf8');//16位 对称公钥
-            const iv = Buffer.from(app.config.GOPAY.iv.toString(), 'utf8');  //偏移量
+            const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
+            const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(password);
             let token = encryptedText.final("hex");

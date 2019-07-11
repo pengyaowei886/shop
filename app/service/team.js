@@ -41,7 +41,6 @@ class TeamService extends Service {
         let reData = xml2js.parseString(body, function (error, res) {
             return res;
         });
-
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
 
 
