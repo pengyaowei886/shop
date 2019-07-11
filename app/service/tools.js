@@ -34,9 +34,6 @@ class ToolsService extends Service {
         let total_fee = Number(money) * 100;
         let appid = this.app.config.info.appid;	//自己的小程序appid
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
-        let body_data = "开团支付";
-        let openid = openid;//openid
-
         let sign = createSign({	//签名
             appid: appid,
             body: body_data,
