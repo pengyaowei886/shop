@@ -33,7 +33,6 @@ class ToolsService extends Service {
         }
         let total_fee = Number(money) * 100;
         let appid = this.app.config.info.appid;	//自己的小程序appid
-        let huidiao_url = huidiao_url;
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
         let body_data = "开团支付";
         let openid = openid;//openid
@@ -90,7 +89,7 @@ class ToolsService extends Service {
     }
     
     //微信退款
-    async  weixin_refund(out_trade_no,money, openid,ip) {
+    async  weixin_refund(out_trade_no,money) {
 
 
         let time = new Date().getTime();	//商户订单号
@@ -148,7 +147,7 @@ class ToolsService extends Service {
             if (reData.return_code[0] == 'SUCCESS') {
               return true;
             } else {
-                throw new Error("退款失败");
+                return false;
             }
         })
         return responseData;
