@@ -95,7 +95,7 @@ class UserService extends Service {
  *  小程序登陆
  * 
  * */
-    async login(code, user_info) {//接收客户端发送过来的信息，其中包括code和appid
+    async login(code, head_pic,nick_name) {//接收客户端发送过来的信息，其中包括code和appid
         /*
         * 首先读取本地 3_rdSession 是否存在，如果存在。判断是否过期。过期再生成一个存放本地（前端做）
         * 如果不存在 往下走
@@ -136,8 +136,8 @@ class UserService extends Service {
             let options = {
                 openid: open_id,
                 balance: 0,
-                wx_pic: user_info.head_pic,
-                wx_nickname: user_info.nick_name,
+                wx_pic: head_pic,
+                wx_nickname:nick_name,
                 status: 1,
                 ctime: new Date()
             }

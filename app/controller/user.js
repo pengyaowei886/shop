@@ -92,8 +92,11 @@ class UserController extends Controller {
         code: {//字符串 必填 不允许为空字符串 
           type: 'string', required: true, allowEmpty: false
         },
-        user_info: {//字符串 必填 不允许为空字符串 
-          type: 'object', required: true, allowEmpty: false
+        head_pic: {//字符串 必填 不允许为空字符串 
+          type: 'string', required: true, allowEmpty: false
+        },
+        nick_name: {//字符串 必填 不允许为空字符串 
+          type: 'string', required: true, allowEmpty: false
         },
       }, ctx.request.body);
     } catch (e) {
@@ -107,8 +110,9 @@ class UserController extends Controller {
     //逻辑处理
     try {
       let code = ctx.request.body.code;
-      let user_info = ctx.request.body.user_info;
-      let data = await service.user.login(code, user_info);
+      let head_pic = ctx.request.body.user_info;
+      let nick_name=ctx.request.body.nick_name;
+      let data = await service.user.login(code, head_pic,nick_name);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);
