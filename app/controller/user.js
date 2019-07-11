@@ -326,7 +326,7 @@ class UserController extends Controller {
     try {
         let handerThis = this;
         const { ctx, service } = handerThis;
-        let uid = Number(ctx, query.uid);
+        let uid = Number(ctx.query.uid);
         let data = await service.user.query_user_info(uid);
         return handerThis.succ(data);
     } catch (error) {

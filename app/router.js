@@ -32,8 +32,8 @@ module.exports = app => {
     //查看拼团商品具体详情
     router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
 
-    // //查看用户具体信息
-    // router.get('/zlpt/web/user/info', controller.admin.query_user_info);
+    //查看用户具体信息
+    router.get('/zlpt/app/user/info', controller.user.query_user_info);
     //查询用户收获地址
     router.get('/zlpt/app/user/address/query', controller.address.query_address);
 

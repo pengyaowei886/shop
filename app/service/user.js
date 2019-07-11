@@ -303,9 +303,13 @@ class UserService extends Service {
     async query_user_info(uid) {
         const mysql = this.app.mysql;
         let result = await mysql.select('user', {
-            where: { id: id }, columns: ['head_pic', '']
-        })
-        return result;
+            where: { id: uid }, columns: ['wx_pic', 'wx_nickname','balance']
+        });
+        if(result.length>0){
+            return result;
+        }else{
+            throw new Error(" 查询用户信息失败");
+        }
     }
 }
 module.exports = UserService;
