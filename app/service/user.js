@@ -115,19 +115,14 @@ class UserService extends Service {
             contentType: "json",
             dataType: "json"
         });
-        console.log(res1.data);
-        //用户服务器返回的数值
-        //console.log("微信返回的信息：",res1.body);
-        // let session_key = JSON.parse(res1.body).session_key;//session_key
+    
         let open_id = res1.data.openid;//open_id
-        console.log(open_id);
         //判断用户是否存在
         let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
         if (is_exist.length > 0) {
             //查出token
             let uid = is_exist[0].id;
-            let token = redis.get(`user:${uid}`);
-            console.log(token);
+            let token = await redis.get(`user:${uid}`);
             databack.uid = uid;
             databack.token = token;
             databack.openid=open_id;
@@ -147,15 +142,19 @@ class UserService extends Service {
             const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
             const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
-            encryptedText.update(password);
+            encryptedText.update(open_id);
             let token = encryptedText.final("hex");
-            let user = await await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
-            let uid = user[0].uid;
-            await redis.set(`user:${uid}`, token);
-            databack.uid = uid;
-            databack.token = token;
-            databack.openid=open_id;
-            return databack
+            let user =  await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
+            let uid = user[0].id;
+             let result=await redis.set(`user:${uid}`, token);
+             if(result=="OK"){
+                databack.uid = uid;
+                databack.token = token;
+                databack.openid=open_id;
+                return databack
+             }else{
+                 throw new Error('redis插入失败');
+             }        
         }
     }
     //查询轮播图

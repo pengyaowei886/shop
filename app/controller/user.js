@@ -110,7 +110,7 @@ class UserController extends Controller {
     //逻辑处理
     try {
       let code = ctx.request.body.code;
-      let head_pic = ctx.request.body.user_info;
+      let head_pic = ctx.request.body.head_pic;
       let nick_name=ctx.request.body.nick_name;
       let data = await service.user.login(code, head_pic,nick_name);
       return handerThis.succ(data);
