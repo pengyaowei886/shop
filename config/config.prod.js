@@ -11,7 +11,6 @@ module.exports = appInfo => {
      * @type {Egg.EggAppConfig}
      **/
     const config = exports = {};
-    const userConfig = exports = {};
     // use for cookie sign key, should change to your own and keep security
     config.keys = appInfo.name + '_1557129655272_1836';
 
@@ -99,7 +98,7 @@ module.exports = appInfo => {
     };
     // add your user config here
     // add your user config here
-    userConfig.info= {
+    config.info= {
         appid: "wxd83411d563dc2ac9", //appid
         secret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
         mch_id:"1543200511",//商户号
@@ -109,7 +108,6 @@ module.exports = appInfo => {
         iv: "FnJL7EDzjqWjcaY9" //偏移量
      } 
     return {
-        ...config,
-        ...userConfig,
+        ...config
     };
 };
