@@ -1,7 +1,7 @@
 'use strict';
 
 const Controller = require('../core/baseController');
-
+const crypto = require('crypto');
 
 
 class UserController extends Controller {
@@ -89,13 +89,13 @@ class UserController extends Controller {
     try {
       //使用插件进行验证 validate    
       ctx.validate({
-        phone: {//字符串 必填 不允许为空字符串 
+        code: {//字符串 必填 不允许为空字符串 
           type: 'string', required: true, allowEmpty: false
         },
-        password: {//字符串 必填 不允许为空字符串 
-          type: 'string', required: true, allowEmpty: false
+        user_info: {//字符串 必填 不允许为空字符串 
+          type: 'object', required: true, allowEmpty: false
         },
-      }, ctx.request.query);
+      }, ctx.request.body);
     } catch (e) {
       ctx.logger.warn(e);
       let logContent = e.code + ' ' + e.message + ',';
@@ -106,9 +106,9 @@ class UserController extends Controller {
     }
     //逻辑处理
     try {
-      let phone = ctx.request.query.phone;
-      let password = ctx.request.query.password;
-      let data = await service.user.login(phone, password);
+      let code = ctx.request.body.code;
+      let user_info = ctx.request.body.user_info;
+      let data = await service.user.login(code, user_info);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);

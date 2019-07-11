@@ -92,8 +92,6 @@ class Goodsservice extends Service {
         }
 
         sql += "  order by g.ctime  desc  limit ?  offset ? ";
-        console.log(sql)
-
 
         let args = [limit, skip];
         let result = await mysql.query(sql, args);

@@ -47,60 +47,6 @@ class ToolsController extends Controller {
         let data = { url: url }
         return handerThis.succ(data);
     }
-//开团支付
-    async open_team_pay() {
-        let handerThis = this;
-        const { ctx, app, service } = handerThis;
-        //参数校验
-        try {
-            //使用插件进行验证 validate    
-            ctx.validate({
-                code: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                },
-                money: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                }
-            }, ctx.request.query);
-        } catch (e) {
-            ctx.logger.warn(e);
-            let logContent = e.code + ' ' + e.message + ',';
-            for (let i in e.errors) {
-                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
-            }
-            return handerThis.error('PARAMETERS_ERROR', logContent);
-        }
-
-        //逻辑判断
-        try {
-            let handerThis = this;
-            const { ctx, service } = handerThis;
-            let code = ctx.request.query.code;
-            let money =ctx.request.query.money;
-            let ip= ctx.request.header.host;
-            console.log(ip);
-            let data = await service.tools.open_team_pay(code,money,ip);
-            return handerThis.succ(data);
-        } catch (error) {
-            return handerThis.error('HANDLE_ERROR', error['message']);
-            
-        }
-
-    }
-    //开团支付成功回调
-    async open_pay_return(){
-        let handerThis = this;
-        const { ctx, app, service } = handerThis;
-        var body = ctx.request.body;
-
-        let data=await service.tools.open_pay_return(body);
-        if(data){
-            var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-            ctx.body = message;
-        }else{
-
-        }
-    }
     async  join_xianjin(){
 
         let handerThis = this;

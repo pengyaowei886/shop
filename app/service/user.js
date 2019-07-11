@@ -71,31 +71,31 @@ class UserService extends Service {
      * @param {*} phone 
      * @param {*} password 
      */
-    async login(phone, password) {
-        const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
-        const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
-        const mysql = this.app.mysql;
-        const redis = this.app.redis.get('customer');
-        let data = {};
-        let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
-        encryptedText.update(password);
-        let result = await mysql.get('user', { phone: phone, password: password })
-        if (result) {
-            let token = encryptedText.final("hex");
-            await redis.set(`${phone}:token`, token);
-            data.token = token;
-            return data;
-        } else {
-            throw new Error("账号或者密码错误")
-        }
+    // async login(phone, password) {
+    //     const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
+    //     const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
+    //     const mysql = this.app.mysql;
+    //     const redis = this.app.redis.get('customer');
+    //     let data = {};
+    //     let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
+    //     encryptedText.update(password);
+    //     let result = await mysql.get('user', { phone: phone, password: password })
+    //     if (result) {
+    //         let token = encryptedText.final("hex");
+    //         await redis.set(`${phone}:token`, token);
+    //         data.token = token;
+    //         return data;
+    //     } else {
+    //         throw new Error("账号或者密码错误")
+    //     }
 
 
-    }
+    // }
     /**
  *  小程序登陆
  * 
  * */
-    async LoginCode(code, userInfo) {//接收客户端发送过来的信息，其中包括code和appid
+    async login(code, user_info) {//接收客户端发送过来的信息，其中包括code和appid
         /*
         * 首先读取本地 3_rdSession 是否存在，如果存在。判断是否过期。过期再生成一个存放本地（前端做）
         * 如果不存在 往下走
@@ -103,8 +103,9 @@ class UserService extends Service {
         let handerThis = this;
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
+        const redis = this.app.redis.get('user');
         let databack = {};
-        let code = userInfo.code;
+
         //console.log("code:",code);
         let appid = this.app.config.info.appid;
         let secret = this.app.config.info.secret;
@@ -114,26 +115,48 @@ class UserService extends Service {
             contentType: "json",
             dataType: "json"
         });
+        console.log(res1.data);
         //用户服务器返回的数值
         //console.log("微信返回的信息：",res1.body);
-        let session_key = JSON.parse(res1.body).session_key;//session_key
-        let open_id = JSON.parse(res1.body).open_id;//open_id
-        /*
-         ** 拿到session_key和open_id，3_rdSession（随机生成）为key，session_key和open_id为value 存入微信小游戏缓存目录，下次登录直接读取，要设置有效期
-         */
-
-        //解密用户信息
-        let signature2 = sha1(body.userInfo.rawData + session_key);
-        if (body.userInfo.signature != signature2) {
-            return res.json("数据签名校验失败");
+        // let session_key = JSON.parse(res1.body).session_key;//session_key
+        let open_id = res1.data.openid;//open_id
+        console.log(open_id);
+        //判断用户是否存在
+        let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
+        if (is_exist.length > 0) {
+            //查出token
+            let uid = is_exist[0].id;
+            let token = redis.get(`user:${uid}`);
+            console.log(token);
+            databack.uid = uid;
+            databack.token = token;
+            databack.openid=open_id;
+            return databack;
+        } else {
+            let options = {
+                openid: open_id,
+                balance: 0,
+                wx_pic: user_info.head_pic,
+                wx_nickname: user_info.nick_name,
+                status: 1,
+                ctime: new Date()
+            }
+            //插入数据库
+            await mysql.insert('user', options);
+            //  生成token
+            const key = Buffer.from(app.config.GOPAY.key, 'utf8');//16位 对称公钥
+            const iv = Buffer.from(app.config.GOPAY.iv.toString(), 'utf8');  //偏移量
+            let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
+            encryptedText.update(password);
+            let token = encryptedText.final("hex");
+            let user = await await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
+            let uid = user[0].uid;
+            await redis.set(`user:${uid}`, token);
+            databack.uid = uid;
+            databack.token = token;
+            databack.openid=open_id;
+            return databack
         }
-        // 解密
-        let pc = new WXBizDataCrypt(appid, sessionkeyList[i]);
-        let data = pc.decryptData(body.userInfo.encryptedData, body.userInfo.iv);
-        //待补充
-        await mysql.insert('user', { openid: open_id, data: data });
-
-        return databack;
     }
     //查询轮播图
     async query_rotate_map(kind) {
@@ -232,7 +255,7 @@ class UserService extends Service {
         } else {
             let goods_id = await redis.lrange(`history:join_goods:${uid}`, 0, -1);
             let result = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['id', 'introduce', 'head_pic'] });
-            let price = await mysql.select('join_specs', { where: { goods_id: goods_id, is_default: 1 }, columns: ['goods_id' ,'leader_price','join_number','join_price'] });
+            let price = await mysql.select('join_specs', { where: { goods_id: goods_id, is_default: 1 }, columns: ['goods_id', 'leader_price', 'join_number', 'join_price'] });
             for (let i in result) {
                 for (let j in price) {
                     if (result[i].id == price[j].goods_id) {
@@ -278,10 +301,10 @@ class UserService extends Service {
         }
     }
     //查询用户基本信息
-    async query_user_info(uid){
+    async query_user_info(uid) {
         const mysql = this.app.mysql;
-        let result= await mysql.select('user',{
-            where:{id:id},columns:['head_pic','']
+        let result = await mysql.select('user', {
+            where: { id: id }, columns: ['head_pic', '']
         })
         return result;
     }

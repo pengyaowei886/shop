@@ -15,8 +15,8 @@ module.exports = app => {
     //请求短信验证码
     router.get('/zlpt/tools/duanxin', controller.user.req_dx);
 
-
-
+    //小程序登陆
+    router.post('/zlpt/wx/login', controller.user.login);
     //查询轮播图
     router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);
     //查看商品列表（名称，分类检索）
@@ -55,9 +55,10 @@ module.exports = app => {
     //用户确认拼团
 
     //用户支付拼团
-    router.get('/zlpt/app/user/team/pay', controller.tools.open_team_pay);
+    router.get('/zlpt/app/user/team/pay', controller.team.open_team_pay);
     //支付拼团回调
-
+    router.get('/zlpt/app/user/team/return', controller.team.open_pay_return);
+    //支付拼团回调
     //用户参加拼团
 
     //用户为自己的团支付剩余余额
