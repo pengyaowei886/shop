@@ -90,7 +90,6 @@ class Goodsservice extends Service {
             sql += "and g.class = " + mysql.escape( class_class );
 
         }
-
         sql += "  order by g.ctime  desc  limit ?  offset ? ";
 
         let args = [limit, skip];
