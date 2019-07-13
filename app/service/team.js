@@ -41,7 +41,7 @@ class TeamService extends Service {
         let reData = xml2js.parseString(body, function (error, res) {
             return res;
         });
-        this.ctx.logger.debug("微信返回值内容" + reData.xml);
+        this.ctx.logger.error("微信返回值内容" + reData.xml);
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
             // 支付成功处理 
             //生成 拼团信息
@@ -157,8 +157,6 @@ class TeamService extends Service {
             where: { goods_id:goods_id},
             columns: ['uid'], order: ['ctime', 'desc'],limit:limit,offset:skip
         });
-      
-
         let head = await mysql.select('user', { where: { id: result }, columns: ['id', 'head_pic'] });
         for (let i in result) {
             for (let j in head) {
@@ -168,7 +166,6 @@ class TeamService extends Service {
                 }
             }
         }
-
         return result;
     }
 
