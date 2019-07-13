@@ -42,10 +42,7 @@ class TeamService extends Service {
             return res;
         });
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
-
-
-            // 支付成功处理
-
+            // 支付成功处理 
             //生成 拼团信息
             await mysql.insert('join_team', {
                 uid: uid,
@@ -57,7 +54,6 @@ class TeamService extends Service {
                 ctime: new Date(),
                 status: 0 //成团中
             });
-
             //生成积分消费记录
             await mysql.insert('gold_record', {
                 uid: uid,
@@ -116,15 +112,17 @@ class TeamService extends Service {
                 ctime: new Date(),
             });
             //增加账号积分
-            let user_sql = "update  user set banlance = banlance + ? where id= ?";
+            let user_sql = "update  user set balance = balance + ? where id= ?";
             let user_args = [user_sql, user_args];
             mysql.query(sql, args);
             return true;
         } else {
             return false;
         }
-
-
+    }
+    //
+    async query_user_team(){
+          
     }
 
 }

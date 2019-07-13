@@ -16,7 +16,8 @@ class UserService extends Service {
         let handerThis = this;
         const { ctx, app } = handerThis;
 
-
+        // const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
+        // const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
 
         const redis = this.app.redis.get('customer');
         const mysql = this.app.mysql;
@@ -104,6 +105,8 @@ class UserService extends Service {
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('user');
+        const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
+const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
         let databack = {};
 
         //console.log("code:",code);
@@ -115,15 +118,17 @@ class UserService extends Service {
             contentType: "json",
             dataType: "json"
         });
-    
         let open_id = res1.data.openid;//open_id
         //判断用户是否存在
         let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
+
         if (is_exist.length > 0) {
             //查出token
-            let uid = is_exist[0].id;
-            let token = await redis.get(`user:${uid}`);
-            databack.uid = uid;
+         
+            let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
+            encryptedText.update(open_id);
+            let token = encryptedText.final("hex"); 
+            databack.uid = is_exist[0].id;
             databack.token = token;
             databack.openid=open_id;
             return databack;
@@ -139,14 +144,13 @@ class UserService extends Service {
             //插入数据库
             await mysql.insert('user', options);
             //  生成token
-            const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
-            const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
+
             let token = encryptedText.final("hex");
             let user =  await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
             let uid = user[0].id;
-             let result=await redis.set(`user:${uid}`, token);
+            let result=await redis.set(`${token}`,uid);
              if(result=="OK"){
                 databack.uid = uid;
                 databack.token = token;

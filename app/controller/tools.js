@@ -47,21 +47,5 @@ class ToolsController extends Controller {
         let data = { url: url }
         return handerThis.succ(data);
     }
-    async  join_xianjin(){
-
-        let handerThis = this;
-        const { ctx, app, service } = handerThis;
-
-        if (true) {
-            //修改订单状态
-
-            //减去库存
-
-
-
-
-
-        }
-    }
 }
 module.exports = ToolsController;

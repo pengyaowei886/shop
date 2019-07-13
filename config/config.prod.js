@@ -18,12 +18,12 @@ module.exports = appInfo => {
     config.middleware = [];
     config.security = {
         xframe: {
-          enable: false,
+            enable: false,
         },
         csrf: {
-          enable: false,
+            enable: false,
         }
-      };
+    };
     config.cors = {
         allowMethods: 'GET,POST,PUT,DELETE,OPTIONS',
         credentials: true,
@@ -89,24 +89,25 @@ module.exports = appInfo => {
         listen: {
             port: 8443,
             hostname: '172.30.0.2',
-            https:{
-                key:"C:/soft/workface/https/https.key",
-                cert:"C:/soft/workface/https/https.pem"
+            https: {
+                key: "C:/soft/workface/https/https.key",
+                cert: "C:/soft/workface/https/https.pem"
             }
         },
 
     };
     // add your user config here
     // add your user config here
-    config.info= {
+    config.info = {
         appid: "wxd83411d563dc2ac9", //appid
-        secret: "459b7e46d08cfad301ad6da6f01f5671" ,//密钥
-        mch_id:"1543200511",//商户号
-        business_secret:"GY32mgLScDLvLmJOfZFz74vmXorfULvr",//api密钥
-        web:"https://caoxianyoushun.cn:8443/",// 域名
+        secret: "459b7e46d08cfad301ad6da6f01f5671",//密钥
+        mch_id: "1543200511",//商户号
+        web: "https://caoxianyoushun.cn:8443/",
+        openid: "oKvMN5Ef0LijcwlVkiLEOtv4urfg",
+        business_secret: "GY32mgLScDLvLmJOfZFz74vmXorfULvr",//商户支付密钥
         key: "9vApxLk5G3PAsJrM",//16位 对称公钥
         iv: "FnJL7EDzjqWjcaY9" //偏移量
-     } 
+    }
     return {
         ...config
     };

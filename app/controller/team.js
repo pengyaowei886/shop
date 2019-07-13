@@ -75,6 +75,7 @@ class TeamController extends Controller {
             let ip_res = ctx.request.header.host
             let ip_arr=ip_res.split(":");
             let ip=ip_arr[0];
+            console.log(ip);
             let data = await service.team.open_team(money, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
