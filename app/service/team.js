@@ -31,16 +31,17 @@ class TeamService extends Service {
     }
     //用户确认开团
     async open_team(money, openid, ip) {
-        let huidiao_url = "https://caoxianyoushun.cn:8443/";
+        let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/team/return";
         let body_data = "开团支付";
         let data = await this.ctx.service.tools.weixin_pay(huidiao_url, body_data, money, openid, ip);
         return data;
     }
     //开团微信回调
-    async open_team_return(body) {
+    async open_pay_return(body) {
         let reData = xml2js.parseString(body, function (error, res) {
             return res;
         });
+        this.ctx.logger.debug("微信返回值内容"+reData.xml);
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
             // 支付成功处理 
             //生成 拼团信息
@@ -69,8 +70,6 @@ class TeamService extends Service {
         } else {
             return false;
         }
-
-
     }
     //用户参加拼团
     async join_team(openid, join_id, money, ip) {
@@ -110,6 +109,7 @@ class TeamService extends Service {
                 num: gold,//预留
                 source: 1, //参团赠送
                 ctime: new Date(),
+                end_time:new Date()
             });
             //增加账号积分
             let user_sql = "update  user set balance = balance + ? where id= ?";
