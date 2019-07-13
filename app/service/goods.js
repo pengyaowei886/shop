@@ -8,24 +8,22 @@ class Goodsservice extends Service {
 
 
     // 用户查询商品列表
-    async query_goods(limit, skip, name, class_class) {
+    async query_goods(limit, skip, name,is_recommend,class_class) {
         const mysql = this.app.mysql;
         //先查商品基本属性
         let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id " +
             " where g.status=1 and s.is_default=1 ";
-        if (name) {
-            if (class_class) {
-                sql += " and g.class = " + mysql.escape(class_class) + " and g.introduce like " +
-                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
-            } else {
-                sql += " and g.introduce like " +
-                    mysql.escape("%" + name + "%") + " order by g.ctime  desc  limit ?  offset ? ";
+            if (name) {
+                sql += "and g.introduce like " + mysql.escape("%" + name + "%");
             }
-        } else {
-            if (class_class) {
-                sql += " and g.class = " + mysql.escape(class_class) + " order by g.ctime  desc  limit ?  offset ? ";
+            if (is_recommend) {
+                sql += "and g.is_recommend = 1 ";
             }
-        }
+            if (class_class) {
+                sql += "and g.class = " + mysql.escape( class_class );
+    
+            }
+            sql += "  order by g.ctime  desc  limit ?  offset ? ";
         let args = [limit, skip];
         let result = await mysql.query(sql, args);
         if (result.length >= 1) {
