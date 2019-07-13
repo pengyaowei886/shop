@@ -41,7 +41,7 @@ class TeamService extends Service {
         let reData = xml2js.parseString(body, function (error, res) {
             return res;
         });
-        this.ctx.logger.debug("微信返回值内容"+reData.xml);
+        this.ctx.logger.debug("微信返回值内容" + reData.xml);
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
             // 支付成功处理 
             //生成 拼团信息
@@ -109,7 +109,7 @@ class TeamService extends Service {
                 num: gold,//预留
                 source: 1, //参团赠送
                 ctime: new Date(),
-                end_time:new Date()
+                end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
             });
             //增加账号积分
             let user_sql = "update  user set balance = balance + ? where id= ?";
@@ -120,10 +120,58 @@ class TeamService extends Service {
             return false;
         }
     }
-    //
-    async query_user_team(){
-          
+    // 查询用户拼团列表
+    async query_user_team(uid, status) {
+        const mysql = this.app.mysql;
+        let result = await mysql.select('join_team', { where: { uid: uid, status: status }, columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'] });
+        return result;
     }
+    //查看用户拼团具体详情
+    async query_user_team_info(join_no) {
+        const mysql = this.app.mysql;
+        let result = await mysql.select('join_team', {
+            where: { uid: uid, status: status },
+            columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'], order: ['ctime', 'desc']
+        });
+        let userinfo = await mysql.select('user_join', { where: { join_num: join_no }, columns: ['uid'] });
+        //查出用户头像
+
+        let head = await mysql.select('user', { where: { id: userinfo }, columns: ['id', 'head_pic'] });
+        for (let i in userinfo) {
+            for (let j in head) {
+                if (userinfo[i].uid == head[j].id) {
+                    userinfo[i].head_pic = head[j].head_pic;
+                    break ;
+                }
+            }
+        }
+        result[0].head=head;
+
+        return result[0];
+    }
+
+    //检索同类拼团列表
+    async query_same_team(goods_id,limit,skip) {
+        const mysql = this.app.mysql;
+        let result = await mysql.select('join_team', {
+            where: { goods_id:goods_id},
+            columns: ['uid'], order: ['ctime', 'desc'],limit:limit,offset:skip
+        });
+      
+
+        let head = await mysql.select('user', { where: { id: result }, columns: ['id', 'head_pic'] });
+        for (let i in result) {
+            for (let j in head) {
+                if (result[i].uid == head[j].id) {
+                    result[i].head_pic = head[j].head_pic;
+                    break ;
+                }
+            }
+        }
+
+        return result;
+    }
+
 
 }
 module.exports = TeamService;
