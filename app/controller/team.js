@@ -76,7 +76,7 @@ class TeamController extends Controller {
             // let ip_arr=ip_res.split(":");
             // let ip=ip_arr[0];
 
-        let ip="1.193.64.69";
+            let ip = "1.193.64.69";
             let data = await service.team.open_team(money, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
@@ -91,14 +91,19 @@ class TeamController extends Controller {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
         var body = ctx.request.body;
-
         let data = await service.team.open_pay_return(body);
-        if (data) {
-            var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-            ctx.body = message;
-        } else {
+        try {
+            if (data) {
+                var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                ctx.body = message;
+            } else {
+
+            }
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
 
         }
+
     }
 }
 module.exports = TeamController;
