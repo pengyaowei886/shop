@@ -92,7 +92,7 @@ class TeamController extends Controller {
         const { ctx, app, service } = handerThis;
         var body = ctx.request.body;
 
-        let data = await service.tools.open_pay_return(body);
+        let data = await service.team.open_pay_return(body);
         if (data) {
             var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             ctx.body = message;
