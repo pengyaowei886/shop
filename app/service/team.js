@@ -1,6 +1,7 @@
 
 const Service = require('egg').Service;
 const xml2js = require('xml2js');
+const fxp = require("fast-xml-parser");
 class TeamService extends Service {
 
     //用户发起拼团
@@ -39,8 +40,16 @@ class TeamService extends Service {
     }
     //开团微信回调
     async open_pay_return(body) {
-        let reData =  await xml2js.parseString(body);
-        this.ctx.logger.error("微信返回值内容" + reData.xml);
+       
+        const xml2json = fxp.parse(body);
+        let reData=JSON.stringify(xml2json);
+
+        // let reData =  new Promise((resove,reject)=>{
+        //     xml2js.parseString(body, function (error, res) {
+        //          resove(res);
+        //     })
+        // });
+        this.ctx.logger.error("微信返回值内容" + reData);
         if (reData.xml.return_code[0] == 'SUCCESS' && reData.xml.result_code[0] == 'SUCCESS') {
             // 支付成功处理 
             //生成 拼团信息
