@@ -33,7 +33,7 @@ class TeamService extends Service {
     }
     //用户确认开团
     async open_team(money, openid, ip) {
-        let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/team/return";
+        let huidiao_url = "https://caoxianyoushun.cn/zlpt/app/user/team/return";
         let body_data = "开团支付";
         let data = await this.ctx.service.tools.weixin_pay(huidiao_url, body_data, money, openid, ip);
         return data;
