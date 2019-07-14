@@ -56,7 +56,7 @@ class Goodsservice extends Service {
         if (result.length > 0) {
             //再查商品规格信息
             let specs = await mysql.select('specs', {
-                where: { goods_id: id }, columns: ["id", 'spec', 'sell_price', 'pic', "repertory"]
+                where: { goods_id: id }, columns: ["id", 'spec', 'sell_price','real_price', 'pic', "repertory",'is_default']
             });
             // 再查收藏记录
             let collation = await mysql.select('collation', {
@@ -105,7 +105,7 @@ class Goodsservice extends Service {
         let result = await mysql.select('join_goods', {
             where: { id: id, status: 1 }, columns: ['introduce', "effectiv_time", "join_xianjin", "details", "video", "goods_rotate",
                 'succ_volume', "specs_name",
-                'repertory', 'pic', 'head_pic', 'good_romate']
+                'repertory', 'pic', 'head_pic']
         });
         if (result.length < 1) {
             throw new Error("查询商品信息失败");
@@ -113,7 +113,7 @@ class Goodsservice extends Service {
             //再查商品规格信息 
             let specs = await mysql.select('join_specs', {
                 where: { goods_id: id, status: 1 }, columns: ['id', 'spec', 'join_price', "join_number", "leader_price",
-                    'repertory']
+                    'repertory','is_default']
             });
             let collation = await mysql.select('collation', {
                 where: { goods_id: id, kind: 2 }, columns: ["id"]

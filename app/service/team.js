@@ -70,6 +70,9 @@ class TeamService extends Service {
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
             let order_res = await mysql.select('join_order', { where: { order_no: order_no } });
             let join_res = await mysql.select('join_specs', { where: { id: spec } })
+
+
+
             //生成 拼团信息
             await mysql.insert('join_team', {
                 uid: uid[0],
@@ -129,7 +132,7 @@ class TeamService extends Service {
         const xml2json = fxp.parse(body);
         let reData = JSON.stringify(xml2json);
         this.ctx.logger.error("微信返回值内容" + reData);
-        
+
         if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
 
             // 支付成功处理
@@ -139,11 +142,9 @@ class TeamService extends Service {
             let join_no = reData.attach
             let wx_num = reData.transaction_id;
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-            let order_res = await mysql.select('join_order', { where: { order_no: order_no } });
-            let join_res = await mysql.select('join_specs', { where: { id: spec } })
 
             //更新 拼团信息
-            let join_sql = "update  join_team set now_gold = now_gold +? where join_no = ?";
+            let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1 where join_no = ?";
             let join_args = [money, join_no];
             await mysql.query(join_sql, join_args);
 
@@ -157,7 +158,7 @@ class TeamService extends Service {
             });
             //生成支付记录
             await mysql.insert('pay_record', {
-                uid: uid,
+                uid: uid[0],
                 money: money,
                 wx_num: wx_num,
                 kind: 1, //微信小程序支付
@@ -166,8 +167,8 @@ class TeamService extends Service {
             });
             //增加账号积分
             let user_sql = "update  user set balance = balance + ? where id= ?";
-            let user_args = [user_sql, user_args];
-            await mysql.query(sql, args);
+            let user_args = [money, uid[0]];
+            await mysql.query(user_sql, user_args);
             return true;
         } else {
             return false;
