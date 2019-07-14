@@ -30,18 +30,6 @@ module.exports = appInfo => {
         origin: '*'
     }
 
-    // //mysql配置
-    // config.mysql = {
-    //     // database configuration
-    //     client: {
-    //         host: '154.48.228.16',
-    //         port: '3306',
-    //         user: 'root',
-    //         password: '159370',
-    //         database: 'shop',
-    //     }
-    // };
-
 
     config.mysql = {
         // 单数据库信息配置
@@ -85,6 +73,22 @@ module.exports = appInfo => {
             }
         }
     }
+    config.bodyParser = {
+        enable: true,
+        encoding: 'utf8',
+        formLimit: '100kb',
+        jsonLimit: '100kb',
+        strict: true,
+        queryString: {
+          arrayLimit: 100,
+          depth: 5,
+          parameterLimit: 1000,
+        },
+        enableTypes: ['json', 'form', 'text'],
+        extendTypes: {
+          text: ['text/xml', 'application/xml'],
+        },
+      };
     config.cluster = {
         listen: {
             port: 8443,

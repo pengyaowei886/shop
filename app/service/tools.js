@@ -7,13 +7,12 @@ class ToolsService extends Service {
     
     
      //微信支付
-     async  weixin_pay(huidiao_url, body_data,money, openid,ip) {
+     async  weixin_pay(order_no,huidiao_url, body_data,money, openid,ip,attach) {
 
 
-        let time = new Date().getTime();	//商户订单号
         let nonce_str = randomStr(); //随机字符串
         function createSign(obj) {	//签名算法（把所有的非空的参数，按字典顺序组合起来+key,然后md5加密，再把加密结果都转成大写的即可）
-            let stringA = 'appid=' + obj.appid + '&body=' + obj.body + '&mch_id=' + obj.mch_id + '&nonce_str=' + obj.nonce_str + '&notify_url=' + obj.notify_url + '&openid=' + obj.openid + '&out_trade_no=' + obj.out_trade_no + '&spbill_create_ip=' + obj.spbill_create_ip + '&total_fee=' + obj.total_fee + '&trade_type=' + obj.trade_type;
+            let stringA = 'appid=' +obj.appid + "&attach"+obj.attach + '&body=' + obj.body + '&mch_id=' + obj.mch_id + '&nonce_str=' + obj.nonce_str + '&notify_url=' + obj.notify_url + '&openid=' + obj.openid + '&out_trade_no=' + obj.out_trade_no + '&spbill_create_ip=' + obj.spbill_create_ip + '&total_fee=' + obj.total_fee + '&trade_type=' + obj.trade_type;
             let stringSignTemp = stringA + '&key=' +obj.key;
             stringSignTemp = md5(stringSignTemp);
             let signValue = stringSignTemp.toUpperCase();
@@ -36,12 +35,13 @@ class ToolsService extends Service {
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
         let sign = createSign({	//签名
             appid: appid,
+            attach:attach,
             body: body_data,
             mch_id: mch_id,
             nonce_str: nonce_str,
             notify_url: huidiao_url, //回调地址  
             openid: openid,
-            out_trade_no: time,
+            out_trade_no: order_no,
             spbill_create_ip: ip,
             total_fee: total_fee,
             key: this.app.config.info.business_secret,
@@ -50,12 +50,13 @@ class ToolsService extends Service {
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
         let formData = `<xml>
                             <appid>${appid}</appid>
+                            <attach>${attach}</attach>
                             <body>${body_data}</body>
 							<mch_id>${mch_id}</mch_id>
                             <nonce_str>${nonce_str}</nonce_str>
                             <notify_url>${huidiao_url}</notify_url>
                             <openid>${openid}</openid>
-                            <out_trade_no>${time}</out_trade_no>
+                            <out_trade_no>${order_no}</out_trade_no>
 							<sign>${sign}</sign>
                             <spbill_create_ip>${ip}</spbill_create_ip>
 							<total_fee>${total_fee}</total_fee>
