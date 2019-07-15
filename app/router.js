@@ -26,7 +26,7 @@ module.exports = app => {
     //查询推荐商品
     router.get('/zlpt/app/goods/hot/query', controller.goods.query_hot_goods);
     //查看商品具体属性
-    router.get('/zlpt/app/goods/info', controller.goods.query_goods_info);  
+    router.get('/zlpt/app/goods/info', controller.goods.query_goods_info);
     //查看拼团商品列表
     router.get('/zlpt/app/join_goods/query', controller.goods.query_join_goods);
     //查看拼团商品具体详情
@@ -47,26 +47,28 @@ module.exports = app => {
     router.post('/zlpt/app/user/trolley/edit', controller.trolley.edit_trolley);
     //用户查看我的浏览历史
     router.get('/zlpt/app/user/history/query', controller.user.query_history);
-     //用户编辑我的浏览历史
+    //用户编辑我的浏览历史
     router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
 
     //用户发起拼团
-    router.post('/zlpt/app/user/team/start', controller.team);
+    router.post('/zlpt/app/user/team/start', controller.team.start_team);
 
     //用户支付拼团
     router.get('/zlpt/app/user/team/pay', controller.team.open_team_pay);
     //支付拼团回调
     router.get('/zlpt/app/user/team/return', controller.team.open_pay_return);
-  
-    //用户参加拼团
 
+    //用户参加拼团
+    router.get('/zlpt/app/user/team/join', controller.team.join_team);
+    //支付拼团回调
+    router.get('/zlpt/app/user/team/join/return', controller.team.join_pay_return);
     //用户为自己的团支付剩余余额
 
     //用户查询拼团列表
 
     //用户查询我的拼团
 
-    
+
 
 
 
@@ -79,7 +81,7 @@ module.exports = app => {
 
 
 
-   
+
 
 
     //*******************       拼团商品订单 ***********************/
@@ -95,7 +97,7 @@ module.exports = app => {
 
     //用户获得拼团所用金币
 
- 
+
     //用户请求购买商品
 
     //用户完成购买商品
