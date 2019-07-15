@@ -17,7 +17,6 @@ class TeamService extends Service {
                 let address = await mysql.select('address', { where: { uid: uid, is_default: 1 },columns:['address','user_name',"phone",'detailInfo'] });
                 //查询商品基本信息
                 let goods_info = await mysql.select('join_goods', { where: { id: goods_id, status: 1 }, columns: ['introduce', 'join_xianjin','head_pic'] });
-                console.log(goods_info)
                 data.join_price = repertory[0].join_price;
                 data.spec=repertory[0].spec,
                 data.join_xianjin = goods_info[0].join_xianjin;
