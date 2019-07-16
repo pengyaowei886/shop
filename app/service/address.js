@@ -6,7 +6,7 @@ class AddressService extends Service {
     async query_address(uid) {
         const mysql = this.app.mysql;
         let result = await mysql.select('address', {
-            where: { status: 1, uid: uid }, columns: ['id', 'user_name', 'phone', 'address', 'detailInfo', 'is_default']
+            where: { uid: uid }, columns: ['id', 'user_name', 'phone', 'address', 'detailInfo', 'is_default']
         });
         if (result.length >= 1) {
             return result;

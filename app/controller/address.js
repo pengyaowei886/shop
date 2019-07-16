@@ -29,7 +29,7 @@ class AddressController extends Controller {
         try {
             let handerThis = this;
             const { ctx, service } = handerThis;
-            let uid = Number(ctx, query.uid);
+            let uid = Number(ctx.query.uid);
             let data = await service.address.query_address(uid);
             return handerThis.succ(data);
         } catch (error) {
