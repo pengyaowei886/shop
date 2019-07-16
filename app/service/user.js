@@ -96,7 +96,7 @@ class UserService extends Service {
  *  小程序登陆
  * 
  * */
-    async login(code, head_pic,nick_name) {//接收客户端发送过来的信息，其中包括code和appid
+    async login(code, head_pic, nick_name) {//接收客户端发送过来的信息，其中包括code和appid
         /*
         * 首先读取本地 3_rdSession 是否存在，如果存在。判断是否过期。过期再生成一个存放本地（前端做）
         * 如果不存在 往下走
@@ -106,7 +106,7 @@ class UserService extends Service {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('user');
         const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
-const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
+        const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
         let databack = {};
 
         //console.log("code:",code);
@@ -121,44 +121,44 @@ const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
         let open_id = res1.data.openid;//open_id
         //判断用户是否存在
         let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
-
+console.log(is_exist);
         if (is_exist.length > 0) {
             //查出token
-         
+
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
-            let token = encryptedText.final("hex"); 
+            let token = encryptedText.final("hex");
             databack.uid = is_exist[0].id;
             databack.token = token;
-            databack.openid=open_id;
+            databack.openid = open_id;
             return databack;
         } else {
             let options = {
                 openid: open_id,
                 balance: 0,
                 wx_pic: head_pic,
-                wx_nickname:nick_name,
+                wx_nickname: nick_name,
                 status: 1,
                 ctime: new Date()
             }
             //插入数据库
-            await mysql.insert('user', options);
+           let uid_res= await mysql.insert('user', options);
             //  生成token
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
-
             let token = encryptedText.final("hex");
-            let user =  await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
-            let uid = user[0].id;
-            let result=await redis.set(`${token}`,uid);
-             if(result=="OK"){
-                databack.uid = uid;
+
+            // let user = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
+            // let uid = user[0].id;
+            let result = await redis.set(`${token}`, uid);
+            if (result == "OK") {
+                databack.uid = uid_res.insertId;
                 databack.token = token;
-                databack.openid=open_id;
-                return databack
-             }else{
-                 throw new Error('redis插入失败');
-             }        
+                databack.openid = open_id;
+                return databack;
+            } else {
+                throw new Error('redis插入失败');
+            }
         }
     }
     //查询轮播图
@@ -307,11 +307,11 @@ const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
     async query_user_info(uid) {
         const mysql = this.app.mysql;
         let result = await mysql.select('user', {
-            where: { id: uid }, columns: ['wx_pic', 'wx_nickname','balance']
+            where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance']
         });
-        if(result.length>0){
+        if (result.length > 0) {
             return result;
-        }else{
+        } else {
             throw new Error(" 查询用户信息失败");
         }
     }

@@ -65,6 +65,9 @@ class TeamController extends Controller {
                 openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
+                gold: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
                 introduce: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
@@ -96,8 +99,9 @@ class TeamController extends Controller {
             let phone = this.ctx.query.phone
             let goods_id = Number(this.ctx.query.goods_id);
             let spec_id = Number(this.ctx.query.spec_id);
+            let gold = Number(this.ctx.query.gold);
             let introduce = this.ctx.query.introduce;
-            let data = await service.team.open_team(goods_id, introduce, spec, spec_id, address, shouhuoren, phone, money, openid, ip);
+            let data = await service.team.open_team(goods_id, introduce, spec, spec_id,gold, address, shouhuoren, phone, money, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);

@@ -36,6 +36,8 @@ module.exports = app => {
     router.get('/zlpt/app/user/info', controller.user.query_user_info);
     //查询用户收获地址
     router.get('/zlpt/app/user/address/query', controller.address.query_address);
+    //编辑用户收货地址
+    router.post('/zlpt/app/user/address/edit', controller.address.edit_address);
 
     // 用户查看我的收藏
     router.get('/zlpt/app/user/collation/query', controller.user.query_collation);
