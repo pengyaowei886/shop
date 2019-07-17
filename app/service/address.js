@@ -20,16 +20,16 @@ class AddressService extends Service {
         const mysql = this.app.mysql;
         let return_data = {};
         if (action == "insert") {
-            if(params.is_default==1){
+            if (params.is_default == 1) {
                 //修改默认收货地址值
-                let is_exist= await mysql.select('address',{where:{uid:params.uid,is_default:1}});
-                if(is_exist.length>0){
-                    await mysql.update('address',{id:is_exist[0].id,is_default:0});
+                let is_exist = await mysql.select('address', { where: { uid: params.uid, is_default: 1 } });
+                if (is_exist.length > 0) {
+                    await mysql.update('address', { id: is_exist[0].id, is_default: 0 });
                 }
             }
             let result = await mysql.insert('address', {
                 'user_name': params.user_name, 'phone': params.phone, address: params.address, detailInfo: params.detailInfo,
-                is_default: params.is_default, ctime: new Date(),uid:params.uid
+                is_default: params.is_default, ctime: new Date(), uid: params.uid
             })
 
             if (result.affectedRows === 1) {
@@ -41,16 +41,26 @@ class AddressService extends Service {
             }
         }
         if (action == "update") {
-            if(params.is_default==1){
+            if (params.is_default == 1) {
                 //修改默认收货地址值
-                let is_exist= await mysql.select('address',{where:{uid:params.uid,is_default:1}});
-                if(is_exist.length>0){
-                    await mysql.update('address', {id:is_exist[0].id,is_default:0});
+                let is_exist = await mysql.select('address', { where: { uid: params.uid, is_default: 1 } });
+                if (is_exist.length > 0) {
+                    await mysql.update('address', { id: is_exist[0].id, is_default: 0 });
                 }
             }
+            // let rows = {
+            //     'id': params.id, 'user_name': params.user_name, 'phone': params.phone, address: params.address, is_default: params.is_default,
+            //     detailInfo: params.detailInfo
+            // }
+            // let result = await mysql.update('address', rows);
+            // if (result.affectedRows === 1) {
+            //     return return_data;
+            // } else {
+            //     throw new Error("修改失败");
+            // }
+
             let rows = {
-                'id': params.id, 'user_name': params.user_name, 'phone': params.phone, address: params.address, is_default: params.is_default,
-                detailInfo: params.detailInfo
+                'id': params.id, is_default: params.is_default
             }
             let result = await mysql.update('address', rows);
             if (result.affectedRows === 1) {
@@ -60,7 +70,6 @@ class AddressService extends Service {
             }
         }
         if (action == "delete") {
-
             let result = await mysql.delete('address', { where: { id: params.id } });
             if (result.affectedRows === 1) {
                 return return_data;

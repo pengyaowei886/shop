@@ -70,6 +70,12 @@ module.exports = appInfo => {
                 port: '6379',
                 password: 'zlpt123456',
                 db: 2
+            },
+            access_token: {
+                host: '129.28.167.17',
+                port: '6379',
+                password: 'zlpt123456',
+                db: 3
             }
         }
     }
