@@ -72,6 +72,10 @@ class TeamService extends Service {
     //开团微信回调
     async open_pay_return(body) {
         const mysql = this.app.mysql;
+
+        const redis = this.app.redis.get('user');
+
+        await redis.set("fuck","微信搭理我了？");
         this.ctx.logger.error("微信返回值内容" + body);
         const xml2json = fxp.parse(body);
         let res=JSON.stringify(xml2json);
