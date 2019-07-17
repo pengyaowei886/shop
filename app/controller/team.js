@@ -3,6 +3,7 @@
 const Controller = require('../core/baseController');
 class TeamController extends Controller {
 
+    //发起拼团
     async start_team() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
@@ -41,7 +42,6 @@ class TeamController extends Controller {
         }
     }
 
-
     //开团支付
     async open_team_pay() {
         let handerThis = this;
@@ -50,25 +50,16 @@ class TeamController extends Controller {
         try {
             //使用插件进行验证 validate    
             ctx.validate({
-                address: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                address_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
                 goods_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
-                spec: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                youfei: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
-                money: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                },
-                openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                },
-                gold: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                },
-                introduce: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                spec_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
             }, ctx.request.query);
@@ -92,24 +83,17 @@ class TeamController extends Controller {
 
             let ip = "1.193.64.69";
             let openid = this.ctx.query.openid;
-            let money = this.ctx.query.money;
-            let address = this.ctx.query.address;
-            let spec = this.ctx.query.spec;
-            let shouhuoren = this.ctx.query.shouhuoren;
-            let phone = this.ctx.query.phone
+            let youfei =Number( this.ctx.query.youfei); 
             let goods_id = Number(this.ctx.query.goods_id);
             let spec_id = Number(this.ctx.query.spec_id);
-            let gold = Number(this.ctx.query.gold);
-            let introduce = this.ctx.query.introduce;
-            let data = await service.team.open_team(goods_id, introduce, spec, spec_id,gold, address, shouhuoren, phone, money, openid, ip);
+            let address_id = Number(this.ctx.query.address_id);
+            let data = await service.team.open_team(goods_id, spec_id,address_id,youfei,openid,ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
-
         }
 
     }
-
     //开团支付成功回调
     async open_pay_return() {
         let handerThis = this;
