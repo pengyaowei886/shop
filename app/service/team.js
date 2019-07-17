@@ -72,11 +72,12 @@ class TeamService extends Service {
     //开团微信回调
     async open_pay_return(body) {
         const mysql = this.app.mysql;
+        this.ctx.logger.error("微信返回值内容" + body);
         const xml2json = fxp.parse(body);
         let res=JSON.stringify(xml2json);
+        this.ctx.logger.error("微信返回值内容" + res);
         let reData =res.xml;
-
-        this.ctx.logger.error("微信返回值内容" + reData);
+      
           if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
         // if (true) {
             // 支付成功处理 
