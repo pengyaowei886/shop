@@ -301,7 +301,7 @@ class UserController extends Controller {
       return handerThis.error('HANDLE_ERROR', error['message']);
     }
   }
-//查询
+//查询用户个人信息
   async query_user_info(){
     let handerThis = this;
     const { ctx, app, service } = handerThis;
@@ -333,5 +333,7 @@ class UserController extends Controller {
         return handerThis.error('HANDLE_ERROR', error['message']);
     }
   }
+
+  
 }
 module.exports = UserController;

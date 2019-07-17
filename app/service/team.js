@@ -3,35 +3,35 @@ const Service = require('egg').Service;
 const fxp = require("fast-xml-parser");
 class TeamService extends Service {
 
-    // //用户发起拼团
-    // async start_team(uid, goods_id, spec) {
-    //     const mysql = this.app.mysql;
-    //     let data = {};
-    //     //判断库存
-    //     let repertory = await mysql.select('join_specs', { where: { id: spec, status: 1 }, columns: ['repertory', 'leader_price', 'spec'] });
-    //     if (repertory[0].repertory > 0) {
-    //         //查询积分余额
-    //         let balance = await mysql.select('user', { where: { id: uid }, columns: ['balance'] });
-    //         if (balance[0].balance >= repertory[0].leader_price) {
-    //             //查询用户收货地址
-    //             let address = await mysql.select('address', { where: { uid: uid, is_default: 1 },columns:['address','user_name',"phone",'detailInfo'] });
-    //             //查询商品基本信息
-    //             let goods_info = await mysql.select('join_goods', { where: { id: goods_id, status: 1 }, columns: ['introduce', 'join_xianjin','head_pic'] });
-    //             data.join_price = repertory[0].join_price;
-    //             data.balance=
-    //             data.spec=repertory[0].spec,
-    //             data.join_xianjin = goods_info[0].join_xianjin;
-    //             data.introduce = goods_info[0].introduce;
-    //             data.head_pic = goods_info[0].head_pic;
-    //             data.address = address;
-    //             return data;
-    //         } else {
-    //             throw new Error("积分余额不足");
-    //         }
-    //     } else {
-    //         throw new Error("库存为0");
-    //     }
-    // }
+    //用户发起拼团
+    async start_team(uid, goods_id, spec) {
+        const mysql = this.app.mysql;
+        let data = {};
+        //判断库存
+        let repertory = await mysql.select('join_specs', { where: { id: spec, status: 1 }, columns: ['repertory', 'leader_price', 'spec'] });
+        if (repertory[0].repertory > 0) {
+            //查询积分余额
+            let balance = await mysql.select('user', { where: { id: uid }, columns: ['balance'] });
+            if (balance[0].balance >= repertory[0].leader_price) {
+                //查询用户收货地址
+                let address = await mysql.select('address', { where: { uid: uid, is_default: 1 },columns:['address','user_name',"phone",'detailInfo'] });
+                //查询商品基本信息
+                let goods_info = await mysql.select('join_goods', { where: { id: goods_id, status: 1 }, columns: ['introduce', 'join_xianjin','head_pic'] });
+                data.join_price = repertory[0].join_price;
+                data.balance=
+                data.spec=repertory[0].spec,
+                data.join_xianjin = goods_info[0].join_xianjin;
+                data.introduce = goods_info[0].introduce;
+                data.head_pic = goods_info[0].head_pic;
+                data.address = address;
+                return data;
+            } else {
+                throw new Error("积分余额不足");
+            }
+        } else {
+            throw new Error("库存为0");
+        }
+    }
     //用户确认开团
     async open_team(goods_id, spec_id, address_id, youfei, openid, ip) {
         const mysql = this.app.mysql;
@@ -78,7 +78,7 @@ class TeamService extends Service {
         this.ctx.logger.error("微信返回值内容" + reData);
           if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
         // if (true) {
-            支付成功处理 
+            // 支付成功处理 
             let openid = reData.openid;
             let order_no = reData.out_trade_no;
             let money = reData.total_fee;

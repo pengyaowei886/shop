@@ -121,7 +121,6 @@ class UserService extends Service {
         let open_id = res1.data.openid;//open_id
         //判断用户是否存在
         let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
-console.log(is_exist);
         if (is_exist.length > 0) {
             //查出token
 

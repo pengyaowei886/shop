@@ -52,8 +52,8 @@ module.exports = app => {
     //用户编辑我的浏览历史
     router.post('/zlpt/app/user/history/edit', controller.user.edit_history);
 
-    // //用户发起拼团
-    // router.post('/zlpt/app/user/team/start', controller.team.start_team);
+    //用户发起拼团
+    router.post('/zlpt/app/user/team/start', controller.team.start_team);
 
     //用户支付拼团
     router.get('/zlpt/app/user/team/pay', controller.team.open_team_pay);
