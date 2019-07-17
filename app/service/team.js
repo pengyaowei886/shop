@@ -73,7 +73,8 @@ class TeamService extends Service {
     async open_pay_return(body) {
         const mysql = this.app.mysql;
         const xml2json = fxp.parse(body);
-        let reData = JSON.stringify(xml2json);
+        let res=JSON.stringify(xml2json);
+        let reData =res.xml;
 
         this.ctx.logger.error("微信返回值内容" + reData);
           if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
