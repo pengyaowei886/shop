@@ -91,63 +91,59 @@ class TeamService extends Service {
         let order_no = reData.out_trade_no[0];
         let money = reData.total_fee[0];
         let wx_num = reData.transaction_id[0];
-        //测试用
-        // let openid = "oKvMN5Ef0LijcwlVkiLEOtv4urfg";
-        // let order_no = "1563158845176"
-        // let money = "200";
-        // let wx_num = "0987654321"
+      
 
         let databack = {};
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-        let order_res = await mysql.select('join_order', { where: { order_no: order_no,status:0 }, columns: ['spec_id', 'goods_id','gold','ctime'] });
-        
-        let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
-        let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
+        let order_res = await mysql.select('join_order', { where: { order_no: order_no, status: 0 }, columns: ['spec_id', 'goods_id', 'gold', 'ctime'] });
+        if (order_res.length > 0) {
+            let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
+            let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
 
-        //生成 拼团信息
-        await mysql.insert('join_team', {
-            uid: uid[0].id,
-            order_no: order_no, //订单号
-            goods_id: join_res[0].goods_id,
-            gold: Number(join_res[0].team_price),//成团需要的积分
-            join_num: join_res[0].join_number,
-            now_join_num: 0,
-            now_gold: 0, //现有积分
-            ctime: new Date(),
-            end_time: new Date(new Date().getTime() + effectiv_time[0].effectiv_time * 60 * 60 * 1000),//拼团结束时间
-            status: 0 //成团中
-        });
-        //修改拼团订单状态
-        await mysql.update('join_order', { status: 1 }, { where: { order_no: order_no } });
-
-
-        //生成积分消费记录
-        await mysql.insert('gold_record', {
-            uid: uid[0].id,
-            num: -join_res[0].leader_price,
-            source: 2, //开团消耗
-            ctime: new Date(),
-        });
-        //生成支付记录
-        await mysql.insert('pay_record', {
-            uid: uid[0].id,
-            pay_num: money,
-            pay_no: wx_num,
-            kind: 1, //微信小程序支付
-            status: 2, //开团支付
-            ctime: new Date(),
-        });
-        //扣除开团积分
-        let sql = "update  user set balance = balance - ? where id= ?";
-        let args = [join_res[0].leader_price, uid[0].id];
-        await mysql.query(sql, args);
-        databack.ctime=order_res[0].ctime;
-        databack.gold=order_res[0].gold;
-        databack.order_no=order_no;
-        databack.wx_no=wx_num;
-        return databack;
-
+            //生成 拼团信息
+            await mysql.insert('join_team', {
+                uid: uid[0].id,
+                order_no: order_no, //订单号
+                goods_id: join_res[0].goods_id,
+                gold: Number(join_res[0].team_price),//成团需要的积分
+                join_num: join_res[0].join_number,
+                now_join_num: 0,
+                now_gold: 0, //现有积分
+                ctime: new Date(),
+                end_time: new Date(new Date().getTime() + effectiv_time[0].effectiv_time * 60 * 60 * 1000),//拼团结束时间
+                status: 0 //成团中
+            });
+            //修改拼团订单状态
+            await mysql.update('join_order', { status: 1 }, { where: { order_no: order_no } });
+            //生成积分消费记录
+            await mysql.insert('gold_record', {
+                uid: uid[0].id,
+                num: -join_res[0].leader_price,
+                source: 2, //开团消耗
+                ctime: new Date(),
+            });
+            //生成支付记录
+            await mysql.insert('pay_record', {
+                uid: uid[0].id,
+                pay_num: money,
+                pay_no: wx_num,
+                kind: 1, //微信小程序支付
+                status: 2, //开团支付
+                ctime: new Date(),
+            });
+            //扣除开团积分
+            let sql = "update  user set balance = balance - ? where id= ?";
+            let args = [join_res[0].leader_price, uid[0].id];
+            await mysql.query(sql, args);
+            databack.ctime = order_res[0].ctime;
+            databack.gold = order_res[0].gold;
+            databack.order_no = order_no;
+            databack.wx_no = wx_num;
+            return databack;
+        } else {
+            throw new Error('该订单已付过款')
+        }
     }
     //用户参加拼团
     async join_team(openid, join_no, money, ip) {
@@ -184,7 +180,7 @@ class TeamService extends Service {
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
-        let order_info = await mysql.select('join_order', { where: { order_no: join_no }, columns: [ 'ctime', 'gold'] });
+        let order_info = await mysql.select('join_order', { where: { order_no: join_no }, columns: ['ctime', 'gold'] });
         //判断此次加入是否成团
         if (team[0].now_gold + money >= team[0].gold) {
             let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
@@ -223,7 +219,7 @@ class TeamService extends Service {
         let user_args = [money, uid[0].id];
         await mysql.query(user_sql, user_args);
 
-    
+
         return true;
 
     }
