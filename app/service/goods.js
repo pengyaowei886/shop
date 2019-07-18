@@ -50,7 +50,7 @@ class Goodsservice extends Service {
         //先查商品信息
 
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', "head_pic", "pic",'spec', 'repertory', 'succ_volume', "details", "video", "goods_rotate"]
+            where: { id: id }, columns: ['introduce', "head_pic", "pic",'spec_name', 'repertory', 'succ_volume', "details", "video", "goods_rotate"]
         });
 
         if (result.length > 0) {
