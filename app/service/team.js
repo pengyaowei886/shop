@@ -75,7 +75,8 @@ class TeamService extends Service {
 
         const redis = this.app.redis.get('user');
 
-        await redis.set("fuck","微信搭理我了？");
+      let result=  await redis.get("fuck");
+      console.log(result);
         this.ctx.logger.error("微信返回值内容" + body);
         const xml2json = fxp.parse(body);
         let res=JSON.stringify(xml2json);
