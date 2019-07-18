@@ -98,15 +98,11 @@ class TeamController extends Controller {
     async open_pay_return() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
-        var body = ctx.request.body;
-        let data = await service.team.open_pay_return(body);
+        let  body = ctx.request.query.order_no;
+       
         try {
-            if (data) {
-                var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-                ctx.body = message;
-            } else {
-
-            }
+            let data = await service.team.open_pay_return(body);
+          return  handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
 
