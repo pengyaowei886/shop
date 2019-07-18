@@ -91,13 +91,13 @@ class TeamService extends Service {
         let order_no = reData.out_trade_no[0];
         let money = reData.total_fee[0];
         let wx_num = reData.transaction_id[0];
-      
+
 
         let databack = {};
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-        let order_res = await mysql.select('join_order', { where: { order_no: order_no, status: 0 }, columns: ['spec_id', 'goods_id', 'gold', 'ctime'] });
-        if (order_res.length > 0) {
+        let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['spec_id', 'goods_id', 'gold', 'ctime', 'status'] });
+        if (order_res[0].status = 0) {
             let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
             let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
 
@@ -142,7 +142,7 @@ class TeamService extends Service {
             databack.wx_no = wx_num;
             return databack;
         } else {
-            throw new Error('该订单已付过款')
+            throw new Error('订单状态异常');
         }
     }
     //用户参加拼团
@@ -180,10 +180,13 @@ class TeamService extends Service {
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
-        let order_info = await mysql.select('join_order', { where: { order_no: join_no }, columns: ['ctime', 'gold'] });
         //判断此次加入是否成团
         if (team[0].now_gold + money >= team[0].gold) {
-            let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
+            let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
+            let join_args = [money, money, join_no];
+            await mysql.query(join_sql, join_args);
+        } else {
+            let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
             let join_args = [money, money, join_no];
             await mysql.query(join_sql, join_args);
         }
@@ -219,8 +222,8 @@ class TeamService extends Service {
         let user_args = [money, uid[0].id];
         await mysql.query(user_sql, user_args);
 
-
-        return true;
+        databack.money = money;
+        return databack;
 
     }
     // 查询用户拼团列表
