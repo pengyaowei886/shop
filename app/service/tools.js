@@ -205,7 +205,6 @@ class ToolsService extends Service {
             //  responseData = res.xml;
             //  console.log(responseData);
             let reData = res.xml;
-
             if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
 
                 responseData = reData;

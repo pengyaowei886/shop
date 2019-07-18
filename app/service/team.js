@@ -96,8 +96,9 @@ class TeamService extends Service {
         let databack = {};
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+
         let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['spec_id', 'goods_id', 'gold', 'ctime', 'status'] });
-        if (order_res[0].status = 0) {
+        if (order_res[0].status ==0) {
             let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
             let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
 
@@ -146,18 +147,18 @@ class TeamService extends Service {
         }
     }
     //用户参加拼团
-    async join_team(openid, join_no, money, ip) {
+    async join_team(openid, uid, join_no, money, ip) {
         const mysql = this.app.mysql;
         //判断团是否已经成团
-        let team_exist = await mysql.select('join_team', { where: { id: join_id }, columns: ['status'] })
-        if (team_exist[0].status == 0) {
+        let team_exist = await mysql.select('join_team', { where: { join_no: join_no }, columns: ['status', 'uid'] })
+        if (uid != team_exist[0].uid && eam_exist[0].status == 0) {
             let order_no = new Date().getTime();
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
             let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
             return data;
         } else {
-            throw new Error('该团已拼成，请选择其他团')
+            throw new Error('不能参加自己的团或者此团已拼成功')
         }
     }
     //参团支付回调
@@ -252,7 +253,6 @@ class TeamService extends Service {
             }
         }
         result[0].head = head;
-
         return result[0];
     }
 
@@ -288,7 +288,7 @@ class TeamService extends Service {
                 let money = gold - now_gold;
                 let order_no = new Date().getTime();
                 let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";;
-                let body_data = "参团支付";
+                let body_data = "包尾支付";
                 let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
                 return data;
             } else {
@@ -303,60 +303,45 @@ class TeamService extends Service {
         // const xml2json = fxp.parse(body);
         // let reData = JSON.stringify(xml2json);
         // this.ctx.logger.error("微信返回值内容" + reData);
+
+        // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
+
+
+        // 支付成功处理
         const mysql = this.app.mysql;
         // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
-        if (true) {
+        let databack = {};
+        let reData = await this.ctx.service.tools.query_weixin_order(body);
+        //支付成功处理
+        let openid = reData.openid[0];
+        let order_no = reData.out_trade_no[0];
+        let money = reData.total_fee[0];
+        let join_no = reData.attach[0]
+        let wx_num = reData.transaction_id[0];
 
-            // 支付成功处理
-            // let openid = reData.openid;
-            // let order_no = reData.out_trade_no;
-            // let money = reData.total_fee;
-            // let join_no = reData.attach
-            // let wx_num = reData.transaction_id;
+        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+        //更新 拼团信息
+        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? where order_no = ?";
+        let join_args = [order_no, join_no];
+        await mysql.query(join_sql, join_args);
+        //生成用户参团记录
+        await mysql.insert('user_join', {
+            uid: uid[0].id,
+            num: money,//预留
+            ctime: new Date(),
+            join_no: join_no
+        });
 
-            let openid = "oKvMN5OEFg3Hm0LTzSxG3kevsGUw";
-            let join_no = "1563158845176"
-            let money = 200;
-            let wx_num = "0987654324";
-
-            let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-            //更新 拼团信息
-            let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1  where order_no = ?";
-            let join_args = [money / 100, money / 100, join_no];
-            await mysql.query(join_sql, join_args);
-            //生成用户参团记录
-            await mysql.insert('user_join', {
-                uid: uid[0].id,
-                num: money,//预留
-                ctime: new Date(),
-                join_no: join_no
-            });
-
-            //生成积分消费记录
-            await mysql.insert('gold_record', {
-                uid: uid[0].id,
-                num: money,//预留
-                source: 1, //参团赠送
-                ctime: new Date(),
-                end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
-            });
-            //生成支付记录
-            await mysql.insert('pay_record', {
-                uid: uid[0].id,
-                pay_num: money,
-                pay_no: wx_num,
-                kind: 1, //微信小程序支付
-                status: 1, //参团支付
-                ctime: new Date(),
-            });
-            //增加账号积分
-            let user_sql = "update  user set balance = balance + ? where id= ?";
-            let user_args = [money, uid[0].id];
-            await mysql.query(user_sql, user_args);
-            return true;
-        } else {
-            return false;
-        }
+        //生成支付记录
+        await mysql.insert('pay_record', {
+            uid: uid[0].id,
+            pay_num: money,
+            pay_no: wx_num,
+            kind: 1, //微信小程序支付
+            status: 1, //参团支付
+            ctime: new Date(),
+        });
+        return databack;
     }
 }
 module.exports = TeamService;
