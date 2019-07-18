@@ -100,7 +100,8 @@ class TeamService extends Service {
         let databack = {};
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-        let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['spec_id', 'goods_id','gold','ctime'] });
+        let order_res = await mysql.select('join_order', { where: { order_no: order_no,status:0 }, columns: ['spec_id', 'goods_id','gold','ctime'] });
+        
         let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
         let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
 
@@ -141,7 +142,6 @@ class TeamService extends Service {
         let sql = "update  user set balance = balance - ? where id= ?";
         let args = [join_res[0].leader_price, uid[0].id];
         await mysql.query(sql, args);
-
         databack.ctime=order_res[0].ctime;
         databack.gold=order_res[0].gold;
         databack.order_no=order_no;
