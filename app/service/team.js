@@ -152,7 +152,7 @@ class TeamService extends Service {
         let team_exist = await mysql.select('join_team', { where: { id: join_id }, columns: ['status'] })
         if (team_exist[0].status == 0) {
             let order_no = new Date().getTime();
-            let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_team/return";;
+            let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";;
             let body_data = "参团支付";
             let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
             return data;
