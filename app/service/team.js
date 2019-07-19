@@ -53,7 +53,7 @@ class TeamService extends Service {
             goods_id: goods_id,
             introduce: goods_info[0].introduce,
             money: goods_info[0].join_xianjin,
-            gold: spec_info[0].team_price,
+            gold: spec_info[0].leader_price,
             youfei: youfei,
             spec: spec_info[0].spec,
             spec_id: spec_id,
@@ -73,8 +73,6 @@ class TeamService extends Service {
     async open_pay_return(body) {
         const mysql = this.app.mysql;
 
-        const redis = this.app.redis.get('user');
-
 
         // // this.ctx.logger.error("微信返回值内容" + body);
         // const xml2json = fxp.parse(body);
@@ -85,8 +83,7 @@ class TeamService extends Service {
         //   console.log(res)
 
         let reData = await this.ctx.service.tools.query_weixin_order(body);
-        // if (true) {
-        // 支付成功处理 
+    
         let openid = reData.openid[0];
         let order_no = reData.out_trade_no[0];
         let money = reData.total_fee[0];
@@ -318,10 +315,10 @@ class TeamService extends Service {
         let money = reData.total_fee[0];
         let join_no = reData.attach[0]
         let wx_num = reData.transaction_id[0];
-
+let self_money
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
-        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? where order_no = ?";
+        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = gold - now_gold  where order_no = ?";
         let join_args = [order_no, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录

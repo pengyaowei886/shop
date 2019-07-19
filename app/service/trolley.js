@@ -34,8 +34,7 @@ class TrolleyService extends Service {
                     str += arr[i] + ";";
                 }
                 str += append;
-                await redis.hmset(`trolley:${uid}`, `${goods_id}:${spec_id}`, str);
-                
+                await redis.hmset(`trolley:${uid}`, `${goods_id}:${spec_id}`, str);             
             } else {
                 //不存在
                 await redis.hmset(`trolley:${uid}`, `${goods_id}:${spec_id}`,params+";1");

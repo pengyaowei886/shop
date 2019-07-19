@@ -185,7 +185,7 @@ class UserService extends Service {
                 throw new Error("重复收藏");
             } else {
                 let result = await mysql.insert('collation', {
-                    'goods_id': params.id, "uid": params.uid, "status": 1, ctime: new Date(), kind: params.kind
+                    'goods_id': params.goods_id, "uid": params.uid, "status": 1, ctime: new Date(), kind: params.kind
                 })
                 if (result.affectedRows === 1) {
                     return return_data;
@@ -197,7 +197,7 @@ class UserService extends Service {
         }
         if (action == "delete") {
             let rows = {
-                'id': params.id
+               'id':params.id
             }
             let result = await mysql.delete('collation', rows);
             if (result.affectedRows === params.id.length) {
