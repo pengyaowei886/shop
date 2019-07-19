@@ -55,9 +55,6 @@ class TrolleyController extends Controller {
                 },
                 uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'int', required: true, allowEmpty: false
-                },
-                params: {
-                    type: 'string', required: false, allowEmpty: false
                 }
             }, ctx.request.body);
         } catch (e) {
@@ -73,11 +70,10 @@ class TrolleyController extends Controller {
             let handerThis = this;
             const { ctx, service } = handerThis;
             let action = this.ctx.request.body.action;
-            let params = this.ctx.request.body.params;
             let goods_id = this.ctx.request.body.goods_id;
             let spec_id = this.ctx.request.body.spec_id;
             let uid = this.ctx.request.body.uid;
-            let data = await service.trolley.edit_trolley(action, goods_id,spec_id,uid,params);
+            let data = await service.trolley.edit_trolley(action, goods_id,spec_id,uid);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
