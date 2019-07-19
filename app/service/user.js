@@ -200,7 +200,7 @@ class UserService extends Service {
                'id':params.id
             }
             let result = await mysql.delete('collation', rows);
-            if (result.affectedRows === params.id.length) {
+            if (result.affectedRows == 1) {
                 return return_data;
             } else {
                 throw new Error("取消收藏失败");
