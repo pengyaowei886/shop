@@ -118,6 +118,8 @@ class Goodsservice extends Service {
             let collation = await mysql.select('collation', {
                 where: { goods_id: id, kind: 2 }, columns: ["id"]
             });
+
+            console.log(collation);
             if (collation.length >= 1) { //已经收藏过
                 result[0].collation = 1;
             } else {
