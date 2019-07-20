@@ -75,7 +75,7 @@ module.exports = app => {
     router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
 
 
-
+    router.get('/zlpt/app/user/team/pay/return', controller.order.goods_pay_return);
 
 
 
