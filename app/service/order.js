@@ -134,7 +134,7 @@ class OrderService extends Service {
             //生成积分消费记录
             await mysql.insert('gold_record', {
                 uid: uid[0].id,
-                num: -join_res[0].leader_price,
+                num: -order_res[0].gold,
                 source: 3, //商店抵扣
                 ctime: new Date(),
             });
