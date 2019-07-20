@@ -71,6 +71,10 @@ module.exports = app => {
     //用户查询我的拼团
 
 
+    //用户购买普通商品
+    router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
+
+
 
 
 
