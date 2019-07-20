@@ -47,5 +47,57 @@ class ToolsController extends Controller {
         let data = { url: url }
         return handerThis.succ(data);
     }
+
+
+
+    //获取物流信息
+    async get_path() {
+        //参数校验
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        try {
+            //使用插件进行验证 validate    
+            ctx.validate({
+                order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                kuaidi_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                delivery_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
+            }, ctx.query);
+        } catch (e) {
+            ctx.logger.warn(e);
+            let logContent = e.code + ' ' + e.message + ',';
+            for (let i in e.errors) {
+                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+            }
+            return handerThis.error('PARAMETERS_ERROR', logContent);
+        }
+        try {
+            //获取token 
+            const redis = this.app.redis.get('access_token');
+            let token = await redis.get("access_token");
+            let token_url = `https://api.weixin.qq.com/cgi-bin/express/business/path/get?access_token=${token}`;
+            
+            let formData = {
+                order_id: this.ctx.request.body.order_no,
+                delivery_id: this.ctx.request.body.delivery_id,
+                waybill_id: this.ctx.request.body.kuaidi_no
+            }
+            let res = await this.ctx.curl(token_url, {
+                method: "POST",
+                data: formData
+            })
+            console.log(res);
+            return handerThis.succ(res);
+        } catch (error) {
+
+        }
+
+    }
 }
 module.exports = ToolsController;

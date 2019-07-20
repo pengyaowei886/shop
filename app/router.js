@@ -14,6 +14,8 @@ module.exports = app => {
     router.post('/zlpt/tools/upload', controller.tools.uoloadImg);
     //请求短信验证码
     router.get('/zlpt/tools/duanxin', controller.user.req_dx);
+    //查询物流
+    router.post('/zlpt/tools/wuliu', controller.tools.get_path);
 
     //小程序登陆
     router.post('/zlpt/wx/login', controller.user.login);

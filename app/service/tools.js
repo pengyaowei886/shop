@@ -152,7 +152,7 @@ class ToolsService extends Service {
         return responseData;
     }
 
-    //微
+    //微信查询订单
     async  query_weixin_order(out_trade_no) {
 
 
@@ -214,9 +214,5 @@ class ToolsService extends Service {
         })
         return responseData;
     }
-
-
-
-
 }
 module.exports = ToolsService;
