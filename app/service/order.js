@@ -160,6 +160,50 @@ class OrderService extends Service {
             throw new Error('订单状态异常');
         }
     }
+    //用户确认收货
+    async confire_order(kind, order_id) {
+        const mysql = this.app.mysql;
+        let data_back = {};
+        if (kind == 1) {
+            let status = mysql.select("join_order", { where: { status: 3, id: order_id, shouhuo_time: new Date() }, columns: ['id', 'goods_id'] });
+            if (status[0].length == 1) {
+                let res = await mysql.update("join_order", { id: id, status: 4 });
+                if (res.affectedRows == 1) {
+                    let sql = "update  join_goods set succ_volume = succ_volume +1  where id= ?";
+                    let args = [status[0].goods_id];
+                    await mysql.query(sql, args);
+                    return data_back;
+                } else {
+                    throw new Error('修改订单状态失败');
+                }
+            } else {
+                throw new Error('订单状态异常');
+            }
+
+        } else {
+            let status = mysql.select("goods_order", { where: { status: 3, id: order_id }, columns: ['id', 'order_no'] });
+            if (status[0].length == 1) {
+                let res = await mysql.update("goods_order", { id: id, status: 4, shouhuo_time: new Date() });
+                if (res.affectedRows == 1) {
+
+                    let goods_info = await mysql.select("goods_order_info", { where: { order_no: status[0].order_no }, columns: ['goods_id'] });
+                    for (let i in goods_info) {
+                        let sql = "update  goods set succ_volume = succ_volume +1  where id= ?";
+                        let args = [goods_info[i].goods_id];
+                        await mysql.query(sql, args);
+                    }
+                    return data_back;
+
+                } else {
+                    throw new Error('修改订单状态失败');
+                }
+            } else {
+                throw new Error('订单状态异常');
+            }
+        }
+    }
+    //用户发表评价
+
 
 }
-module.exports = OrderService;
+module.exports = OrderService; d
