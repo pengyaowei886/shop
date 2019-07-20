@@ -76,9 +76,11 @@ module.exports = app => {
     //用户购买普通商品
     router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
 
-
+    //回调
     router.get('/zlpt/app/user/team/pay/return', controller.order.goods_pay_return);
 
+    //查看订单角标
+    router.get('/zlpt/app/user/order/num', controller.order.query_order_num);
 
 
     // //用户查看我的评价

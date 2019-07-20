@@ -202,8 +202,25 @@ class OrderService extends Service {
             }
         }
     }
+    //用户查询不同状态订单数量
+    async query_order_num(kind, uid) {
+        const mysql = this.app.mysql;
+        if (kind == 1) {
+             let sql="select count (*) as sum ,status  from join_order where uid= ? group by status order by ctime ";
+             let args=[uid]
+            let result  = await mysql.query(sql, args);
+            return result;
+        } else {
+            let sql="select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
+             let args=[uid]
+            let result  = await mysql.query(sql, args);
+            return result;
+        }
+    }
+
+
     //用户发表评价
 
 
 }
-module.exports = OrderService; d
+module.exports = OrderService; 
