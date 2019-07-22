@@ -70,18 +70,11 @@ class TeamService extends Service {
         return data;
     }
     //用户继续完成开团支付
-    async open_team_again(order_no, openid, ip) {
-        const mysql = this.app.mysql;
-
-        let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
-        let body_data = "开团支付";
-        let order_info = await mysql.select('join_order', {
-            where: { order_no: order_no }, columns: ['money', 'youfei', 'goods_id']
-        })
-        let money = order_info[0].money + order_info[0].youfei;
-        let attach = order_info[0].goods_id;
-        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-        return data;
+    async open_team_again(order_no, uid) {
+        const redis = this.app.redis.get('pay');
+        let result = redis.hgetall(`pay:${uid}:${order_no}`);
+        console.log(result);
+        return result;
     }
 
     //开团微信回调

@@ -70,6 +70,7 @@ class ToolsService extends Service {
         let responseData = {};
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
+            console.log(reData);
             if (reData.return_code[0] == 'SUCCESS') {
                 responseData = {
                     timeStamp: new Date().getTime(),

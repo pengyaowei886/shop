@@ -76,7 +76,13 @@ module.exports = appInfo => {
                 port: '6379',
                 password: 'zlpt123456',
                 db: 3
-            }
+            },
+            pay: {
+                host: '129.28.167.17',
+                port: '6379',
+                password: 'zlpt123456',
+                db: 4
+              }
         }
     }
     config.bodyParser = {

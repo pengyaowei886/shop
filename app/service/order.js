@@ -35,6 +35,7 @@ class OrderService extends Service {
     //用户结算购物车
     async trolley_pay(goods, uid, is_gold, youfei, address_id, openid, ip) {
         const mysql = this.app.mysql;
+        const redis = this.app.redis.get('pay');
         let goods_id = [];
         let spec_id = [];
         for (let i in goods) {
@@ -90,7 +91,7 @@ class OrderService extends Service {
             address: address[0].address,
             detailInfo: address[0].detailInfo,
             ctime: new Date(),
-            end_time:new Date(new Date().getTime() + 30 * 60 * 1000),//30分钟
+            end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//30分钟
             status: 0
         })
 
@@ -112,24 +113,24 @@ class OrderService extends Service {
         let attach = order_no;
         //付款
         let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+
+        //放入redis 
+        await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
+        await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
+        await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
+        await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
+        await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
         return data;
     }
 
-//用户继续完成 支付
-async trolley_pay_again(order_no, openid, ip) {
-    const mysql = this.app.mysql;
+    //用户继续完成 支付
+    async trolley_pay_again(order_no, uid) {
+         const redis = this.app.redis.get('pay');
+        let result = redis.hgetall(`pay:${uid}:${order_no}`);
+        console.log(result);
+        return result;
+    }
 
-    let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
-    let body_data = "订单支付";
-    let order_info = await mysql.select('goods_order', {
-        where: { order_no: order_no }, columns: ['money', 'youfei', 'goods_id']
-    })
-    let money = order_info[0].money + order_info[0].youfei;
-    let attach = order_info[0].goods_id;
-    let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-    return data;
-}
-    
     //用户完成购买
     async goods_pay_return(body) {
         const mysql = this.app.mysql;
@@ -247,11 +248,11 @@ async trolley_pay_again(order_no, openid, ip) {
         let rows = {}
         if (status == 100000) {
             rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
+                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
             }
         } else {
             rows = {
-                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
+                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
             }
         }
         let result = await mysql.select('goods_order', rows);
@@ -261,7 +262,7 @@ async trolley_pay_again(order_no, openid, ip) {
                 order_no.push(result[i].order_no)
             }
             let order_info = await mysql.select('goods_order_info', {
-                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no','goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
+                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
             });
 
 
@@ -290,7 +291,7 @@ async trolley_pay_again(order_no, openid, ip) {
         let rows = {}
         if (status == 100000) {
             rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
+                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
             }
         } else {
             rows = {

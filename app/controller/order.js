@@ -79,8 +79,8 @@ class OrderController extends Controller {
                 order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
-                openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'int', required: true, allowEmpty: false
                 }
             }, ctx.request.body);
         } catch (e) {
@@ -98,13 +98,10 @@ class OrderController extends Controller {
 
             const { ctx, service } = handerThis;
 
-            // let ip_arr=ip_res.split(":");
-            // let ip=ip_arr[0];
-
-            let ip = "1.193.64.69";
-            let openid = this.ctx.request.body.openid;
+        
+            let uid = this.ctx.request.body.uid;
             let order_no = this.ctx.request.body.order_no;
-            let data = await service.order.trolley_pay_again(order_no, openid, ip);
+            let data = await service.order.trolley_pay_again(order_no, uid);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
