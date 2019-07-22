@@ -235,7 +235,7 @@ class OrderService extends Service {
             }
         } else {
             rows = {
-                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
             }
         }
         let result = await mysql.select('goods_order', rows);
