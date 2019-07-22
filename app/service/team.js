@@ -264,10 +264,9 @@ class TeamService extends Service {
     //检索同类拼团列表
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
-        console.log("epjods")
         let result = await mysql.select('join_team', {
             where: { goods_id: goods_id,status:0 },
-            columns: ['uid','end_time'], order: ['ctime', 'desc'], limit: limit, offset: skip
+            columns: ['uid','end_time','order_no'], order: ['ctime', 'desc'], limit: limit, offset: skip
         });
         let id=[];
         for(let i in result){
