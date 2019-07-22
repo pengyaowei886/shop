@@ -54,6 +54,7 @@ class OrderController extends Controller {
             // let ip=ip_arr[0];
 
             let ip = "1.193.64.69";
+            console.log("????")
             let openid = this.ctx.request.body.openid;
             let youfei = Number(this.ctx.request.body.youfei);
             let goods = this.ctx.request.body.goods;

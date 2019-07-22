@@ -67,7 +67,8 @@ class OrderService extends Service {
         let order_no = new Date().getTime();
         let gold_info = await mysql.select('user', { where: { id: uid }, columns: ['balance'] })
 
-        let address = await mysql.select('address', { where: { id: address_id }, columns: ['address', 'phone', 'user_name', 'detailInfo'] })
+        let address = await mysql.select('address', { where: { id: address_id }, columns: ['address', 'phone', 'user_name', 'detailInfo'] });
+        console.log(address)
 
         let gold = 0;
         if (is_gold == 1) {
@@ -120,7 +121,7 @@ class OrderService extends Service {
         await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
         await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
         await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
-        await redis.expire(`${phone}:code`, 2400);//40分钟后过期
+        await redis.expire(`pay:${uid}:${order_no}`, 2400);//40分钟后过期
         return data;
     }
 

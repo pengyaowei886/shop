@@ -30,7 +30,10 @@ class ToolsService extends Service {
             return str;
 
         }
-        let total_fee = Number(money) * 100;
+    
+      
+        let total_fee =  Math.floor(money *100);
+        console.log(total_fee)
         let appid = this.app.config.info.appid;	//自己的小程序appid
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
         let sign = createSign({	//签名
