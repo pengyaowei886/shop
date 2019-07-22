@@ -137,7 +137,6 @@ class OrderService extends Service {
         const mysql = this.app.mysql;
 
         let reData = await this.ctx.service.tools.query_weixin_order(body);
-
         let openid = reData.openid[0];
         let order_no = reData.out_trade_no[0];
         let money = reData.total_fee[0];
@@ -149,6 +148,7 @@ class OrderService extends Service {
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
         let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold', 'id'] });
+    
         if (order_res[0].status == 0) {
             //生成积分消费记录
             await mysql.insert('gold_record', {
@@ -158,7 +158,7 @@ class OrderService extends Service {
                 ctime: new Date(),
             });
             //修改订单状态
-            await mysql.insert('goods_order', {
+            await mysql.update('goods_order', {
                 id: order_res[0].id,
                 status: 1,
                 pay_time: new Date()
