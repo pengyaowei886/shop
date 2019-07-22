@@ -230,6 +230,14 @@ class TeamService extends Service {
         let result = await mysql.select('join_team', { where: { uid: uid, status: status }, columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'] });
         return result;
     }
+//    // 查询用户参团列表
+//    async query_user_team(uid, status) {
+//     const mysql = this.app.mysql;
+//     let result = await mysql.select('user_join', { where: { uid: uid, status: status }, columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'] });
+//     return result;
+// }
+
+
     //查看用户拼团具体详情
     async query_user_team_info(join_no) {
         const mysql = this.app.mysql;
@@ -256,15 +264,22 @@ class TeamService extends Service {
     //检索同类拼团列表
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
+        console.log("epjods")
         let result = await mysql.select('join_team', {
-            where: { goods_id: goods_id },
-            columns: ['uid'], order: ['ctime', 'desc'], limit: limit, offset: skip
+            where: { goods_id: goods_id,status:0 },
+            columns: ['uid','end_time'], order: ['ctime', 'desc'], limit: limit, offset: skip
         });
-        let head = await mysql.select('user', { where: { id: result }, columns: ['id', 'head_pic'] });
+        let id=[];
+        for(let i in result){
+            id.push(result[i].uid)
+        }
+        let head = await mysql.select('user', { where: { id: id }, columns: ['id', 'wx_pic','wx_nickname'] });
+ 
         for (let i in result) {
             for (let j in head) {
                 if (result[i].uid == head[j].id) {
-                    result[i].head_pic = head[j].head_pic;
+                    result[i].head_pic = head[j].wx_pic;
+                    result[i].nick_name = head[j].wx_nickname;
                     break;
                 }
             }
@@ -315,7 +330,6 @@ class TeamService extends Service {
         let money = reData.total_fee[0];
         let join_no = reData.attach[0]
         let wx_num = reData.transaction_id[0];
-let self_money
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
         let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = gold - now_gold  where order_no = ?";

@@ -72,6 +72,8 @@ module.exports = app => {
 
     //用户查询我的拼团
 
+    //用户检索相同拼团
+    router.get('/zlpt/app/user/team/query/same', controller.team.query_same_team);
 
     //用户购买普通商品
     router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
