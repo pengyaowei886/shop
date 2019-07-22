@@ -1,6 +1,6 @@
 
 const Service = require('egg').Service;
-const fxp = require("fast-xml-parser");
+
 class TeamService extends Service {
 
     //用户发起拼团
@@ -69,6 +69,45 @@ class TeamService extends Service {
 
         return data;
     }
+    //用户继续完成开团支付
+
+    async open_team_again(goods_id, spec_id, address_id, youfei, openid, ip) {
+        const mysql = this.app.mysql;
+        let attach = goods_id;
+        let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
+        let body_data = "开团支付";
+        let order_no = new Date().getTime();
+        let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
+
+        let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
+
+        let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
+        //生成预付款订单
+        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+        let money = goods_info[0].join_xianjin;
+        await mysql.insert('join_order', {
+            uid: uid[0].id,
+            order_no: order_no, //订单号
+            goods_id: goods_id,
+            introduce: goods_info[0].introduce,
+            money: goods_info[0].join_xianjin,
+            gold: spec_info[0].leader_price,
+            youfei: youfei,
+            spec: spec_info[0].spec,
+            spec_id: spec_id,
+            address: address_info[0].address,
+            detailInfo: address_info[0].detailInfo,
+            shouhuoren: address_info[0].user_name,
+            phone: address_info[0].phone,
+            ctime: new Date(),
+            end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//订单付款截止时间
+            status: 0 //待付款
+        });
+        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+
+        return data;
+    }
+
     //开团微信回调
     async open_pay_return(body) {
         const mysql = this.app.mysql;
@@ -298,7 +337,7 @@ class TeamService extends Service {
 
                 let money = gold - now_gold;
                 let order_no = new Date().getTime();
-                let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";;
+                let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";
                 let body_data = "包尾支付";
                 let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
                 return data;

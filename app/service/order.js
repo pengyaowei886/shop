@@ -245,7 +245,7 @@ class OrderService extends Service {
                 order_no.push(result[i].order_no)
             }
             let order_info = await mysql.select('goods_order_info', {
-                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no'], group: ['order_no'], order: [['ctime', 'desc']]
+                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no','goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
             });
 
 
