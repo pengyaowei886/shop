@@ -113,8 +113,6 @@ class OrderController extends Controller {
 
             const { ctx, service } = handerThis;
 
-            // let ip_arr=ip_res.split(":");
-            // let ip=ip_arr[0];
 
             let uid = Number(this.ctx.request.query.uid);
             let kind = Number(this.ctx.request.query.kind);
@@ -126,6 +124,55 @@ class OrderController extends Controller {
 
     }
 
+ //用户查询订单列表
+ async query_order_list() {
+
+    let handerThis = this;
+    const { ctx, app, service } = handerThis;
+    //参数校验
+    try {
+        //使用插件进行验证 validate    
+        ctx.validate({
+            status: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            }
+        }, ctx.request.query);
+    } catch (e) {
+        ctx.logger.warn(e);
+        let logContent = e.code + ' ' + e.message + ',';
+        for (let i in e.errors) {
+            logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+        }
+        return handerThis.error('PARAMETERS_ERROR', logContent);
+    }
+
+    //逻辑判断
+    try {
+
+
+        const { ctx, service } = handerThis;
+
+
+        let uid = Number(this.ctx.request.query.uid);
+        let status = Number(this.ctx.request.query.status);
+        let limit = Number(this.ctx.request.query.limit);
+        let skip = Number(this.ctx.request.query.skip);
+        let data = await service.order.query_order_list(uid, status,limit,skip);
+        return handerThis.succ(data);
+    } catch (error) {
+        return handerThis.error('HANDLE_ERROR', error['message']);
+    }
+
+}
 
 }
 module.exports = OrderController;

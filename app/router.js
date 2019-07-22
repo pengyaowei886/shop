@@ -83,7 +83,8 @@ module.exports = app => {
 
     //查看订单角标
     router.get('/zlpt/app/user/order/num', controller.order.query_order_num);
-
+  //查看订单列表
+  router.get('/zlpt/app/user/order/list', controller.order.query_order_list);
 
     // //用户查看我的评价
     // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);

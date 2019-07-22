@@ -129,7 +129,7 @@ class OrderService extends Service {
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
-        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold'] });
+        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold','id'] });
         if (order_res[0].status == 0) {
             //生成积分消费记录
             await mysql.insert('gold_record', {
@@ -137,6 +137,12 @@ class OrderService extends Service {
                 num: -order_res[0].gold,
                 source: 3, //商店抵扣
                 ctime: new Date(),
+            });
+            //修改订单状态
+            await mysql.insert('goods_order', {
+               id:order_res[0].id,
+               status:1,
+               pay_time:new Date()
             });
             //生成支付记录
             await mysql.insert('pay_record', {
@@ -206,20 +212,79 @@ class OrderService extends Service {
     async query_order_num(kind, uid) {
         const mysql = this.app.mysql;
         if (kind == 1) {
-             let sql="select count (*) as sum ,status  from join_order where uid= ? group by status order by ctime ";
-             let args=[uid]
-            let result  = await mysql.query(sql, args);
+            let sql = "select count (*) as sum ,status  from join_order where uid= ? group by status order by ctime ";
+            let args = [uid]
+            let result = await mysql.query(sql, args);
             return result;
         } else {
-            let sql="select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
-             let args=[uid]
-            let result  = await mysql.query(sql, args);
+            let sql = "select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
+            let args = [uid]
+            let result = await mysql.query(sql, args);
             return result;
         }
     }
+    //用户查询订单列表
+    async query_order_list(uid, status, limit, skip) {
+        const mysql = this.app.mysql;
+        // if (kind == 1) {
+        //      let sql="select count (*) as sum ,status  from join_order where uid= ? group by status order by ctime ";
+        //      let args=[uid]
+        //     let result  = await mysql.query(sql, args);
+        //     return result;
+        // } else {
+        //     let sql="select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
+        //      let args=[uid]
+        //     let result  = await mysql.query(sql, args);
+        //     return result;
+        // }
 
+        let rows = {}
+        if (status == 100000) {
+            rows = {
+                where: { uid: uid }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+            }
+        }else{
+            rows={
+                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+            }
+        }
+        let result = await mysql.select('goods_order', rows);
+if(result.length>0){
+    let order_no = [];
+        for (let i in result) {
+            order_no.push(result[i].order_no)
+        }
+        let order_info = await mysql.select('goods_order_info', {
+            where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no'], group: ['order_no'], order: [['ctime', 'desc']]
+        });
+
+
+        for (let i in result) {
+            let info = [];
+            for (let j in order_info) {
+                if (result[i].order_no == order_info[j].order_no) {
+                    info.push(order_info[j]);
+                    result[i].order_info = info;
+                }
+            }
+        }
+        return result;
+}else{
+    return result;
+}
+    
+    }
 
     //用户发表评价
+
+
+    //用户查询我的评价
+
+
+    //用户查询商品评价
+
+
+
 
 
 }
