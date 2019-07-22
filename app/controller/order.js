@@ -104,7 +104,7 @@ class OrderController extends Controller {
             let ip = "1.193.64.69";
             let openid = this.ctx.request.body.openid;
             let order_no = this.ctx.request.body.order_no;
-            let data = await service.team.trolley_pay_again(order_no, openid, ip);
+            let data = await service.order.trolley_pay_again(order_no, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
