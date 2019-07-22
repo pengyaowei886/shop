@@ -90,6 +90,7 @@ class OrderService extends Service {
             address: address[0].address,
             detailInfo: address[0].detailInfo,
             ctime: new Date(),
+            end_time:new Date(new Date().getTime() + 30 * 60 * 1000),//30分钟
             status: 0
         })
 
@@ -129,7 +130,7 @@ class OrderService extends Service {
 
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
-        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold','id'] });
+        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold', 'id'] });
         if (order_res[0].status == 0) {
             //生成积分消费记录
             await mysql.insert('gold_record', {
@@ -140,9 +141,9 @@ class OrderService extends Service {
             });
             //修改订单状态
             await mysql.insert('goods_order', {
-               id:order_res[0].id,
-               status:1,
-               pay_time:new Date()
+                id: order_res[0].id,
+                status: 1,
+                pay_time: new Date()
             });
             //生成支付记录
             await mysql.insert('pay_record', {
@@ -185,7 +186,6 @@ class OrderService extends Service {
             } else {
                 throw new Error('订单状态异常');
             }
-
         } else {
             let status = mysql.select("goods_order", { where: { status: 3, id: order_id }, columns: ['id', 'order_no'] });
             if (status[0].length == 1) {
@@ -226,56 +226,65 @@ class OrderService extends Service {
     //用户查询订单列表
     async query_order_list(uid, status, limit, skip) {
         const mysql = this.app.mysql;
-        // if (kind == 1) {
-        //      let sql="select count (*) as sum ,status  from join_order where uid= ? group by status order by ctime ";
-        //      let args=[uid]
-        //     let result  = await mysql.query(sql, args);
-        //     return result;
-        // } else {
-        //     let sql="select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
-        //      let args=[uid]
-        //     let result  = await mysql.query(sql, args);
-        //     return result;
-        // }
+
 
         let rows = {}
         if (status == 100000) {
             rows = {
                 where: { uid: uid }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
             }
-        }else{
-            rows={
+        } else {
+            rows = {
                 where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
             }
         }
         let result = await mysql.select('goods_order', rows);
-if(result.length>0){
-    let order_no = [];
-        for (let i in result) {
-            order_no.push(result[i].order_no)
-        }
-        let order_info = await mysql.select('goods_order_info', {
-            where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no'], group: ['order_no'], order: [['ctime', 'desc']]
-        });
+        if (result.length > 0) {
+            let order_no = [];
+            for (let i in result) {
+                order_no.push(result[i].order_no)
+            }
+            let order_info = await mysql.select('goods_order_info', {
+                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no'], group: ['order_no'], order: [['ctime', 'desc']]
+            });
 
 
-        for (let i in result) {
-            let info = [];
-            for (let j in order_info) {
-                if (result[i].order_no == order_info[j].order_no) {
-                    info.push(order_info[j]);
-                    result[i].order_info = info;
+            for (let i in result) {
+                let info = [];
+                for (let j in order_info) {
+                    if (result[i].order_no == order_info[j].order_no) {
+                        info.push(order_info[j]);
+                        result[i].order_info = info;
+                    }
                 }
             }
+            return result;
+        } else {
+            return result;
         }
-        return result;
-}else{
-    return result;
-}
-    
+
     }
 
-    //用户发表评价
+    //用户查询拼团订单列表
+
+    async query_join_list(uid, status, limit, skip) {
+        const mysql = this.app.mysql;
+
+
+        let rows = {}
+        if (status == 100000) {
+            rows = {
+                where: { uid: uid }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
+            }
+        } else {
+            rows = {
+                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+            }
+        }
+        let result = await mysql.select('join_order', rows);
+
+        return result;
+    }
 
 
     //用户查询我的评价
