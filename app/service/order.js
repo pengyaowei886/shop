@@ -114,6 +114,22 @@ class OrderService extends Service {
         let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
         return data;
     }
+
+//用户继续完成 支付
+async trolley_pay_again(order_no, openid, ip) {
+    const mysql = this.app.mysql;
+
+    let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
+    let body_data = "订单支付";
+    let order_info = await mysql.select('goods_order', {
+        where: { order_no: order_no }, columns: ['money', 'youfei', 'goods_id']
+    })
+    let money = order_info[0].money + order_info[0].youfei;
+    let attach = order_info[0].goods_id;
+    let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+    return data;
+}
+    
     //用户完成购买
     async goods_pay_return(body) {
         const mysql = this.app.mysql;

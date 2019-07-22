@@ -59,6 +59,8 @@ module.exports = app => {
 
     //用户支付拼团
     router.get('/zlpt/app/user/team/pay', controller.team.open_team_pay);
+      //用户继续支付拼团
+      router.get('/zlpt/app/user/team/pay/again', controller.team.open_team_again);
     //支付拼团回调
     router.get('/zlpt/app/user/team/return', controller.team.open_pay_return);
 
@@ -77,7 +79,8 @@ module.exports = app => {
 
     //用户购买普通商品
     router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
-
+    //用户继续购买普通商品
+    router.post('/zlpt/app/user/goods/pay/again', controller.order.trolley_pay_again);
     //回调
     router.get('/zlpt/app/user/team/pay/return', controller.order.goods_pay_return);
 

@@ -67,6 +67,50 @@ class OrderController extends Controller {
         }
 
     }
+
+    //用户继续完成开团支付
+    async trolley_pay_again() {
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        //参数校验
+        try {
+            //使用插件进行验证 validate    
+            ctx.validate({
+                order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
+            }, ctx.request.query);
+        } catch (e) {
+            ctx.logger.warn(e);
+            let logContent = e.code + ' ' + e.message + ',';
+            for (let i in e.errors) {
+                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+            }
+            return handerThis.error('PARAMETERS_ERROR', logContent);
+        }
+
+        //逻辑判断
+        try {
+
+
+            const { ctx, service } = handerThis;
+
+            // let ip_arr=ip_res.split(":");
+            // let ip=ip_arr[0];
+
+            let ip = "1.193.64.69";
+            let openid = this.ctx.query.openid;
+            let order_no = this.ctx.query.order_no;
+            let data = await service.team.trolley_pay_again(order_no, openid, ip);
+            return handerThis.succ(data);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+        }
+    }
+
     //开团支付成功回调
     async goods_pay_return() {
         let handerThis = this;
@@ -124,55 +168,55 @@ class OrderController extends Controller {
 
     }
 
- //用户查询订单列表
- async query_order_list() {
+    //用户查询订单列表
+    async query_order_list() {
 
-    let handerThis = this;
-    const { ctx, app, service } = handerThis;
-    //参数校验
-    try {
-        //使用插件进行验证 validate    
-        ctx.validate({
-            status: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
-            },
-            uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
-            },
-            limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
-            },
-            skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        //参数校验
+        try {
+            //使用插件进行验证 validate    
+            ctx.validate({
+                status: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
+            }, ctx.request.query);
+        } catch (e) {
+            ctx.logger.warn(e);
+            let logContent = e.code + ' ' + e.message + ',';
+            for (let i in e.errors) {
+                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
             }
-        }, ctx.request.query);
-    } catch (e) {
-        ctx.logger.warn(e);
-        let logContent = e.code + ' ' + e.message + ',';
-        for (let i in e.errors) {
-            logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+            return handerThis.error('PARAMETERS_ERROR', logContent);
         }
-        return handerThis.error('PARAMETERS_ERROR', logContent);
+
+        //逻辑判断
+        try {
+
+
+            const { ctx, service } = handerThis;
+
+
+            let uid = Number(this.ctx.request.query.uid);
+            let status = Number(this.ctx.request.query.status);
+            let limit = Number(this.ctx.request.query.limit);
+            let skip = Number(this.ctx.request.query.skip);
+            let data = await service.order.query_order_list(uid, status, limit, skip);
+            return handerThis.succ(data);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+        }
+
     }
-
-    //逻辑判断
-    try {
-
-
-        const { ctx, service } = handerThis;
-
-
-        let uid = Number(this.ctx.request.query.uid);
-        let status = Number(this.ctx.request.query.status);
-        let limit = Number(this.ctx.request.query.limit);
-        let skip = Number(this.ctx.request.query.skip);
-        let data = await service.order.query_order_list(uid, status,limit,skip);
-        return handerThis.succ(data);
-    } catch (error) {
-        return handerThis.error('HANDLE_ERROR', error['message']);
-    }
-
-}
 
 }
 module.exports = OrderController;
