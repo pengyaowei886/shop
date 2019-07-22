@@ -82,7 +82,7 @@ class OrderController extends Controller {
                 openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 }
-            }, ctx.request.query);
+            }, ctx.request.body);
         } catch (e) {
             ctx.logger.warn(e);
             let logContent = e.code + ' ' + e.message + ',';
@@ -102,8 +102,8 @@ class OrderController extends Controller {
             // let ip=ip_arr[0];
 
             let ip = "1.193.64.69";
-            let openid = this.ctx.query.openid;
-            let order_no = this.ctx.query.order_no;
+            let openid = this.ctx.request.body.openid;
+            let order_no = this.ctx.request.body.order_no;
             let data = await service.team.trolley_pay_again(order_no, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
