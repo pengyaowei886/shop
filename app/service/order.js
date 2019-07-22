@@ -231,7 +231,7 @@ class OrderService extends Service {
         let rows = {}
         if (status == 100000) {
             rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+                where: { uid: uid }, columns: ['order_no', 'id', 'money','status'], limit: limit, skip: skip
             }
         } else {
             rows = {
