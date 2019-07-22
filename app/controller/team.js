@@ -126,7 +126,7 @@ class TeamController extends Controller {
             const { ctx, service } = handerThis;
 
            
-            let uid = this.ctx.query.uid;
+            let uid =  Number(this.ctx.query.uid);
             let order_no = this.ctx.query.order_no;
             let data = await service.team.open_team_again(order_no, uid);
             return handerThis.succ(data);

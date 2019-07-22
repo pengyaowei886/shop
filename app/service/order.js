@@ -120,6 +120,7 @@ class OrderService extends Service {
         await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
         await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
         await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
+        await redis.expire(`${phone}:code`, 2400);//40分钟后过期
         return data;
     }
 

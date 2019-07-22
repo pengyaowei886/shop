@@ -66,7 +66,13 @@ class TeamService extends Service {
             status: 0 //待付款
         });
         let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-
+        //放入redis 
+        await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
+        await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
+        await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
+        await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
+        await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
+        await redis.expire(`${phone}:code`, 2400);//40分钟后过期
         return data;
     }
     //用户继续完成开团支付
