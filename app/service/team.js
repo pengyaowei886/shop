@@ -212,7 +212,7 @@ class TeamService extends Service {
 
 
             } else {
-                let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
+                let join_sql = "update  join_team set now_gold = now_gold +? , now_join_num = now_join_num + 1, sum_gold= sum_gold +?   where order_no = ?";
                 let join_args = [money, money, join_no];
                 await mysql.query(join_sql, join_args);
             }
