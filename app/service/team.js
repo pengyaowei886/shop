@@ -209,6 +209,8 @@ class TeamService extends Service {
 
 
                 await mysql.update('join_order',{status:1},{where:{order_no:join_no}});
+
+
             } else {
                 let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
                 let join_args = [money, money, join_no];
@@ -294,7 +296,7 @@ class TeamService extends Service {
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
         let result = await mysql.select('join_team', {
-            where: { goods_id: goods_id, status: 6 },
+            where: { goods_id: goods_id, status: 0 },
             columns: ['uid', 'end_time', 'order_no'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
         if (result.length > 0) {
