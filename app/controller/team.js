@@ -292,7 +292,7 @@ class TeamController extends Controller {
     async join_pay_return() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
-        let body = ctx.request.body;
+        let body = ctx.request.query.order_no;
      
    
         try {

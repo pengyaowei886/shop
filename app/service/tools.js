@@ -72,7 +72,7 @@ class ToolsService extends Service {
             data: formData
         })
         let responseData = {};
-
+console.log(order_no);
 
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
