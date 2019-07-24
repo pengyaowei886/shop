@@ -35,13 +35,13 @@ class TeamService extends Service {
     //用户确认开团
     async open_team(goods_id, spec_id, address_id, youfei, openid, ip) {
         const mysql = this.app.mysql;
+        const redis = this.app.redis.get('pay');
         let attach = goods_id;
         let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
         let body_data = "开团支付";
         let order_no = new Date().getTime();
-        console.log(goods_id)
         let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
-console.log(goods_info)
+
         let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
 
         let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
@@ -161,6 +161,7 @@ console.log(goods_info)
     //用户参加拼团
     async join_team(openid, uid, join_no, money, ip) {
         const mysql = this.app.mysql;
+        const redis = this.app.redis.get('pay');
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
         if (uid != team_exist[0].uid && eam_exist[0].status == 0) {
@@ -168,6 +169,12 @@ console.log(goods_info)
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
             let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
+            await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
+            await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
+            await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
+            await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
+            await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
+            await redis.expire(`${phone}:code`, 2400);//40分钟后过期
             return data;
         } else {
             throw new Error('不能参加自己的团或者此团已拼成功')
