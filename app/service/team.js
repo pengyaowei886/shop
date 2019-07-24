@@ -39,8 +39,9 @@ class TeamService extends Service {
         let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
         let body_data = "开团支付";
         let order_no = new Date().getTime();
+        console.log(goods_id)
         let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
-
+console.log(goods_info)
         let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
 
         let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });

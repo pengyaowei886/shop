@@ -83,7 +83,7 @@ class ToolsService extends Service {
                     order_no: order_no
                 }
             } else {
-                throw new Error("获取签名失败")
+                throw new Error(reData.return_msg[0]);
             }
         })
         return responseData;
