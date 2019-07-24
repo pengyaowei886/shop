@@ -69,7 +69,7 @@ module.exports = app => {
     //支付拼团回调
     router.get('/zlpt/app/user/team/join/return', controller.team.join_pay_return);
     //用户为自己的团支付剩余余额
-
+    router.get('/zlpt/app/user/team/self', controller.team.join_self);
     //用户查询拼团列表
 
     //用户查询我的拼团

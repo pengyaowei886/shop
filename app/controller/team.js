@@ -125,8 +125,8 @@ class TeamController extends Controller {
 
             const { ctx, service } = handerThis;
 
-           
-            let uid =  Number(this.ctx.query.uid);
+
+            let uid = Number(this.ctx.query.uid);
             let order_no = this.ctx.query.order_no;
             let data = await service.team.open_team_again(order_no, uid);
             return handerThis.succ(data);
@@ -135,7 +135,48 @@ class TeamController extends Controller {
         }
 
     }
+    //用户补差额
+    async join_myself() {
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        //参数校验
+        try {
+            //使用插件进行验证 validate    
+            ctx.validate({
+                order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
+            }, ctx.request.query);
+        } catch (e) {
+            ctx.logger.warn(e);
+            let logContent = e.code + ' ' + e.message + ',';
+            for (let i in e.errors) {
+                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+            }
+            return handerThis.error('PARAMETERS_ERROR', logContent);
 
+        }
+
+
+        //逻辑判断
+        try {
+
+
+            const { ctx, service } = handerThis;
+
+
+            let openid =this.ctx.query.openid
+            let order_no = this.ctx.query.order_no;
+            let ip = "1.193.64.69";
+            let data = await service.team.join_myself(openid,order_no, ip);
+            return handerThis.succ(data);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+        }
+    }
 
     //开团支付成功回调
     async open_pay_return() {
@@ -168,6 +209,9 @@ class TeamController extends Controller {
                 },
                 openid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
+                },
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
                 }
             }, ctx.request.query);
         } catch (e) {
@@ -189,11 +233,12 @@ class TeamController extends Controller {
             // let ip=ip_arr[0];
 
             let ip = "1.193.64.69";
+            let uid =  Number(this.ctx.query.openid);
             let openid = this.ctx.query.openid;
             let money = this.ctx.query.money;
             let join_no = this.ctx.query.join_no;
 
-            let data = await service.team.join_team(openid, join_no, money, ip);
+            let data = await service.team.join_team(openid, uid,join_no, money, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
@@ -260,10 +305,10 @@ class TeamController extends Controller {
             // let ip_arr=ip_res.split(":");
             // let ip=ip_arr[0];
 
-      
-            let goods_id =  Number(this.ctx.query.goods_id);
-            let limit =  Number(this.ctx.query.limit);
-            let skip =  Number(this.ctx.query.skip);
+
+            let goods_id = Number(this.ctx.query.goods_id);
+            let limit = Number(this.ctx.query.limit);
+            let skip = Number(this.ctx.query.skip);
             let data = await service.team.query_same_team(goods_id, limit, skip);
             return handerThis.succ(data);
         } catch (error) {
