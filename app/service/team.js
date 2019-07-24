@@ -165,7 +165,7 @@ class TeamService extends Service {
         const redis = this.app.redis.get('pay');
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
-        if (uid != team_exist[0].uid && team_exist[0].status == 6) {
+        if (uid != team_exist[0].uid && team_exist[0].status == 0) {
             let order_no = new Date().getTime();
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
@@ -323,7 +323,7 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { id: join_id }, columns: ['status', 'gold', 'now_gold'] })
-        if (team_exist[0].status == 6) {
+        if (team_exist[0].status == 0) {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
@@ -348,7 +348,7 @@ class TeamService extends Service {
         let data = {};
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'gold', 'now_gold'] })
-        if (team_exist[0].status == 6) {
+        if (team_exist[0].status == 0) {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
