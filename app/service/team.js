@@ -331,7 +331,7 @@ class TeamService extends Service {
             //判断能否包尾
             if (now_gold / gold >= 0.8) {
 
-                let money = gold - now_gold;
+                let money = (gold - now_gold)/100;
                 let order_no = new Date().getTime();
                 let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";
                 let body_data = "补差价支付";
