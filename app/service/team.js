@@ -140,7 +140,7 @@ class TeamService extends Service {
             //生成支付记录
             await mysql.insert('pay_record', {
                 uid: uid[0].id,
-                pay_num: money/100,
+                pay_num: money / 100,
                 pay_no: wx_num,
                 kind: 1, //微信小程序支付
                 status: 2, //开团支付
@@ -183,68 +183,71 @@ class TeamService extends Service {
     }
     //参团支付回调
     async join_pay_return(body) {
-        // const xml2json = fxp.parse(body);
-        // let reData = JSON.stringify(xml2json);
-        // this.ctx.logger.error("微信返回值内容" + reData);
+
         const mysql = this.app.mysql;
         // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
         let databack = {};
         let reData = await this.ctx.service.tools.query_weixin_order(body);
-        //支付成功处理
-        let openid = reData.openid[0];
-        // let order_no = reData.out_trade_no[0];
-        let money = reData.total_fee[0];
-        let join_no = reData.attach[0]
-        let wx_num = reData.transaction_id[0];
+        console.log(reData)
+        if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
+            //支付成功处理
+            let openid = reData.openid[0];
+            // let order_no = reData.out_trade_no[0];
+            let money = reData.total_fee[0];
+            let join_no = reData.attach[0]
+            let wx_num = reData.transaction_id[0];
 
 
 
-        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-        let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
-        //判断此次加入是否成团
-        if (team[0].now_gold + money >= team[0].gold) {
-            let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-            let join_args = [money, money, join_no];
-            await mysql.query(join_sql, join_args);
+            let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+            let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
+            //判断此次加入是否成团
+            if (team[0].now_gold + money >= team[0].gold) {
+                let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
+                let join_args = [money, money, join_no];
+                await mysql.query(join_sql, join_args);
+            } else {
+                let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
+                let join_args = [money, money, join_no];
+                await mysql.query(join_sql, join_args);
+            }
+            //更新 拼团信息
+
+            //生成用户参团记录
+            await mysql.insert('user_join', {
+                uid: uid[0].id,
+                num: money,//预留
+                ctime: new Date(),
+                join_no: join_no
+            });
+
+            //生成积分消费记录
+            await mysql.insert('gold_record', {
+                uid: uid[0].id,
+                num: money,//预留
+                source: 1, //参团赠送
+                ctime: new Date(),
+                end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
+            });
+            //生成支付记录
+            await mysql.insert('pay_record', {
+                uid: uid[0].id,
+                pay_num: money / 100,
+                pay_no: wx_num,
+                kind: 1, //微信小程序支付
+                status: 1, //参团支付
+                ctime: new Date(),
+            });
+            //增加账号积分
+            let user_sql = "update  user set balance = balance + ? where id= ?";
+            let user_args = [money, uid[0].id];
+            await mysql.query(user_sql, user_args);
+
+            databack.money = money;
+            return databack
         } else {
-            let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
-            let join_args = [money, money, join_no];
-            await mysql.query(join_sql, join_args);
+            throw new Error(reData.err_code_des[0]);
         }
-        //更新 拼团信息
-
-        //生成用户参团记录
-        await mysql.insert('user_join', {
-            uid: uid[0].id,
-            num: money,//预留
-            ctime: new Date(),
-            join_no: join_no
-        });
-
-        //生成积分消费记录
-        await mysql.insert('gold_record', {
-            uid: uid[0].id,
-            num: money,//预留
-            source: 1, //参团赠送
-            ctime: new Date(),
-            end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
-        });
-        //生成支付记录
-        await mysql.insert('pay_record', {
-            uid: uid[0].id,
-            pay_num: money/100,
-            pay_no: wx_num,
-            kind: 1, //微信小程序支付
-            status: 1, //参团支付
-            ctime: new Date(),
-        });
-        //增加账号积分
-        let user_sql = "update  user set balance = balance + ? where id= ?";
-        let user_args = [money, uid[0].id];
-        await mysql.query(user_sql, user_args);
-
-        databack.money = money;
-        return databack;
 
     }
     // 查询用户拼团列表
@@ -288,29 +291,29 @@ class TeamService extends Service {
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
         let result = await mysql.select('join_team', {
-            where: { goods_id : goods_id, status: 0 },
+            where: { goods_id: goods_id, status: 0 },
             columns: ['uid', 'end_time', 'order_no'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
-       if(result.length>0){
-        let id = [];
-        for (let i in result) {
-            id.push(result[i].uid)
-        }
-        let head = await mysql.select('user', { where: { id: id }, columns: ['id', 'wx_pic', 'wx_nickname'] });
+        if (result.length > 0) {
+            let id = [];
+            for (let i in result) {
+                id.push(result[i].uid)
+            }
+            let head = await mysql.select('user', { where: { id: id }, columns: ['id', 'wx_pic', 'wx_nickname'] });
 
-        for (let i in result) {
-            for (let j in head) {
-                if (result[i].uid == head[j].id) {
-                    result[i].head_pic = head[j].wx_pic;
-                    result[i].nick_name = head[j].wx_nickname;
-                    break;
+            for (let i in result) {
+                for (let j in head) {
+                    if (result[i].uid == head[j].id) {
+                        result[i].head_pic = head[j].wx_pic;
+                        result[i].nick_name = head[j].wx_nickname;
+                        break;
+                    }
                 }
             }
+            return result;
+        } else {
+            return [];
         }
-        return result;
-       }else{
-           return [];
-       }    
     }
     // 用户对自己的团进行包尾
     async join_myself(openid, join_no, ip) {
@@ -337,9 +340,9 @@ class TeamService extends Service {
         }
     }
 
-    async query_join_myself( join_no) {
+    async query_join_myself(join_no) {
         const mysql = this.app.mysql;
-        let data={};
+        let data = {};
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'gold', 'now_gold'] })
         if (team_exist[0].status == 0) {
@@ -348,10 +351,10 @@ class TeamService extends Service {
             //判断能否包尾
             if (now_gold / gold >= 0.8) {
 
-                data.money=gold=now_gold;
+                data.money = gold = now_gold;
                 return data;
             } else {
-                data.money=0;
+                data.money = 0;
                 return data;
             }
         } else {

@@ -292,15 +292,12 @@ class TeamController extends Controller {
     async join_pay_return() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
-        var body = ctx.request.body;
-        let data = await service.team.join_pay_return(body);
+        let body = ctx.request.body;
+     
+   
         try {
-            if (data) {
-                var message = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-                ctx.body = message;
-            } else {
-
-            }
+            let data = await service.team.join_pay_return(body);
+            return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
 
