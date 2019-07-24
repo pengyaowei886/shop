@@ -136,7 +136,7 @@ class TeamController extends Controller {
 
     }
     //用户补差额
-    async join_myself() {
+    async join_self() {
         let handerThis = this;
         const { ctx, app, service } = handerThis;
         //参数校验
