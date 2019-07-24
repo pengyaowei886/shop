@@ -324,7 +324,7 @@ class TeamService extends Service {
     async join_myself(openid, join_no, ip) {
         const mysql = this.app.mysql;
         //判断团是否已经成团
-        let team_exist = await mysql.select('join_team', { where: { order_no: join_id }, columns: ['status', 'gold', 'now_gold'] })
+        let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'gold', 'now_gold'] })
         if (team_exist[0].status == 0) {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
@@ -356,7 +356,7 @@ class TeamService extends Service {
             //判断能否包尾
             if (now_gold / gold >= 0.8) {
 
-                data.money = gold = now_gold;
+                data.money = gold-now_gold;
                 return data;
             } else {
                 data.money = 0;
