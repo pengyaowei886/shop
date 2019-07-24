@@ -234,6 +234,22 @@ class TeamController extends Controller {
         }
 
     }
+
+        //补差价回调
+        async join_myself_return() {
+            let handerThis = this;
+            const { ctx, app, service } = handerThis;
+            let body = ctx.request.query.order_no;
+    
+            try {
+                let data = await service.team.join_myself_return(body);
+                return handerThis.succ(data);
+            } catch (error) {
+                return handerThis.error('HANDLE_ERROR', error['message']);
+    
+            }
+    
+        }
     //参团支付
     async join_team() {
         let handerThis = this;

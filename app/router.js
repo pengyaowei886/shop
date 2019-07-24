@@ -66,12 +66,14 @@ module.exports = app => {
 
     //用户参加拼团
     router.get('/zlpt/app/user/team/join', controller.team.join_team);
-    //支付拼团回调
+    //支付参团回调
     router.get('/zlpt/app/user/team/join/return', controller.team.join_pay_return);
     //用户查询能否补差额
     router.get('/zlpt/app/user/team/self/query', controller.team.query_join_self);
     //用户为自己的团支付剩余余额
     router.get('/zlpt/app/user/team/self', controller.team.join_self);
+      //b补差价回调
+      router.get('/zlpt/app/user/team/self/return', controller.team.join_myself_return);
     //用户查询拼团列表
 
     //用户查询我的拼团

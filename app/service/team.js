@@ -384,7 +384,7 @@ class TeamService extends Service {
         let openid = reData.openid[0];
         let order_no = reData.out_trade_no[0];
         let money = reData.total_fee[0];
-        let join_no = reData.attach[0]
+        let join_no = reData.attach[0];
         let wx_num = reData.transaction_id[0];
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
