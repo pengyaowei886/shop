@@ -161,7 +161,7 @@ class TeamService extends Service {
     async join_team(openid, uid, join_no, money, ip) {
         const mysql = this.app.mysql;
         //判断团是否已经成团
-        let team_exist = await mysql.select('join_team', { where: { join_no: join_no }, columns: ['status', 'uid'] })
+        let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
         if (uid != team_exist[0].uid && eam_exist[0].status == 0) {
             let order_no = new Date().getTime();
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
@@ -302,8 +302,7 @@ class TeamService extends Service {
         return result;
        }else{
            return [];
-       }
-     
+       }    
     }
     // 用户对自己的团进行包尾
     async join_myself(openid, join_no, ip) {
