@@ -138,7 +138,7 @@ class TeamService extends Service {
             //生成支付记录
             await mysql.insert('pay_record', {
                 uid: uid[0].id,
-                pay_num: money,
+                pay_num: money/100,
                 pay_no: wx_num,
                 kind: 1, //微信小程序支付
                 status: 2, //开团支付
@@ -223,7 +223,7 @@ class TeamService extends Service {
         //生成支付记录
         await mysql.insert('pay_record', {
             uid: uid[0].id,
-            pay_num: money,
+            pay_num: money/100,
             pay_no: wx_num,
             kind: 1, //微信小程序支付
             status: 1, //参团支付
@@ -278,10 +278,12 @@ class TeamService extends Service {
     //检索同类拼团列表
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
+        console.log(goods_id)
         let result = await mysql.select('join_team', {
-            where: { goods_id: goods_id, status: 0 },
-            columns: ['uid', 'end_time', 'order_no'], order: ['ctime', 'desc'], limit: limit, offset: skip
+            where: { goods_id : goods_id, status: 0 },
+            columns: ['uid', 'end_time', 'order_no'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
+       if(result.length>0){
         let id = [];
         for (let i in result) {
             id.push(result[i].uid)
@@ -298,6 +300,10 @@ class TeamService extends Service {
             }
         }
         return result;
+       }else{
+           return [];
+       }
+     
     }
     // 用户对自己的团进行包尾
     async join_myself(openid, join_no, ip) {

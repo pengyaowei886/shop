@@ -127,7 +127,7 @@ class OrderService extends Service {
 
     //用户继续完成 支付
     async trolley_pay_again(order_no, uid) {
-         const redis = this.app.redis.get('pay');
+        const redis = this.app.redis.get('pay');
         let result = redis.hgetall(`pay:${uid}:${order_no}`);
         console.log(result);
         return result;
@@ -149,7 +149,7 @@ class OrderService extends Service {
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
         let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold', 'id'] });
-    
+
         if (order_res[0].status == 0) {
             //生成积分消费记录
             await mysql.insert('gold_record', {
@@ -187,45 +187,36 @@ class OrderService extends Service {
         }
     }
     //用户确认收货
-    async confire_order(kind, order_id) {
+    async confire_order(kind, order_id, action) {
         const mysql = this.app.mysql;
         let data_back = {};
+        let table_name = "";
         if (kind == 1) {
-            let status = mysql.select("join_order", { where: { status: 3, id: order_id, shouhuo_time: new Date() }, columns: ['id', 'goods_id'] });
-            if (status[0].length == 1) {
-                let res = await mysql.update("join_order", { id: id, status: 4 });
-                if (res.affectedRows == 1) {
-                    let sql = "update  join_goods set succ_volume = succ_volume +1  where id= ?";
-                    let args = [status[0].goods_id];
-                    await mysql.query(sql, args);
-                    return data_back;
-                } else {
-                    throw new Error('修改订单状态失败');
-                }
-            } else {
-                throw new Error('订单状态异常');
-            }
+            table_name = "join_order"
         } else {
-            let status = mysql.select("goods_order", { where: { status: 3, id: order_id }, columns: ['id', 'order_no'] });
-            if (status[0].length == 1) {
-                let res = await mysql.update("goods_order", { id: id, status: 4, shouhuo_time: new Date() });
-                if (res.affectedRows == 1) {
+            table_name = "goods_order"
+        }
 
-                    let goods_info = await mysql.select("goods_order_info", { where: { order_no: status[0].order_no }, columns: ['goods_id'] });
-                    for (let i in goods_info) {
-                        let sql = "update  goods set succ_volume = succ_volume +1  where id= ?";
-                        let args = [goods_info[i].goods_id];
-                        await mysql.query(sql, args);
-                    }
-                    return data_back;
-
-                } else {
-                    throw new Error('修改订单状态失败');
-                }
+        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['sattus'] });
+        if (action == "quxiao") {
+            if (status[0].status == 0) {
+                await mysql.delete(table_name, { id: order_id });
+                return data_back
             } else {
                 throw new Error('订单状态异常');
             }
         }
+
+        if (action == "tuikuan") {
+            if (status[0].status == 4) {
+                await mysql.update(table_name, { id: order_id, status: 4 });
+                return data_back;
+            } else {
+                throw new Error('订单状态异常');
+            }
+        }
+
+    
     }
     //用户查询不同状态订单数量
     async query_order_num(kind, uid) {
