@@ -45,6 +45,7 @@ class TeamService extends Service {
         let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
 
         let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
+        console.log(address_info);
         //生成预付款订单
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         let money = goods_info[0].join_xianjin + youfei;
@@ -73,7 +74,7 @@ class TeamService extends Service {
         await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
         await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
         await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
-        await redis.expire(`${phone}:code`, 2400);//40分钟后过期
+        await redis.expire(`pay:${uid}:${order_no}`, 2400);//40分钟后过期
         return data;
     }
     //用户继续完成开团支付
@@ -174,7 +175,7 @@ class TeamService extends Service {
             await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
             await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
             await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
-            await redis.expire(`${phone}:code`, 2400);//40分钟后过期
+            await redis.expire(`pay:${uid}:${order_no}`, 2400);//40分钟后过期
             return data;
         } else {
             throw new Error('不能参加自己的团或者此团已拼成功')
