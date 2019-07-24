@@ -81,8 +81,7 @@ class TeamController extends Controller {
             // let ip_arr=ip_res.split(":");
             // let ip=ip_arr[0];
 
-            let ip = this.ctx.header.host;
-            console.log(ip);
+            let ip = "1.193.64.69";
             let openid = this.ctx.query.openid;
             let youfei = Number(this.ctx.query.youfei);
             let goods_id = Number(this.ctx.query.goods_id);
@@ -189,7 +188,7 @@ class TeamController extends Controller {
             // let ip_arr=ip_res.split(":");
             // let ip=ip_arr[0];
 
-            let ip = this.ctx.header.host;
+            let ip = "1.193.64.69";
             let openid = this.ctx.query.openid;
             let money = this.ctx.query.money;
             let join_no = this.ctx.query.join_no;
