@@ -165,7 +165,7 @@ class TeamService extends Service {
         const redis = this.app.redis.get('pay');
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
-        if (uid != team_exist[0].uid && eam_exist[0].status == 0) {
+        if (uid != team_exist[0].uid && team_exist[0].status == 0) {
             let order_no = new Date().getTime();
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
@@ -331,6 +331,28 @@ class TeamService extends Service {
                 return data;
             } else {
                 throw new Error('不能包尾，去邀请其他人吧')
+            }
+        } else {
+            throw new Error('该团已拼成，请选择其他团')
+        }
+    }
+
+    async query_join_myself( join_no) {
+        const mysql = this.app.mysql;
+        let data={};
+        //判断团是否已经成团
+        let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'gold', 'now_gold'] })
+        if (team_exist[0].status == 0) {
+            let gold = team_exist[0].gold;
+            let now_gold = team_exist[0].now_gold;
+            //判断能否包尾
+            if (now_gold / gold >= 0.8) {
+
+                data.money=gold=now_gold;
+                return data;
+            } else {
+                data.money=0;
+                return data;
             }
         } else {
             throw new Error('该团已拼成，请选择其他团')
