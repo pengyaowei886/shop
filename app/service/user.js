@@ -149,7 +149,7 @@ class UserService extends Service {
 
             // let user = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
             // let uid = user[0].id;
-            let result = await redis.set(`${token}`, uid);
+            let result = await redis.set(`${token}`, uid_res.insertId);
             if (result == "OK") {
                 databack.uid = uid_res.insertId;
                 databack.token = token;
