@@ -294,7 +294,7 @@ class TeamService extends Service {
     async query_same_team(goods_id, limit, skip) {
         const mysql = this.app.mysql;
         let result = await mysql.select('join_team', {
-            where: { goods_id: goods_id, status: 0 },
+            where: { goods_id: goods_id, status: 6 },
             columns: ['uid', 'end_time', 'order_no'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
         if (result.length > 0) {
@@ -323,7 +323,7 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { id: join_id }, columns: ['status', 'gold', 'now_gold'] })
-        if (team_exist[0].status == 0) {
+        if (team_exist[0].status == 6) {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
@@ -348,7 +348,7 @@ class TeamService extends Service {
         let data = {};
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'gold', 'now_gold'] })
-        if (team_exist[0].status == 0) {
+        if (team_exist[0].status == 6) {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
