@@ -129,7 +129,7 @@ class TeamService extends Service {
                 status: 0 //成团中
             });
             //修改拼团订单状态
-            await mysql.update('join_order', { status: 1 }, { where: { order_no: order_no } });
+            await mysql.update('join_order', { status: 6 }, { where: { order_no: order_no } }); //成团中
             //生成积分消费记录
             await mysql.insert('gold_record', {
                 uid: uid[0].id,
@@ -165,7 +165,7 @@ class TeamService extends Service {
         const redis = this.app.redis.get('pay');
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
-        if (uid != team_exist[0].uid && team_exist[0].status == 0) {
+        if (uid != team_exist[0].uid && team_exist[0].status == 6) {
             let order_no = new Date().getTime();
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
@@ -204,8 +204,11 @@ class TeamService extends Service {
             //判断此次加入是否成团
             if (team[0].now_gold + money >= team[0].gold) {
                 let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-                let join_args = [money, money, join_no];
+                let join_args = [money, join_no];
                 await mysql.query(join_sql, join_args);
+
+
+                await mysql.update('join_order',{status:1},{where:{order_no:join_no}});
             } else {
                 let join_sql = "update  join_team set now_gold = now_gold +? , join_num = join_num + 1, sum_gold= sum_gold +? ,status=1   where order_no = ?";
                 let join_args = [money, money, join_no];
