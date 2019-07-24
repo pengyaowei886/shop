@@ -103,7 +103,7 @@ module.exports = appInfo => {
       };
     config.cluster = {
         listen: {
-            port: 8443,
+            port: 443,
             hostname: '172.30.0.2',
             https: {
                 key: "C:/soft/workface/https/https.key",
