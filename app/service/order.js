@@ -186,7 +186,7 @@ class OrderService extends Service {
             throw new Error('订单状态异常');
         }
     }
-    //用户确认收货
+    //用户确认收货或者取消订单
     async confire_order(kind, order_id, action) {
         const mysql = this.app.mysql;
         let data_back = {};
@@ -197,7 +197,7 @@ class OrderService extends Service {
             table_name = "goods_order"
         }
 
-        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['sattus'] });
+        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['status'] });
         if (action == "quxiao") {
             if (status[0].status == 0) {
                 await mysql.delete(table_name, { id: order_id });
@@ -218,6 +218,8 @@ class OrderService extends Service {
 
     
     }
+
+    
     //用户查询不同状态订单数量
     async query_order_num(kind, uid) {
         const mysql = this.app.mysql;
@@ -239,7 +241,7 @@ class OrderService extends Service {
 
 
         let rows = {}
-        if (status == 100000) {
+        if (status.length==0) {
             rows = {
                 where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
             }
