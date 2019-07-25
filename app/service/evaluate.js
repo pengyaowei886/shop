@@ -40,16 +40,38 @@ class EvaluateService extends Service {
 
     }
     //用户发表评价
-    async edit_evaluate(uid, order_no, goods_id, kind, num, content) {
+    async edit_evaluate(uid, order_no, kind,params) {
         const mysql = this.app.mysql;
-        let result = await mysql.insert('evaluate', {
-            kind: kind, goods_id: goods_id, evaluate_num: num, content: content, ctime: new Date(), uid: uid, order_no: order_no, is_default: 1
 
-        })
-        if (result.affectedRows === 1) {
+        
+        // let result = await mysql.insert('evaluate', {
+        //     kind: kind, goods_id: goods_id, evaluate_num: num, content: content, ctime: new Date(), uid: uid, order_no: order_no, is_default: 1
+
+        // })
+        // if (result.affectedRows === 1) {
+        //     return {};
+        // } else {
+        //     throw new Error("发表评价失败")
+        // }
+        let sql = "insert into evaluate ( kind,order_no,goods_id,evaluate_num,content,ctime,uid,is_default) values  ";
+        let args = [];
+        console.log(params)
+        for (let i = 0; i < params.length; i++) {
+
+            args.push(kind, order_no, params[i].goods_id, params[i].evaluate_num,  params[i].content,
+             new Date(), uid,1);
+            if (i === params.length - 1) {
+                sql += "(?,?,?,?,?,?,?,?) ;";
+                break;
+            } else {
+                sql += "(?,?,?,?,?,?,?,?) ,";
+            }
+        }
+        let spec_result = await mysql.query(sql, args);
+        if (spec_result.affectedRows === params.length) {
             return {};
         } else {
-            throw new Error("发表评价失败")
+            throw new Error("增加失败");
         }
     }
 

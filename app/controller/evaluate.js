@@ -99,20 +99,15 @@ class EvaluateController extends Controller {
     try {
         //使用插件进行验证 validate    
         ctx.validate({
-            goods_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'int', required: true, allowEmpty: false
-            },
+        
             order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                 type: 'string', required: true, allowEmpty: false
             },
             uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                 type: 'int', required: true, allowEmpty: false
             },
-            num: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'int', required: true, allowEmpty: false
-            },
-            content: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
+            params: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'array', required: true, allowEmpty: false
             },
             kind: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                 type: 'int', required: true, allowEmpty: false
@@ -130,13 +125,12 @@ class EvaluateController extends Controller {
     try {
         let handerThis = this;
         const { ctx, service } = handerThis;
-        let goods_id = this.ctx.request.body.goods_id;
+   
         let order_no =  this.ctx.request.body.order_no;
         let uid = this.ctx.request.body.uid;
-        let num = this.ctx.request.body.num;
-        let content = this.ctx.request.body.content;
         let kind = this.ctx.request.body.kind;
-        let data = await service.evaluate.edit_evaluate(uid,order_no,goods_id,kind,num,content);
+        let params = this.ctx.request.body.params;
+        let data = await service.evaluate.edit_evaluate(uid,order_no,kind,params);
         return handerThis.succ(data);
     } catch (error) {
         return handerThis.error('HANDLE_ERROR', error['message']);
