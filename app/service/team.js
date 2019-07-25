@@ -45,7 +45,6 @@ class TeamService extends Service {
         let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
 
         let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
-        console.log(address_info);
         //生成预付款订单
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         let money = goods_info[0].join_xianjin + youfei;
@@ -389,8 +388,8 @@ class TeamService extends Service {
         let wx_num = reData.transaction_id[0];
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
-        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = gold - now_gold  where order_no = ?";
-        let join_args = [order_no, join_no];
+        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
+        let join_args = [order_no,money, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录
         await mysql.insert('user_join', {

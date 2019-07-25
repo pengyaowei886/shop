@@ -223,6 +223,14 @@ class OrderService extends Service {
                 throw new Error('订单状态异常');
             }
         }
+        if (action == "pingjia") {
+            if (status[0].status == 3) {
+                await mysql.update(table_name, { id: order_id, status: 7});
+                return data_back;
+            } else {
+                throw new Error('订单状态异常');
+            }
+        }
 
     
     }

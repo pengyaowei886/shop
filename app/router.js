@@ -95,10 +95,13 @@ module.exports = app => {
   //用户编辑订单
   router.post('/zlpt/app/user/order/edit', controller.order.confire_order);
 
-  // //用户查看我的评价
-  // router.get('/zlpt/app/user/evaluate/query', controller.user.query_evaluate);
-  // //用户发表评价
-  // router.post('/zlpt/app/user/evaluate/exit', controller.user.edit_evaluate);
+  //用户查看商品评价
+  router.get('/zlpt/app/user/evaluate/order/query', controller.evaluate.query_self_evaluate);
+ //用户查看订单评价
+ router.get('/zlpt/app/user/evaluate/goods/query', controller.evaluate.query_goods_evaluate);
+
+  //用户发表评价
+  router.post('/zlpt/app/user/evaluate/edit', controller.evaluate.edit_evaluate);
 
 
 
