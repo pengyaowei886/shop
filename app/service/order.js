@@ -206,10 +206,18 @@ class OrderService extends Service {
                 throw new Error('订单状态异常');
             }
         }
-
-        if (action == "tuikuan") {
+        if (action == "tuikun") {
             if (status[0].status == 3) {
-                await mysql.update(table_name, { id: order_id, status: 4 });
+                await mysql.update(table_name, { id: order_id, status: 4});
+                return data_back
+            } else {
+                throw new Error('订单状态异常');
+            }
+        }
+
+        if (action == "shouhuo") {
+            if (status[0].status == 2) {
+                await mysql.update(table_name, { id: order_id, status: 3});
                 return data_back;
             } else {
                 throw new Error('订单状态异常');
