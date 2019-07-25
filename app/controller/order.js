@@ -214,6 +214,51 @@ class OrderController extends Controller {
         }
 
     }
+    //用户编辑订单
+    async confire_order() {
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+        //参数校验
+        try {
+            //使用插件进行验证 validate    
+            ctx.validate({
+                kind: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'int', required: true, allowEmpty: false
+                },
+                 action: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                order_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                }
+            }, ctx.request.body);
+        } catch (e) {
+            ctx.logger.warn(e);
+            let logContent = e.code + ' ' + e.message + ',';
+            for (let i in e.errors) {
+                logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+            }
+            return handerThis.error('PARAMETERS_ERROR', logContent);
+        }
+
+        //逻辑判断
+        try {
+
+
+            const { ctx, service } = handerThis;
+
+
+            let kind = this.ctx.request.body.kind;
+            let action = this.ctx.request.body.action;
+            let order_id = this.ctx.request.body.order_id;
+            let data = await service.order.confire_order(kind, order_id,action);
+            return handerThis.succ(data);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+        }
+
+    }
 
 }
 module.exports = OrderController;

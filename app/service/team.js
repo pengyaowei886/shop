@@ -54,6 +54,7 @@ class TeamService extends Service {
             order_no: order_no, //订单号
             goods_id: goods_id,
             introduce: goods_info[0].introduce,
+            head_pic :goods_info[0].head_pic,
             money: goods_info[0].join_xianjin,
             gold: spec_info[0].leader_price,
             youfei: youfei,

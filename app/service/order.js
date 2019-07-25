@@ -208,7 +208,7 @@ class OrderService extends Service {
         }
 
         if (action == "tuikuan") {
-            if (status[0].status == 4) {
+            if (status[0].status == 3) {
                 await mysql.update(table_name, { id: order_id, status: 4 });
                 return data_back;
             } else {
