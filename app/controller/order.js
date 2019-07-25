@@ -54,7 +54,6 @@ class OrderController extends Controller {
             // let ip=ip_arr[0];
 
             let ip = "1.193.64.69";
-            console.log("????")
             let openid = this.ctx.request.body.openid;
             let youfei = Number(this.ctx.request.body.youfei);
             let goods = this.ctx.request.body.goods;
@@ -176,18 +175,18 @@ class OrderController extends Controller {
             //使用插件进行验证 validate    
             ctx.validate({
                 status: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
+                    type: 'array', required: true, allowEmpty: false
                 },
                 uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
+                    type: 'int', required: true, allowEmpty: false
                 },
                 limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
+                    type: 'int', required: true, allowEmpty: false
                 },
                 skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
+                    type: 'int', required: true, allowEmpty: false
                 }
-            }, ctx.request.query);
+            }, ctx.request.body);
         } catch (e) {
             ctx.logger.warn(e);
             let logContent = e.code + ' ' + e.message + ',';
@@ -204,10 +203,10 @@ class OrderController extends Controller {
             const { ctx, service } = handerThis;
 
 
-            let uid = Number(this.ctx.request.query.uid);
-            let status = Number(this.ctx.request.query.status);
-            let limit = Number(this.ctx.request.query.limit);
-            let skip = Number(this.ctx.request.query.skip);
+            let uid = this.ctx.request.body.uid;
+            let status = this.ctx.request.body.status;
+            let limit = this.ctx.request.body.limit;
+            let skip = this.ctx.request.body.skip;
             let data = await service.order.query_order_list(uid, status, limit, skip);
             return handerThis.succ(data);
         } catch (error) {
