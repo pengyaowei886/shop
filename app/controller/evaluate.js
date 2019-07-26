@@ -16,7 +16,10 @@ class EvaluateController extends Controller {
         try {
             //使用插件进行验证 validate    
             ctx.validate({
-                order_no: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
+                },
+                kind: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
             }, ctx.request.query);
@@ -32,8 +35,9 @@ class EvaluateController extends Controller {
         try {
             let handerThis = this;
             const { ctx, service } = handerThis;
-
-            let data = await service.evaluate.query_self_evaluate(this.ctx.request.query.order_no);
+            let uid= Number(this.ctx.request.query.uid);
+            let kind= Number(this.ctx.request.query.kind);
+            let data = await service.evaluate.query_self_evaluate(uid,kind);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
