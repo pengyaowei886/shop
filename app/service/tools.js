@@ -165,8 +165,35 @@ class ToolsService extends Service {
         let args = [new Date()]
         await mysql.query(sql, args);
 
-        let other_sql = "delete from goods_order where status = 0  end_time < ?";
+        let other_sql = "delete from goods_order where status = 0  and end_time < ?";
         let other_args = [new Date()]
+        await mysql.query(other_sql, other_args);
+    }
+    //自动收货
+    async   shouhuo_order() {
+
+        const mysql = this.app.mysql;
+        let sql = "update   join_order set status= 3 ,shouhuo_time = ? where  status = 2 and fahuo_time <  ?";
+     
+        let args = [new Date(), new Date(new Date()- 10*24*60*60*1000)]
+        await mysql.query(sql, args);
+
+        let other_sql = "update  goods_order set status =3 ,shouhuo_time = ? where status = 2  and fahuo_time  < ? ";
+        let other_args = [new Date(),new Date(new Date()- 10*24*60*60*1000)]
+        await mysql.query(other_sql, other_args);
+    }
+
+    // 自动评价
+     async   pingjia_order() {
+
+        const mysql = this.app.mysql;
+        let sql = "update from join_order set status = 7  where  status = 3 and fahuo_time <  ?";
+     
+        let args = [new Date(new Date()- 10*24*60*60*1000)]
+        await mysql.query(sql, args);
+
+        let other_sql = "update from goods_order set status = 7  and fahuo_time  < ? ";
+        let other_args = [new Date(new Date()- 10*24*60*60*1000)]
         await mysql.query(other_sql, other_args);
     }
 }

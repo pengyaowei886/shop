@@ -60,10 +60,10 @@ class EvaluateService extends Service {
             args.push(kind, order_no, params[i].goods_id, params[i].spec, params[i].num, params[i].content,
                 new Date(), uid, 1);
             if (i === params.length - 1) {
-                sql += "(?,?,?,?,?,?,?,?) ;";
+                sql += "(?,?,?,?,?,?,?,?,?) ;";
                 break;
             } else {
-                sql += "(?,?,?,?,?,?,?,?) ,";
+                sql += "(?,?,?,?,?,?,?,?,?) ,";
             }
         }
         await mysql.query(sql, args);

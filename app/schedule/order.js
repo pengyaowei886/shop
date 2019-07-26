@@ -1,6 +1,6 @@
 const Subscription = require('egg').Subscription;
 
-class AccessToken extends Subscription {
+class Order extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
@@ -14,9 +14,14 @@ class AccessToken extends Subscription {
 
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
+    //清理未支付订单
       this.ctx.service.tools.pay_order();
+      //清理代收货时间
+
+      //自动评价
+
      
   }
 }
 
-module.exports = AccessToken;
+module.exports = Order;
