@@ -254,7 +254,7 @@ class OrderService extends Service {
     //用户查询订单列表
     async query_order_list(uid, status, kind, limit, skip) {
         const mysql = this.app.mysql;
-        if (kind = 2) {
+        if (kind == 2) {
             let rows = {}
             if (status.length == 0) {
                 rows = {
@@ -301,7 +301,7 @@ class OrderService extends Service {
                 }
             }
 
-            let result = await mysql.select('goods_order', rows);
+            let result = await mysql.select('join_order', rows);
             return result;
         }
     }
