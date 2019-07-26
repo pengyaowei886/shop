@@ -185,6 +185,9 @@ class OrderController extends Controller {
                 },
                 skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'int', required: true, allowEmpty: false
+                },
+                kind: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'int', required: true, allowEmpty: false
                 }
             }, ctx.request.body);
         } catch (e) {
@@ -207,7 +210,8 @@ class OrderController extends Controller {
             let status = this.ctx.request.body.status;
             let limit = this.ctx.request.body.limit;
             let skip = this.ctx.request.body.skip;
-            let data = await service.order.query_order_list(uid, status, limit, skip);
+            let kind = this.ctx.request.body.kind;
+            let data = await service.order.query_order_list(uid, status,kind, limit, skip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);

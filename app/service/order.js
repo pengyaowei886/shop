@@ -208,7 +208,7 @@ class OrderService extends Service {
         }
         if (action == "tuikuan") {
             if (status[0].status == 3) {
-                await mysql.update(table_name, { id: order_id, status: 4});
+                await mysql.update(table_name, { id: order_id, status: 4 });
                 return data_back
             } else {
                 throw new Error('订单状态异常');
@@ -217,7 +217,7 @@ class OrderService extends Service {
 
         if (action == "shouhuo") {
             if (status[0].status == 2) {
-                await mysql.update(table_name, { id: order_id, status: 3});
+                await mysql.update(table_name, { id: order_id, status: 3 });
                 return data_back;
             } else {
                 throw new Error('订单状态异常');
@@ -225,17 +225,17 @@ class OrderService extends Service {
         }
         if (action == "pingjia") {
             if (status[0].status == 3) {
-                await mysql.update(table_name, { id: order_id, status: 7});
+                await mysql.update(table_name, { id: order_id, status: 7 });
                 return data_back;
             } else {
                 throw new Error('订单状态异常');
             }
         }
 
-    
+
     }
 
-    
+
     //用户查询不同状态订单数量
     async query_order_num(kind, uid) {
         const mysql = this.app.mysql;
@@ -252,45 +252,58 @@ class OrderService extends Service {
         }
     }
     //用户查询订单列表
-    async query_order_list(uid, status, limit, skip) {
+    async query_order_list(uid, status, kind, limit, skip) {
         const mysql = this.app.mysql;
-
-
-        let rows = {}
-        if (status.length==0) {
-            rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
-            }
-        } else {
-            rows = {
-                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
-            }
-        }
-        let result = await mysql.select('goods_order', rows);
-        if (result.length > 0) {
-            let order_no = [];
-            for (let i in result) {
-                order_no.push(result[i].order_no)
-            }
-            let order_info = await mysql.select('goods_order_info', {
-                where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
-            });
-
-
-            for (let i in result) {
-                let info = [];
-                for (let j in order_info) {
-                    if (result[i].order_no == order_info[j].order_no) {
-                        info.push(order_info[j]);
-                        result[i].order_info = info;
-                    }
+        if (kind = 2) {
+            let rows = {}
+            if (status.length == 0) {
+                rows = {
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
+                }
+            } else {
+                rows = {
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
                 }
             }
-            return result;
-        } else {
+            let result = await mysql.select('goods_order', rows);
+            if (result.length > 0) {
+                let order_no = [];
+                for (let i in result) {
+                    order_no.push(result[i].order_no)
+                }
+                let order_info = await mysql.select('goods_order_info', {
+                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
+                });
+
+
+                for (let i in result) {
+                    let info = [];
+                    for (let j in order_info) {
+                        if (result[i].order_no == order_info[j].order_no) {
+                            info.push(order_info[j]);
+                            result[i].order_info = info;
+                        }
+                    }
+                }
+                return result;
+            } else {
+                return result;
+            }
+        }else{
+            let rows = {}
+            if (status.length == 0) {
+                rows = {
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status','introduce','head_pic','spec'], limit: limit, skip: skip
+                }
+            } else {
+                rows = {
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status','introduce','head_pic','spec'], limit: limit, skip: skip
+                }
+            }
+
+            let result = await mysql.select('goods_order', rows);
             return result;
         }
-
     }
 
     //用户查询拼团订单列表
