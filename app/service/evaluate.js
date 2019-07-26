@@ -55,10 +55,9 @@ class EvaluateService extends Service {
         // }
         let sql = "insert into evaluate ( kind,order_no,goods_id,evaluate_num,content,ctime,uid,is_default) values  ";
         let args = [];
-        console.log(params)
         for (let i = 0; i < params.length; i++) {
 
-            args.push(kind, order_no, params[i].goods_id, params[i].evaluate_num,  params[i].content,
+            args.push(kind, order_no, params[i].goods_id, params[i].num,  params[i].content,
              new Date(), uid,1);
             if (i === params.length - 1) {
                 sql += "(?,?,?,?,?,?,?,?) ;";
@@ -67,7 +66,6 @@ class EvaluateService extends Service {
                 sql += "(?,?,?,?,?,?,?,?) ,";
             }
         }
-
         await mysql.query(sql,args);
         //修改订单状态
         let table_name="";
@@ -78,7 +76,8 @@ class EvaluateService extends Service {
             table_name="goods_order";
         }
         let spec_result = await mysql.update(table_name,{status:7},{where:{order_no:order_no}});
-        if (spec_result.affectedRows === params.length) {
+        console.log(spec_result);
+        if (spec_result.affectedRows ==1) {
             return {};
         } else {
             throw new Error("增加失败");

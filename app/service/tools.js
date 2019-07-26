@@ -160,12 +160,12 @@ class ToolsService extends Service {
     async   pay_order() {
 
         const mysql = this.app.mysql;
-        let sql = "delete from join_order where end_time < ?";
+        let sql = "delete from join_order where  status = 0 and end_time < ?";
      
         let args = [new Date()]
         await mysql.query(sql, args);
 
-        let other_sql = "delete from goods_order where end_time < ?";
+        let other_sql = "delete from goods_order where status = 0  end_time < ?";
         let other_args = [new Date()]
         await mysql.query(other_sql, other_args);
     }
