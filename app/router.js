@@ -17,8 +17,16 @@ module.exports = app => {
   //查询物流
   router.post('/zlpt/tools/wuliu', controller.tools.get_path);
 
+  //获取后台设置的参团协议
+  router.get('/zlpt/tools/xieyi/edit', controller.tools.get_xieyi);
+
   //小程序登陆
   router.post('/zlpt/wx/login', controller.user.login);
+
+
+  //添加手机号
+  router.post('/zlpt/wx/add/phone', controller.user.add_phone);
+
   //查询轮播图
   router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);
   //查看商品列表（名称，分类检索）
@@ -97,8 +105,8 @@ module.exports = app => {
 
   //用户查看商品评价
   router.get('/zlpt/app/user/evaluate/order/query', controller.evaluate.query_self_evaluate);
- //用户查看订单评价
- router.get('/zlpt/app/user/evaluate/goods/query', controller.evaluate.query_goods_evaluate);
+  //用户查看订单评价
+  router.get('/zlpt/app/user/evaluate/goods/query', controller.evaluate.query_goods_evaluate);
 
   //用户发表评价
   router.post('/zlpt/app/user/evaluate/edit', controller.evaluate.edit_evaluate);
@@ -107,31 +115,4 @@ module.exports = app => {
 
 
 
-
-
-  //*******************       拼团商品订单 ***********************/
-
-
-  //*******************       商城商品订单 ***********************/
-
-
-
-  //用户发起拼团
-
-  //用户参加拼团
-
-  //用户获得拼团所用金币
-
-
-  //用户请求购买商品
-
-  //用户完成购买商品
-
-  //用户请求退款
-
-  //查看我的订单
-
-  //查看我的通知消息
-
-  //查看我的分销
 };

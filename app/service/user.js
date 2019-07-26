@@ -306,7 +306,7 @@ class UserService extends Service {
     async query_user_info(uid) {
         const mysql = this.app.mysql;
         let result = await mysql.select('user', {
-            where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance']
+            where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance','phone']
         });
         if (result.length > 0) {
             return result;
@@ -314,5 +314,18 @@ class UserService extends Service {
             throw new Error(" 查询用户信息失败");
         }
     }
+    //用户绑定手机号
+    async add_phone(uid,phone){
+        const mysql = this.app.mysql;
+        let result = await mysql.select('user', {
+            where: { id: uid }, columns: ['phone']
+        });
+        if (result[0].phone) {
+            throw new Error("已经绑定过");
+        } else {
+           await mysql.update('user',{id:uid,phone:phone});
+        }
+    }
+
 }
 module.exports = UserService;

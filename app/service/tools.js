@@ -72,7 +72,7 @@ class ToolsService extends Service {
             data: formData
         })
         let responseData = {};
-console.log(order_no);
+        console.log(order_no);
 
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
@@ -138,23 +138,36 @@ console.log(order_no);
                         </xml>`;
 
         //发起请求，获取微信支付的一些必要信息
-       
-            let result = await this.ctx.curl(reqUrl, {
-                method: "POST",
-                data: formData
+
+        let result = await this.ctx.curl(reqUrl, {
+            method: "POST",
+            data: formData
+        })
+        return new Promise(function (resolve, reject) {
+
+            xml2js.parseString(result.data, function (error, res) {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(res.xml);
+                }
             })
+        });
 
-             return new Promise(function (resolve, reject) {
+    }
 
-                xml2js.parseString(result.data, function (error, res) {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(res.xml);
-                    }
-                })
-            });
-        
+    //定时任务 清除未付款的订单
+    async   pay_order() {
+
+        const mysql = this.app.mysql;
+        let sql = "delete from join_order where end_time < ?";
+     
+        let args = [new Date()]
+        await mysql.query(sql, args);
+
+        let other_sql = "delete from goods_order where end_time < ?";
+        let other_args = [new Date()]
+        await mysql.query(other_sql, other_args);
     }
 }
 module.exports = ToolsService;

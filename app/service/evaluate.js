@@ -67,7 +67,17 @@ class EvaluateService extends Service {
                 sql += "(?,?,?,?,?,?,?,?) ,";
             }
         }
-        let spec_result = await mysql.query(sql, args);
+
+        await mysql.query(sql,args);
+        //修改订单状态
+        let table_name="";
+        if(kind==1){
+            table_name="join_order";
+        }
+        if(kind==2){
+            table_name="goods_order";
+        }
+        let spec_result = await mysql.update(table_name,{status:7},{where:{order_no:order_no}});
         if (spec_result.affectedRows === params.length) {
             return {};
         } else {

@@ -99,5 +99,27 @@ class ToolsController extends Controller {
         }
 
     }
+
+
+    //获取协议信息
+    async get_xieyi() {
+        //参数校验
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+   
+        try {
+            //获取token 
+            const redis = this.app.redis.get('access_token');
+            let xieyi = await redis.get("xieyi");
+            return handerThis.succ(xieyi);
+
+
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+
+        }
+
+    }
 }
 module.exports = ToolsController;

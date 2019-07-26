@@ -111,8 +111,8 @@ class UserController extends Controller {
     try {
       let code = ctx.request.body.code;
       let head_pic = ctx.request.body.head_pic;
-      let nick_name=ctx.request.body.nick_name;
-      let data = await service.user.login(code, head_pic,nick_name);
+      let nick_name = ctx.request.body.nick_name;
+      let data = await service.user.login(code, head_pic, nick_name);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);
@@ -295,45 +295,80 @@ class UserController extends Controller {
       let uid = ctx.request.body.uid;
       let kind = ctx.request.body.kind;
       let goods_id = ctx.request.body.goods_id;
-      let data = await service.user.edit_history(uid,goods_id, kind);
+      let data = await service.user.edit_history(uid, goods_id, kind);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);
     }
   }
-//查询用户个人信息
-  async query_user_info(){
+  //查询用户个人信息
+  async query_user_info() {
     let handerThis = this;
     const { ctx, app, service } = handerThis;
 
     //参数校验
     try {
-        //使用插件进行验证 validate    
-        ctx.validate({
-            uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                type: 'string', required: true, allowEmpty: false
-            },
-        }, ctx.request.query);
+      //使用插件进行验证 validate    
+      ctx.validate({
+        uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+          type: 'string', required: true, allowEmpty: false
+        },
+      }, ctx.request.query);
     } catch (e) {
-        ctx.logger.warn(e);
-        let logContent = e.code + ' ' + e.message + ',';
-        for (let i in e.errors) {
-            logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
-        }
-        return handerThis.error('PARAMETERS_ERROR', logContent);
+      ctx.logger.warn(e);
+      let logContent = e.code + ' ' + e.message + ',';
+      for (let i in e.errors) {
+        logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+      }
+      return handerThis.error('PARAMETERS_ERROR', logContent);
     }
     //逻辑判断
     try {
-        let handerThis = this;
-        const { ctx, service } = handerThis;
-        let uid = Number(ctx.query.uid);
-        let data = await service.user.query_user_info(uid);
-        return handerThis.succ(data);
+      let handerThis = this;
+      const { ctx, service } = handerThis;
+      let uid = Number(ctx.query.uid);
+      let data = await service.user.query_user_info(uid);
+      return handerThis.succ(data);
     } catch (error) {
-        return handerThis.error('HANDLE_ERROR', error['message']);
+      return handerThis.error('HANDLE_ERROR', error['message']);
     }
   }
 
-  
+  //查询用户个人信息
+  async add_phone() {
+    let handerThis = this;
+    const { ctx, app, service } = handerThis;
+
+    //参数校验
+    try {
+      //使用插件进行验证 validate    
+      ctx.validate({
+        uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+          type: 'int', required: true, allowEmpty: false
+        },
+        phone: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+          type: 'string', required: true, allowEmpty: false
+        },
+      }, ctx.request.body);
+    } catch (e) {
+      ctx.logger.warn(e);
+      let logContent = e.code + ' ' + e.message + ',';
+      for (let i in e.errors) {
+        logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+      }
+      return handerThis.error('PARAMETERS_ERROR', logContent);
+    }
+    //逻辑判断
+    try {
+      let handerThis = this;
+      const { ctx, service } = handerThis;
+      let uid = this.ctx.request.body.uid;
+      let phone = this.ctx.request.body.phone;
+      let data = await service.user.add_phone(uid,phone);
+      return handerThis.succ(data);
+    } catch (error) {
+      return handerThis.error('HANDLE_ERROR', error['message']);
+    }
+  }
 }
 module.exports = UserController;
