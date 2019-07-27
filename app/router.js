@@ -18,7 +18,10 @@ module.exports = app => {
   router.post('/zlpt/tools/wuliu', controller.tools.get_path);
 
   //获取后台设置的参团协议
-  router.get('/zlpt/tools/xieyi/edit', controller.tools.get_xieyi);
+  router.get('/zlpt/tools/xieyi/query', controller.tools.get_xieyi);
+    //获取后台设置的公告
+    router.get('/zlpt/tools/gonggao/query', controller.tools.get_gonggao);
+
 
   //小程序登陆
   router.post('/zlpt/wx/login', controller.user.login);
@@ -85,7 +88,7 @@ module.exports = app => {
   //用户查询拼团列表
 
   //用户查询我的拼团
-
+  router.get('/zlpt/app/user/team/list', controller.team.query_user_team);
   //用户检索相同拼团
   router.get('/zlpt/app/user/team/query/same', controller.team.query_same_team);
 
@@ -100,6 +103,7 @@ module.exports = app => {
   router.get('/zlpt/app/user/order/num', controller.order.query_order_num);
   //查看订单列表
   router.post('/zlpt/app/user/order/list', controller.order.query_order_list);
+  
   //用户编辑订单
   router.post('/zlpt/app/user/order/edit', controller.order.confire_order);
 

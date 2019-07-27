@@ -82,7 +82,7 @@ class ToolsController extends Controller {
             const redis = this.app.redis.get('access_token');
             let token = await redis.get("access_token");
             let token_url = `https://api.weixin.qq.com/cgi-bin/express/business/path/get?access_token=${token}`;
-            
+
             let formData = {
                 order_id: this.ctx.request.body.order_no,
                 delivery_id: this.ctx.request.body.delivery_id,
@@ -107,7 +107,7 @@ class ToolsController extends Controller {
 
         let handerThis = this;
         const { ctx, app, service } = handerThis;
-   
+
         try {
             //获取token 
             const redis = this.app.redis.get('access_token');
@@ -121,5 +121,47 @@ class ToolsController extends Controller {
         }
 
     }
+
+    //获取公告
+    async get_gonggao() {
+        //参数校验
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+
+        try {
+            //获取token 
+            const redis = this.app.redis.get('access_token');
+            let gonggao = await redis.get("gonggao");
+            return handerThis.succ(gonggao);
+
+
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+
+        }
+
+    }
+    //获取拼团公告
+    async get_join_team() {
+        //参数校验
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+
+        try {
+            //获取token 
+            const mysql = this.app.mysql;
+            let result = await mysql.select('join_team', { where: { status: 1 }, orders: [['ctime', 'desc']], limit: 10, skip: 0 })
+            return handerThis.succ(result);
+
+
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+
+        }
+
+    }
+
 }
 module.exports = ToolsController;

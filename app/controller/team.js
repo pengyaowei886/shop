@@ -370,5 +370,60 @@ class TeamController extends Controller {
 
         }
     }
+  //查看我的拼团列表
+
+  async query_user_team() {
+    let handerThis = this;
+    const { ctx, app, service } = handerThis;
+    //参数校验
+    try {
+        //使用插件进行验证 validate    
+        ctx.validate({
+            uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            status: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            skip: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            },
+            limit: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                type: 'string', required: true, allowEmpty: false
+            }
+        }, ctx.request.query);
+    } catch (e) {
+        ctx.logger.warn(e);
+        let logContent = e.code + ' ' + e.message + ',';
+        for (let i in e.errors) {
+            logContent += e.errors[i]['code'] + ' ' + e.errors[i]['field'] + ' ' + e.errors[i]['message'] + ' '
+        }
+        return handerThis.error('PARAMETERS_ERROR', logContent);
+    }
+
+
+    //逻辑判断
+    try {
+
+
+        const { ctx, service } = handerThis;
+
+        // let ip_arr=ip_res.split(":");
+        // let ip=ip_arr[0];
+
+
+        let uid = Number(this.ctx.query.uid);
+        let status = Number(this.ctx.query.status);
+        let limit = Number(this.ctx.query.limit);
+        let skip = Number(this.ctx.query.skip);
+        let data = await service.team.query_user_team(uid,status, limit, skip);
+        return handerThis.succ(data);
+    } catch (error) {
+        return handerThis.error('HANDLE_ERROR', error['message']);
+
+    }
+}
+
+
 }
 module.exports = TeamController;

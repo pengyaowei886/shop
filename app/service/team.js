@@ -53,7 +53,7 @@ class TeamService extends Service {
             order_no: order_no, //订单号
             goods_id: goods_id,
             introduce: goods_info[0].introduce,
-            head_pic :goods_info[0].head_pic,
+            head_pic: goods_info[0].head_pic,
             money: goods_info[0].join_xianjin,
             gold: spec_info[0].leader_price,
             youfei: youfei,
@@ -208,7 +208,7 @@ class TeamService extends Service {
                 await mysql.query(join_sql, join_args);
 
 
-                await mysql.update('join_order',{status:1},{where:{order_no:join_no}});
+                await mysql.update('join_order', { status: 1 }, { where: { order_no: join_no } });
 
 
             } else {
@@ -256,10 +256,44 @@ class TeamService extends Service {
 
     }
     // 查询用户拼团列表
-    async query_user_team(uid, status) {
+    async query_user_team(uid, status, limit, skip) {
         const mysql = this.app.mysql;
-        let result = await mysql.select('join_team', { where: { uid: uid, status: status }, columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'] });
-        return result;
+        let row = {}
+        if (status == 10000) {
+            row = {
+                uid: uid
+            }
+        } else {
+            row = {
+                uid: uid, 
+                status: status
+            }
+        }
+        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no'], limit: limit, skip: skip });
+    
+        if (result.length > 0) {
+            let order_no = [];
+            for (let i in result) {
+                order_no.push(result[i].order_no);
+            }
+        
+            let goods_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['order_no', 'introduce', 'spec', 'head_pic'] })
+console.log(goods_info)
+            for (let i in result) {
+                for (let j in goods_info) {
+                    if (result[i].order_no == goods_info[j].order_no) {
+                        result[i].head_pic = goods_info[j].head_pic;
+                        result[i].spec = goods_info[j].spec;
+                        result[i].introduce = goods_info[j].introduce;
+                        break;
+                    }
+                }
+            }
+            return result;
+        } else {
+            return result;
+        }
+
     }
     //    // 查询用户参团列表
     //    async query_user_team(uid, status) {
@@ -331,7 +365,7 @@ class TeamService extends Service {
             //判断能否包尾
             if (now_gold / gold >= 0.8) {
 
-                let money = (gold - now_gold)/100;
+                let money = (gold - now_gold) / 100;
                 let order_no = new Date().getTime();
                 let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";
                 let body_data = "补差价支付";
@@ -356,7 +390,7 @@ class TeamService extends Service {
             //判断能否包尾
             if (now_gold / gold >= 0.8) {
 
-                data.money = gold-now_gold;
+                data.money = gold - now_gold;
                 return data;
             } else {
                 data.money = 0;
@@ -389,7 +423,7 @@ class TeamService extends Service {
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
         let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
-        let join_args = [order_no,money, join_no];
+        let join_args = [order_no, money, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录
         await mysql.insert('user_join', {
