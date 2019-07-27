@@ -36,7 +36,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start  --port 443 --host 172.30.0.2  --daemon --title=egg-server-shop  --https.key=../../https/https.key --https.cert=../../https/https.pem",
+    "start": "egg-scripts start  --port 443 --host 172.30.0.2  --daemon --title=egg-server-shop  --https.key=/www/zlpt/https/https.key --https.cert=/www/zlpt/https/https.pem",
     "stop": "egg-scripts stop --title=egg-server-shop",
     "dev": "egg-bin dev --port 7001 --host 127.0.0.1 ",
     "debug": "egg-bin debug",
