@@ -30,61 +30,63 @@ module.exports = appInfo => {
         origin: '*'
     }
 
-
-    config.mysql = {
-        // 单数据库信息配置
-        client: {
-            // host
-            host: '129.28.167.17',
-            // 端口号
-            port: '3306',
-            // 用户名
-            user: 'root',
-            // 密码
-            password: 'zlptpyw',
-            // 数据库名
-            database: 'zlpt',
-        },
-        // 是否加载到 app 上，默认开启
-        app: true,
-        // 是否加载到 agent 上，默认关闭
-        agent: false,
-    };
-
-    config.redis = {
-        clients: {
-            user: {
-                host: '129.28.167.17',
-                port: '6379',
-                password: 'zlpt123456',
-                db: 0,
-            },
-            trolley: {
-                host: '129.28.167.17',
-                port: '6379',
-                password: 'zlpt123456',
-                db: 1,
-            },
-            history: {
-                host: '129.28.167.17',
-                port: '6379',
-                password: 'zlpt123456',
-                db: 2
-            },
-            access_token: {
-                host: '129.28.167.17',
-                port: '6379',
-                password: 'zlpt123456',
-                db: 3
-            },
-            pay: {
-                host: '129.28.167.17',
-                port: '6379',
-                password: 'zlpt123456',
-                db: 4
-              }
-        }
+     //redis
+  config.redis = {
+    clients: {
+      user: {
+        host:'47.105.169.49',
+        port: '6379',
+        password: 'zlpt123456',
+        db: 0,
+      },
+      trolley: { //购物车
+        host:'47.105.169.49',
+        port: '6379',
+        password: 'zlpt123456',
+        db: 1,
+      },
+      history: {
+        host: '47.105.169.49',
+        port: '6379',
+        password: 'zlpt123456',
+        db: 2
+      },
+      access_token: {
+        host: '47.105.169.49',
+        port: '6379',
+        password: 'zlpt123456',
+        db: 3
+      },
+      pay: {
+        host:'47.105.169.49',
+        port: '6379',
+        password: 'zlpt123456',
+        db: 4
+      }
     }
+  }
+
+
+
+  config.mysql = {
+    // 单数据库信息配置
+    client: {
+        // host
+        host: '47.105.169.49',
+        // 端口号
+        port: '3306',
+        // 用户名
+        user: 'root',
+        // 密码
+        password: '159370pyw',
+        // 数据库名
+        database: 'zlpt',
+    },
+    // 是否加载到 app 上，默认开启
+    app: true,
+    // 是否加载到 agent 上，默认关闭
+    agent: false,
+};
     config.bodyParser = {
         enable: true,
         encoding: 'utf8',
@@ -104,10 +106,10 @@ module.exports = appInfo => {
     config.cluster = {
         listen: {
             port: 443,
-            hostname: '172.30.0.2',
+            hostname:  '172.31.242.17',
             https: {
-                key: "C:/soft/workface/https/https.key",
-                cert: "C:/soft/workface/https/https.pem"
+                key: "../.././https/https.key",
+                cert: "../../..//https/https.pem"
             }
         },
 
