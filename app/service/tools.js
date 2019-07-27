@@ -192,7 +192,7 @@ class ToolsService extends Service {
         let args = [new Date(new Date()- 10*24*60*60*1000)]
         await mysql.query(sql, args);
 
-        let other_sql = "update from goods_order set status = 7  and fahuo_time  < ? ";
+        let other_sql = "update from goods_order set status = 7  where  status = 3 and fahuo_time  < ? ";
         let other_args = [new Date(new Date()- 10*24*60*60*1000)]
         await mysql.query(other_sql, other_args);
     }

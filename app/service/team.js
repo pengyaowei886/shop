@@ -269,7 +269,7 @@ class TeamService extends Service {
                 status: status
             }
         }
-        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no'], limit: limit, skip: skip });
+        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no','join_num'], limit: limit, skip: skip });
     
         if (result.length > 0) {
             let order_no = [];
