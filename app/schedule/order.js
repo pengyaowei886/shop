@@ -8,18 +8,18 @@ class Order extends Subscription {
         type: 'worker', // 指定随机一个worker 都需要执行
         immediate:'true',//配置了该参数为 true 时，这个定时任务会在应用启动并 ready 后立刻执行一次这个定时任务。
        // disable:'true',//配置该参数为 true 时，这个定时任务不会被启动
-        env:['prod']//仅在指定的环境下才启动该定时任务。
+        env:['test']//仅在指定的环境下才启动该定时任务。
     };
   }
 
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
     //清理未支付订单
-      this.ctx.service.tools.pay_order();
+     await this.ctx.service.tools.pay_order();
       //清理代收货时间
-
+      await this.ctx.service.tools.shouhuo_order();
       //自动评价
-
+      await this.ctx.service.tools.pingjia_order();
      
   }
 }

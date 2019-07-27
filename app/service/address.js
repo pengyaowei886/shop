@@ -71,7 +71,8 @@ class AddressService extends Service {
             }
         }
         if (action == "delete") {
-            let result = await mysql.delete('address', { where: { id: params.id } });
+            console.log(params.id)
+            let result = await mysql.delete('address',{id: params.id});
             if (result.affectedRows === 1) {
                 return return_data;
             } else {
