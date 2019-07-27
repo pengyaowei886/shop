@@ -19,8 +19,10 @@ module.exports = app => {
 
   //获取后台设置的参团协议
   router.get('/zlpt/tools/xieyi/query', controller.tools.get_xieyi);
+  //获取后台设置的公告
+  router.get('/zlpt/tools/gonggao/query', controller.tools.get_gonggao);
     //获取后台设置的公告
-    router.get('/zlpt/tools/gonggao/query', controller.tools.get_gonggao);
+    router.get('/zlpt/tools/new/query', controller.tools.get_join_team) ;
 
 
   //小程序登陆
@@ -103,7 +105,7 @@ module.exports = app => {
   router.get('/zlpt/app/user/order/num', controller.order.query_order_num);
   //查看订单列表
   router.post('/zlpt/app/user/order/list', controller.order.query_order_list);
-  
+
   //用户编辑订单
   router.post('/zlpt/app/user/order/edit', controller.order.confire_order);
 
