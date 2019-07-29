@@ -297,35 +297,42 @@ class TeamService extends Service {
     // 查询用户分享内容
     async query_fenxiang(order_no) {
         const mysql = this.app.mysql;
-        let data={};
+        let data = {};
 
 
         let uid = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['uid'] });
 
-        let team_info= await mysql.select('user', { where: { id: uid[0].uid }, columns: ['wx_pic','wx_nickname'] });
+        let team_info = await mysql.select('user', { where: { id: uid[0].uid }, columns: ['wx_pic', 'wx_nickname'] });
 
         let join = await mysql.select('user_join', { where: { join_no: order_no }, columns: ['uid'] });
-        let user_id=[];
-        for(let i in join){
+
+        let user_id = [];
+        for (let i in join) {
             user_id.push(join[i].uid);
         }
-        let user_info=await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic','id']});
+        let user_info = await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic', 'id'] });
 
-
-
-        for(let i in join){
-            for(let j in user_info){
-                if(join[i].uid==user_info[j].id){
-                    join[i].wx_pic= user_info[j].wx_pic;
-                    break;
+        if (join.length > 0) {
+            for (let i in join) {
+                for (let j in user_info) {
+                    if (join[i].uid == user_info[j].id) {
+                        join[i].wx_pic = user_info[j].wx_pic;
+                        break;
+                    }
                 }
             }
-        }
-        data.team_pic=team_info[0].wx_pic;
-        data.team_name=team_info[0].wx_nickname;
-        data.user_pic=join;
+            data.team_pic = team_info[0].wx_pic;
+            data.team_name = team_info[0].wx_nickname;
+            data.user_pic = join;
 
-        return data;
+            return data;
+        }else{
+            data.team_pic = team_info[0].wx_pic;
+            data.team_name = team_info[0].wx_nickname;
+            data.user_pic = join;
+        }
+
+
     }
 
 
