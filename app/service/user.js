@@ -88,7 +88,7 @@ class UserService extends Service {
                 "dtype": "json"
             }
         })
-        if (result.data.reason == "操作成功") {
+        if (result.data.error_code == 0) {
             let data = {};
             // redis
             await redis.set(`${phone}:code`, code);
@@ -96,6 +96,8 @@ class UserService extends Service {
             await redis.expire(`${phone}:code`, 60);
             //  console.log(result);
             return data;
+        }else{
+            return  result.data.reason;
         }
 
     };
