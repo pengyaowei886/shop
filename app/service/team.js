@@ -307,12 +307,23 @@ class TeamService extends Service {
         let join = await mysql.select('user_join', { where: { join_no: order_no }, columns: ['uid'] });
         let user_id=[];
         for(let i in join){
-            user_id.push(join[i].id);
+            user_id.push(join[i].uid);
         }
-        let user_info=await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic']});
+        let user_info=await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic','id']});
+
+
+
+        for(let i in join){
+            for(let j in user_info){
+                if(join[i].uid==user_info[j].id){
+                    join[i].wx_pic= user_info[j].wx_pic;
+                    break;
+                }
+            }
+        }
         data.team_pic=team_info[0].wx_pic;
         data.team_name=team_info[0].wx_nickname;
-        data.user_pic=user_info;
+        data.user_pic=join;
 
         return data;
     }

@@ -6,9 +6,9 @@ let userVerify = function (options) {
         //解析token 获得uid
         let redis = ctx.app.redis.get('user');//获取数据库实例
         let token = ctx.request.header.token;
-        console.log(token)
+
         let result = await redis.get(token);
-        console.log(result)
+
         if (result) {
             await next();
         } else {
