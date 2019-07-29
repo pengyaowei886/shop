@@ -127,6 +127,7 @@ class UserService extends Service {
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
             let token = encryptedText.final("hex");
+            await redis.set(`${token}`, uid_res.insertId);
             databack.uid = is_exist[0].id;
             databack.token = token;
             databack.openid = open_id;

@@ -6,7 +6,7 @@
 module.exports = app => {
 
   const { router, controller, middleware } = app;
-  // let adminVerify = middleware.loginVerify({})//管理员权限验证
+  let userVerify = middleware.userVerify({})//token 验证
 
 
   //tools工具类api***************tools工具类api
@@ -30,7 +30,7 @@ module.exports = app => {
 
 
   //添加手机号
-  router.post('/zlpt/wx/add/phone', controller.user.add_phone);
+  router.post('/zlpt/wx/add/phone',userVerify, controller.user.add_phone);
 
   //查询轮播图
   router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);

@@ -2,7 +2,6 @@
 const Service = require('egg').Service;
 const md5 = require('md5');
 const xml2js = require('xml2js');
-const fxp = require('fast-xml-parser')
 class ToolsService extends Service {
 
 
@@ -160,41 +159,53 @@ class ToolsService extends Service {
     async   pay_order() {
 
         const mysql = this.app.mysql;
-        let sql = "delete from join_order where  status = 0 and end_time < ?";
-     
+        let sql = "delete from join_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
+
         let args = [new Date()]
+
         await mysql.query(sql, args);
 
-        let other_sql = "delete from goods_order where status = 0  and end_time < ?";
-        let other_args = [new Date()]
-        await mysql.query(other_sql, other_args);
+
+        let other_sql = "delete from goods_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
+
+
+        await mysql.query(other_sql, args);
     }
     //自动收货
     async   shouhuo_order() {
 
         const mysql = this.app.mysql;
-        let sql = "update   join_order set status= 3 ,shouhuo_time = ? where  status = 2 and fahuo_time <  ?";
-     
-        let args = [new Date(), new Date(new Date()- 10*24*60*60*1000)]
+        let sql = "update   join_order set status= 2 ,shouhuo_time = ? where  status = 2  and  " +
+            " unix_timestamp(fahuo_time) is not null and  unix_timestamp(fahuo_time) >  unix_timestamp(?)  ;"
+
+
+        let args = [new Date(new Date() - 10 * 24 * 60 * 60 * 1000), new Date(new Date() - 10 * 24 * 60 * 60 * 1000)]
         await mysql.query(sql, args);
 
-        let other_sql = "update  goods_order set status =3 ,shouhuo_time = ? where status = 2  and fahuo_time  < ? ";
-        let other_args = [new Date(),new Date(new Date()- 10*24*60*60*1000)]
-        await mysql.query(other_sql, other_args);
+
+
+        let other_sql = "update   goods_order set status= 2 ,shouhuo_time = ? where  status = 2  and  " +
+            " unix_timestamp(fahuo_time) is not null and  unix_timestamp(fahuo_time) >  unix_timestamp(?)  ;"
+
+
+        await mysql.query(other_sql, args);
     }
 
     // 自动评价
-     async   pingjia_order() {
+    async   pingjia_order() {
 
         const mysql = this.app.mysql;
-        let sql = "update from join_order set status = 7  where  status = 3 and fahuo_time <  ?";
-     
-        let args = [new Date(new Date()- 10*24*60*60*1000)]
+        let sql = "update  join_order set status = 7  where    status = 3   and  " +
+            " unix_timestamp(shouhuo_time) is not null and  unix_timestamp(shouhuo_time) >  unix_timestamp(?)  ;"
+
+        let args = [new Date(new Date() - 7 * 24 * 60 * 60 * 1000)]
         await mysql.query(sql, args);
 
-        let other_sql = "update from goods_order set status = 7  where  status = 3 and fahuo_time  < ? ";
-        let other_args = [new Date(new Date()- 10*24*60*60*1000)]
-        await mysql.query(other_sql, other_args);
+        let other_sql = "update  join_order set status = 7  where    status = 3  and  " +
+            " unix_timestamp(shouhuo_time) is not null and  unix_timestamp(shouhuo_time) >  unix_timestamp(?)  ;"
+
+
+        await mysql.query(other_sql, args);
     }
 }
 module.exports = ToolsService;

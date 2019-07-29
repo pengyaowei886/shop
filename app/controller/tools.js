@@ -155,13 +155,14 @@ class ToolsController extends Controller {
             let result = await mysql.select('join_team', { where: { status: 1 }, orders: [['ctime', 'desc']], limit: 10, skip: 0 })
             return handerThis.succ(result);
 
-
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
 
         }
 
     }
+
+
 
 }
 module.exports = ToolsController;
