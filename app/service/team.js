@@ -265,20 +265,19 @@ class TeamService extends Service {
             }
         } else {
             row = {
-                uid: uid, 
+                uid: uid,
                 status: status
             }
         }
-        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no','join_num','status','end_time'], limit: limit, skip: skip });
-    
+        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no', 'join_num', 'status', 'end_time'], limit: limit, skip: skip });
+
         if (result.length > 0) {
             let order_no = [];
             for (let i in result) {
                 order_no.push(result[i].order_no);
             }
-        
+
             let goods_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['order_no', 'introduce', 'spec', 'head_pic'] })
-console.log(goods_info)
             for (let i in result) {
                 for (let j in goods_info) {
                     if (result[i].order_no == goods_info[j].order_no) {
@@ -295,12 +294,28 @@ console.log(goods_info)
         }
 
     }
-    //    // 查询用户参团列表
-    //    async query_user_team(uid, status) {
-    //     const mysql = this.app.mysql;
-    //     let result = await mysql.select('user_join', { where: { uid: uid, status: status }, columns: ['gold', 'now_gold', 'join_number', 'goods_id', 'spec'] });
-    //     return result;
-    // }
+    // 查询用户分享内容
+    async query_fenxiang(order_no) {
+        const mysql = this.app.mysql;
+        let data={};
+
+
+        let uid = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['uid'] });
+
+        let team_info= await mysql.select('user', { where: { id: uid[0].uid }, columns: ['wx_pic','wx_nickname'] });
+
+        let join = await mysql.select('user_join', { where: { join_no: order_no }, columns: ['uid'] });
+        let user_id=[];
+        for(let i in join){
+            user_id.push(join[i].id);
+        }
+        let user_info=await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic']});
+        data.team_pic=team_info[0].wx_pic;
+        data.team_name=team_info[0].wx_nickname;
+        data.user_pic=user_info;
+
+        return data;
+    }
 
 
     //查看用户拼团具体详情

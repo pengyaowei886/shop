@@ -118,7 +118,8 @@ module.exports = app => {
   router.post('/zlpt/app/user/evaluate/edit',userVerify, controller.evaluate.edit_evaluate);
 
 
-
+//用户查看分享
+router.get('/zlpt/app/user/team/fenxiang',userVerify, controller.team.query_fenxiang);
 
 
 };

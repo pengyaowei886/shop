@@ -91,7 +91,91 @@ class ToolsService extends Service {
         return responseData;
     }
 
+    //微信退款
+    async  weixin_refund(out_trade_no, money) {
 
+
+        let time = new Date().getTime();	//商户退款单号
+        let nonce_str = randomStr(); //随机字符串
+        function createSign(obj) {	//签名算法（把所有的非空的参数，按字典顺序组合起来+key,然后md5加密，再把加密结果都转成大写的即可）
+            let stringA = 'appid=' + obj.appid + '&mch_id=' + obj.mch_id + '&nonce_str=' + obj.nonce_str + '&out_refund_no='
+                + obj.out_refund_no + '&out_trade_no=' + obj.out_trade_no + '&refund_fee=' + obj.refund_fee + '&total_fee=' + obj.total_fee + "&key=" + obj.key;
+            let stringSignTemp = md5(stringA);
+            let signValue = stringSignTemp.toUpperCase();
+            return signValue;
+        }
+        function randomStr() {	//产生一个随机字符串	
+            var str = "";
+            var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+            for (var i = 1; i <= 32; i++) {
+                var random = Math.floor(Math.random() * arr.length);
+                str += arr[random];
+            }
+            return str;
+        }
+        let total_fee = Number(money * 100);
+
+        let appid = this.app.config.info.appid;	//自己的小程序appid
+        console.log(appid)
+
+        let mch_id = this.app.config.info.mch_id;	//自己的商户号id
+        let business_secret = this.app.config.info.business_secret;
+        console.log(business_secret);
+        let sign = createSign({	//签名
+            appid: appid,
+            mch_id: mch_id,
+            nonce_str: nonce_str,
+            out_refund_no: time,
+            out_trade_no: out_trade_no,
+            refund_fee: total_fee,
+            total_fee: total_fee,
+            key: business_secret
+        });
+        let reqUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+        let formData = `<xml>
+                            <appid>${appid}</appid>
+							<mch_id>${mch_id}</mch_id>
+                            <nonce_str>${nonce_str}</nonce_str> 
+                            <out_refund_no>${time}</out_refund_no>
+                            <out_trade_no>${out_trade_no}</out_trade_no>
+                            <refund_fee>${total_fee}</refund_fee>
+							<sign>${sign}</sign>
+							<total_fee>${total_fee}</total_fee>
+                        </xml>`;
+
+        //发起请求，获取微信支付的一些必要信息
+        let result = await this.ctx.curl(reqUrl, {
+            method: "POST",
+            data: formData,
+            pfx: fs.readFileSync('/www/zlpt/https/apiclient_cert.p12'),
+            passphrase: mch_id
+        })
+
+        let responseData = {};
+        xml2js.parseString(result.data, function (error, res) {
+            let reData = res.xml;
+
+            if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
+                // //验证微信返回值
+                let sign_again = createSign({	//签名
+                    appid: reData.appid[0],
+                    mch_id: reData.mch_id[0],
+                    nonce_str: reData.nonce_str[0],
+                    out_refund_no: reData.out_refund_no[0],
+                    out_trade_no: reData.out_trade_no[0],
+                    refund_fee: reData.refund_fee[0],
+                    total_fee: reData.total_fee[0],
+                    key: business_secret
+                });
+                responseData = reData;
+            } else {
+                throw new Error(reData.err_code_des[0])
+            }
+
+        })
+        return responseData;
+    }
 
     //微信查询订单
     async  query_weixin_order(out_trade_no) {
@@ -207,5 +291,59 @@ class ToolsService extends Service {
 
         await mysql.query(other_sql, args);
     }
+
+    //每天统计可用积分
+
+
+    //定时任务 清除未拼成的团
+    async   team_order() {
+
+        const mysql = this.app.mysql;
+
+        let select_sql = "select  id, uid ,order_no  from join_team where status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )"
+
+
+        let args = [new Date()]
+
+        let info = await mysql.query(select_sql, args);
+        let join_id = [];
+        let order_no = [];
+        for (let i in info) {
+            join_id.push(info[i].id);
+            order_no.push(info[i].order_no);
+            
+        }
+        //修改状态
+        await mysql.update('join_team', {
+            id: join_id, status: -1
+        })
+
+        let order_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['money', 'order_no', 'gold','uid'] })
+        //退款
+        for (let i in order_info) {
+            //退款
+            this.weixin_refund(Number(order_info[i].money) * 100, order_info[i].order_no)
+            //修改状态
+            await mysql.update('join_order', {
+                status: 8
+            }, { where: { order_no: order_no } })
+            //退积分
+            let user_sql =" update user set balance = balance + ? where  id = ?"
+            let user_args =[ order_info[i].gold,order_info[i].uid];
+            await mysql.query(user_sql,user_args);
+            //生成积分退款记录
+
+            await mysql.insert('gold_record',{
+                uid:order_info[i].uid,
+                num:order_info[i].gold,
+                source:4,//开团失败退款
+                ctime:new Date()
+            })
+        }
+
+
+        await mysql.query(other_sql, args);
+    }
+
 }
 module.exports = ToolsService;
