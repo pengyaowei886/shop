@@ -305,14 +305,14 @@ class TeamService extends Service {
         let team_info = await mysql.select('user', { where: { id: uid[0].uid }, columns: ['wx_pic', 'wx_nickname'] });
 
         let join = await mysql.select('user_join', { where: { join_no: order_no }, columns: ['uid'] });
-
-        let user_id = [];
-        for (let i in join) {
-            user_id.push(join[i].uid);
-        }
-        let user_info = await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic', 'id'] });
+   
 
         if (join.length > 0) {
+            let user_id = [];
+            for (let i in join) {
+                user_id.push(join[i].uid);
+            }
+            let user_info = await mysql.select('user', { where: { id: user_id }, columns: ['wx_pic', 'id'] });
             for (let i in join) {
                 for (let j in user_info) {
                     if (join[i].uid == user_info[j].id) {
@@ -326,13 +326,12 @@ class TeamService extends Service {
             data.user_pic = join;
 
             return data;
-        }else{
+        } else {
             data.team_pic = team_info[0].wx_pic;
             data.team_name = team_info[0].wx_nickname;
             data.user_pic = join;
+            return data;
         }
-
-
     }
 
 
