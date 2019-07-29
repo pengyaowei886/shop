@@ -10,7 +10,7 @@ let userVerify = function (options) {
         let result = await redis.get(token);
         console.log(result)
         if (result) {
-            next();
+            await next();
         } else {
             function error(desc) {
                 ctx.status = 200;
@@ -23,7 +23,6 @@ let userVerify = function (options) {
             }
             return error("认证失败")
         }
-        next();
     }
 }
 module.exports = userVerify

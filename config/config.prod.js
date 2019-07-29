@@ -124,7 +124,8 @@ module.exports = appInfo => {
         openid: "oKvMN5Ef0LijcwlVkiLEOtv4urfg",
         business_secret: "GY32mgLScDLvLmJOfZFz74vmXorfULvr",//商户支付密钥
         key: "9vApxLk5G3PAsJrM",//16位 对称公钥
-        iv: "FnJL7EDzjqWjcaY9" //偏移量
+        iv: "FnJL7EDzjqWjcaY9" ,//偏移量
+        duanxin_key:"e7e49d13bd28f80d191aaa8311f97371" //聚合数据短信key
     }
     return {
         ...config

@@ -2,7 +2,7 @@
 
 const Service = require('egg').Service;
 const crypto = require('crypto');
-
+const xml2js = require('xml2js');
 // const WXBizDataCrypt = require('wxbizdatacrypt');
 class UserService extends Service {
 
@@ -54,17 +54,50 @@ class UserService extends Service {
     async req_dx(phone) {
         let handerThis = this;
         const { ctx, app } = handerThis;
-        const redis = this.app.redis.get('customer');
+        // const redis = this.app.redis.get('customer');
 
-        let data = {};
-        //接入第三方短信验证码接口
-        let params = "123456";
-        // redis
-        await redis.set(`${phone}:code`, params);
-        //2分钟过期
-        await redis.expire(`${phone}:code`, 120);
-        //  console.log(result);
-        return data;
+
+
+        function randomStr() {	//产生一个随机字符串	
+            var str = "";
+            var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+            for (var i = 1; i <= 6; i++) {
+                var random = Math.floor(Math.random() * arr.length);
+                str += arr[random];
+            }
+
+            return str;
+
+        }
+    
+        let url = "http://v.juhe.cn/sms/send";
+        let result = await this.ctx.curl(url, {
+            method: "POST",
+            data: {
+
+                "mobile": phone,  // 接受短信的用户手机号码
+                "tpl_id": 175967,  // 您申请的短信模板ID，根据实际情况修改
+                "tpl_value": `#code#=${randomStr()}`,  // 您设置的模板变量，根据实际情况修改
+                "key": this.app.config.info.duanxin_key,  // 应用APPKEY(应用详细页查询
+                "dtype": "json"
+            }
+        })
+        return result;
+        xml2js.parseString(result.data, function (error, res) {
+
+            console.log(res);
+        })
+        console.log(JSON.stringify(result.data));
+        // let data = {};
+        // //接入第三方短信验证码接口
+        // let params = "123456";
+        // // redis
+        // await redis.set(`${phone}:code`, params);
+        // //2分钟过期
+        // await redis.expire(`${phone}:code`, 120);
+        // //  console.log(result);
+        // return data;
 
     };
     /**
@@ -142,7 +175,7 @@ class UserService extends Service {
                 ctime: new Date()
             }
             //插入数据库
-           let uid_res= await mysql.insert('user', options);
+            let uid_res = await mysql.insert('user', options);
             //  生成token
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
@@ -198,10 +231,10 @@ class UserService extends Service {
         }
         if (action == "delete") {
             let rows = {
-               'id':params.id
+                'id': params.id
             }
             let result = await mysql.delete('collation', rows);
-            if (result.affectedRows ==params.id.length ) {
+            if (result.affectedRows == params.id.length) {
                 return return_data;
             } else {
                 throw new Error("取消收藏失败");
@@ -307,7 +340,7 @@ class UserService extends Service {
     async query_user_info(uid) {
         const mysql = this.app.mysql;
         let result = await mysql.select('user', {
-            where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance','phone']
+            where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance', 'phone']
         });
         if (result.length > 0) {
             return result;
@@ -316,7 +349,7 @@ class UserService extends Service {
         }
     }
     //用户绑定手机号
-    async add_phone(uid,phone){
+    async add_phone(uid, phone) {
         const mysql = this.app.mysql;
         let result = await mysql.select('user', {
             where: { id: uid }, columns: ['phone']
@@ -324,7 +357,7 @@ class UserService extends Service {
         if (result[0].phone) {
             throw new Error("已经绑定过");
         } else {
-           await mysql.update('user',{id:uid,phone:phone});
+            await mysql.update('user', { id: uid, phone: phone });
         }
     }
 
