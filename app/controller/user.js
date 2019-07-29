@@ -334,7 +334,7 @@ class UserController extends Controller {
     }
   }
 
-  //查询用户个人信息
+  //绑定手机号
   async add_phone() {
     let handerThis = this;
     const { ctx, app, service } = handerThis;
@@ -347,6 +347,9 @@ class UserController extends Controller {
           type: 'int', required: true, allowEmpty: false
         },
         phone: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+          type: 'string', required: true, allowEmpty: false
+        },
+        code: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
           type: 'string', required: true, allowEmpty: false
         },
       }, ctx.request.body);
@@ -364,7 +367,8 @@ class UserController extends Controller {
       const { ctx, service } = handerThis;
       let uid = this.ctx.request.body.uid;
       let phone = this.ctx.request.body.phone;
-      let data = await service.user.add_phone(uid,phone);
+      let code = this.ctx.request.body.code;
+      let data = await service.user.add_phone(uid,phone,code);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);

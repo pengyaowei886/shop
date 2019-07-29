@@ -54,7 +54,7 @@ class UserService extends Service {
     async req_dx(phone) {
         let handerThis = this;
         const { ctx, app } = handerThis;
-        // const redis = this.app.redis.get('customer');
+        const redis = this.app.redis.get('duanxin');
 
 
 
@@ -70,34 +70,33 @@ class UserService extends Service {
             return str;
 
         }
-    
+        let code = randomStr();
         let url = "http://v.juhe.cn/sms/send";
+
+
+        console.log()
         let result = await this.ctx.curl(url, {
             method: "POST",
+            dataAsQueryString: true,
+            dataType: "json",
             data: {
 
                 "mobile": phone,  // 接受短信的用户手机号码
                 "tpl_id": 175967,  // 您申请的短信模板ID，根据实际情况修改
-                "tpl_value": `#code#=${randomStr()}`,  // 您设置的模板变量，根据实际情况修改
+                "tpl_value": `#code#=${code}`,  // 您设置的模板变量，根据实际情况修改
                 "key": this.app.config.info.duanxin_key,  // 应用APPKEY(应用详细页查询
                 "dtype": "json"
             }
         })
-        return result;
-        xml2js.parseString(result.data, function (error, res) {
-
-            console.log(res);
-        })
-        console.log(JSON.stringify(result.data));
-        // let data = {};
-        // //接入第三方短信验证码接口
-        // let params = "123456";
-        // // redis
-        // await redis.set(`${phone}:code`, params);
-        // //2分钟过期
-        // await redis.expire(`${phone}:code`, 120);
-        // //  console.log(result);
-        // return data;
+        if (result.data.reason == "操作成功") {
+            let data = {};
+            // redis
+            await redis.set(`${phone}:code`, code);
+            //2分钟过期
+            await redis.expire(`${phone}:code`, 60);
+            //  console.log(result);
+            return data;
+        }
 
     };
     /**
@@ -105,26 +104,7 @@ class UserService extends Service {
      * @param {*} phone 
      * @param {*} password 
      */
-    // async login(phone, password) {
-    //     const key = Buffer.from(this.app.config.info.key, 'utf8');//16位 对称公钥
-    //     const iv = Buffer.from(this.app.config.info.iv.toString(), 'utf8');  //偏移量
-    //     const mysql = this.app.mysql;
-    //     const redis = this.app.redis.get('customer');
-    //     let data = {};
-    //     let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
-    //     encryptedText.update(password);
-    //     let result = await mysql.get('user', { phone: phone, password: password })
-    //     if (result) {
-    //         let token = encryptedText.final("hex");
-    //         await redis.set(`${phone}:token`, token);
-    //         data.token = token;
-    //         return data;
-    //     } else {
-    //         throw new Error("账号或者密码错误")
-    //     }
 
-
-    // }
     /**
  *  小程序登陆
  * 
@@ -349,15 +329,23 @@ class UserService extends Service {
         }
     }
     //用户绑定手机号
-    async add_phone(uid, phone) {
+    async add_phone(uid, phone, code) {
         const mysql = this.app.mysql;
+        const redis = this.app.redis.get('duanxin');
         let result = await mysql.select('user', {
             where: { id: uid }, columns: ['phone']
         });
         if (result[0].phone) {
             throw new Error("已经绑定过");
         } else {
-            await mysql.update('user', { id: uid, phone: phone });
+            let re_code=await redis.get(`${phone}:code`);
+            if(re_code==code){
+                await mysql.update('user', { id: uid, phone: phone });
+                return {};
+            }else{
+                throw new Error("验证码错误");
+            }
+            
         }
     }
 
