@@ -2,7 +2,7 @@
 
 const Service = require('egg').Service;
 const crypto = require('crypto');
-const xml2js = require('xml2js');
+
 // const WXBizDataCrypt = require('wxbizdatacrypt');
 class UserService extends Service {
 

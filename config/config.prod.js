@@ -67,7 +67,7 @@ module.exports = appInfo => {
         host:'47.105.169.49',
         port: '6379',
         password: 'zlpt123456',
-        db: 4
+        db: 5
       }
     }
   }

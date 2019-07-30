@@ -112,7 +112,7 @@ class Goodsservice extends Service {
         } else {
             //再查商品规格信息 
             let specs = await mysql.select('join_specs', {
-                where: { goods_id: id, status: 1 }, columns: ['id', 'spec', 'join_price', "join_number", "leader_price",
+                where: { goods_id: id, status: 1 }, columns: ['id', 'spec','cost_price', 'join_price', "join_number", "leader_price",
                     'repertory','is_default']
             });
             let collation = await mysql.select('collation', {
