@@ -386,7 +386,7 @@ class TeamService extends Service {
             return [];
         }
     }
-    // 用户对自己的团进行包尾
+    // 用户对自己的团进行补差价
     async join_myself(openid, join_no, ip) {
         const mysql = this.app.mysql;
         //判断团是否已经成团
@@ -395,8 +395,7 @@ class TeamService extends Service {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
-            if (now_gold / gold >= 0.8) {
-
+            if (now_gold / gold >= 0.6) {
                 let money = (gold - now_gold) / 100;
                 let order_no = new Date().getTime();
                 let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";
@@ -434,11 +433,7 @@ class TeamService extends Service {
     }
     //包尾支付回调
     async join_myself_return(body) {
-        // const xml2json = fxp.parse(body);
-        // let reData = JSON.stringify(xml2json);
-        // this.ctx.logger.error("微信返回值内容" + reData);
 
-        // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
 
 
         // 支付成功处理

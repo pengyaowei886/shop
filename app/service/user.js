@@ -141,6 +141,12 @@ class UserService extends Service {
 
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
+            //更新微信头像和昵称
+            await mysql.update('user',{
+                id:is_exist[0].id,
+                wx_pic:head_pic,
+                wx_nickname:nick_name
+            })
             let token = encryptedText.final("hex");
             await redis.set(`${token}`, is_exist[0].id);
             databack.uid = is_exist[0].id;
