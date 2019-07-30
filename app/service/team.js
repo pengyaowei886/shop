@@ -67,11 +67,10 @@ class TeamService extends Service {
             end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//订单付款截止时间
             status: 0 //待付款
         });
-        // let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-        // //放入redis 
+        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+        //放入redis 
 
         await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
-
         await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
         await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
         await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
