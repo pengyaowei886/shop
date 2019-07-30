@@ -258,11 +258,11 @@ class OrderService extends Service {
             let rows = {}
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'order_no', 'kuaidi','kuaidi_no','status'], limit: limit, skip: skip
                 }
             } else {
                 rows = {
-                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money','order_no', 'kuaidi','kuaidi_no', 'status'], limit: limit, skip: skip
                 }
             }
             let result = await mysql.select('goods_order', rows);
@@ -272,7 +272,7 @@ class OrderService extends Service {
                     order_no.push(result[i].order_no)
                 }
                 let order_info = await mysql.select('goods_order_info', {
-                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
+                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
                 });
 
 
@@ -293,11 +293,11 @@ class OrderService extends Service {
             let rows = {}
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status','introduce','head_pic','spec'], limit: limit, skip: skip
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status','kuaidi_no','kuaidi','introduce','head_pic','spec'], limit: limit, skip: skip
                 }
             } else {
                 rows = {
-                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'status','introduce','head_pic','spec'], limit: limit, skip: skip
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'kuaidi_no','kuaidi','status','introduce','head_pic','spec'], limit: limit, skip: skip
                 }
             }
 
