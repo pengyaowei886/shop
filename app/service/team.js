@@ -33,7 +33,7 @@ class TeamService extends Service {
         }
     }
     //用户确认开团
-    async open_team(goods_id, spec_id, address_id, youfei, openid, ip) {
+    async open_team(goods_id, spec_id, address_id, uid, youfei, openid, ip) {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
         let attach = goods_id;
@@ -46,10 +46,10 @@ class TeamService extends Service {
 
         let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
         //生成预付款订单
-        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+
         let money = goods_info[0].join_xianjin + youfei;
         await mysql.insert('join_order', {
-            uid: uid[0].id,
+            uid: uid,
             order_no: order_no, //订单号
             goods_id: goods_id,
             introduce: goods_info[0].introduce,
@@ -67,9 +67,11 @@ class TeamService extends Service {
             end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//订单付款截止时间
             status: 0 //待付款
         });
-        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-        //放入redis 
+        // let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+        // //放入redis 
+
         await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
+
         await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
         await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
         await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
@@ -80,7 +82,7 @@ class TeamService extends Service {
     //用户继续完成开团支付
     async open_team_again(order_no, uid) {
         const redis = this.app.redis.get('pay');
-        let result = redis.hgetall(`pay:${uid}:${order_no}`);
+        let result = redis.hgetall(`pay:${uid[0].id}:${order_no}`);
         console.log(result);
         return result;
     }
@@ -305,7 +307,7 @@ class TeamService extends Service {
         let team_info = await mysql.select('user', { where: { id: uid[0].uid }, columns: ['wx_pic', 'wx_nickname'] });
 
         let join = await mysql.select('user_join', { where: { join_no: order_no }, columns: ['uid'] });
-   
+
 
         if (join.length > 0) {
             let user_id = [];

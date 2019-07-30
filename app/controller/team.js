@@ -61,7 +61,11 @@ class TeamController extends Controller {
                 },
                 spec_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
+                }, 
+                uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                    type: 'string', required: true, allowEmpty: false
                 },
+
             }, ctx.request.query);
         } catch (e) {
             ctx.logger.warn(e);
@@ -87,7 +91,9 @@ class TeamController extends Controller {
             let goods_id = Number(this.ctx.query.goods_id);
             let spec_id = Number(this.ctx.query.spec_id);
             let address_id = Number(this.ctx.query.address_id);
-            let data = await service.team.open_team(goods_id, spec_id, address_id, youfei, openid, ip);
+
+            let uid = Number(this.ctx.query.uid);
+            let data = await service.team.open_team(goods_id, spec_id, address_id, uid,youfei, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
@@ -455,8 +461,8 @@ class TeamController extends Controller {
             // let ip=ip_arr[0];
 
 
-            let order_no =this.ctx.query.order_no;
-     
+            let order_no = this.ctx.query.order_no;
+
             let data = await service.team.query_fenxiang(order_no);
             return handerThis.succ(data);
         } catch (error) {
