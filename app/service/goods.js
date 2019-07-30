@@ -76,7 +76,7 @@ class Goodsservice extends Service {
     //用户查询拼团商品列表
     async query_join_goods(limit, skip, name, class_class, is_recommend) {
         const mysql = this.app.mysql;
-        let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.succ_volume,g.introduce " +
+        let sql = "select g.id,g.head_pic,s.join_price,s.leader_price,s.cost_price,s.join_number,g.succ_volume,g.introduce " +
             "from join_goods g left join join_specs s  on g.id= s.goods_id  where  g.status=1 and s.is_default=1 and s.status=1 ";
         if (name) {
             sql += "and g.introduce like " + mysql.escape("%" + name + "%");
