@@ -311,14 +311,14 @@ class ToolsService extends Service {
         for (let i in info) {
             join_id.push(info[i].id);
             order_no.push(info[i].order_no);
-            
+
         }
         //修改状态
         await mysql.update('join_team', {
             id: join_id, status: -1
         })
 
-        let order_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['money', 'order_no', 'gold','uid'] })
+        let order_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['money', 'order_no', 'gold', 'uid'] })
         //退款
         for (let i in order_info) {
             //退款
@@ -328,21 +328,19 @@ class ToolsService extends Service {
                 status: 8
             }, { where: { order_no: order_no } })
             //退积分
-            let user_sql =" update user set balance = balance + ? where  id = ?"
-            let user_args =[ order_info[i].gold,order_info[i].uid];
-            await mysql.query(user_sql,user_args);
+            let user_sql = " update user set balance = balance + ? where  id = ?"
+            let user_args = [order_info[i].gold, order_info[i].uid];
+            await mysql.query(user_sql, user_args);
             //生成积分退款记录
 
-            await mysql.insert('gold_record',{
-                uid:order_info[i].uid,
-                num:order_info[i].gold,
-                source:4,//开团失败退款
-                ctime:new Date()
+            await mysql.insert('gold_record', {
+                uid: order_info[i].uid,
+                num: order_info[i].gold,
+                source: 4,//开团失败退款
+                ctime: new Date()
             })
         }
 
-
-        await mysql.query(other_sql, args);
     }
 
 }
