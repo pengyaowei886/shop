@@ -192,15 +192,18 @@ class OrderService extends Service {
         let data_back = {};
         let table_name = "";
         if (kind == 1) {
-            table_name = "join_order"
+            table_name = "join_order";
+            other_name = "join_goods";
         } else {
-            table_name = "goods_order"
+            table_name = "goods_order";
+            other_name = "goods";
         }
 
-        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['status'] });
+        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['status', 'goods_id'] });
         if (action == "quxiao") {
             if (status[0].status == 0) {
                 await mysql.delete(table_name, { id: order_id });
+
                 return data_back
             } else {
                 throw new Error('订单状态异常');
@@ -208,6 +211,7 @@ class OrderService extends Service {
         }
         if (action == "tuikuan") {
             if (status[0].status == 3) {
+                await mysql.update(table_name, { id: order_id, status: 4 });
                 await mysql.update(table_name, { id: order_id, status: 4 });
                 return data_back
             } else {
@@ -218,6 +222,9 @@ class OrderService extends Service {
         if (action == "shouhuo") {
             if (status[0].status == 2) {
                 await mysql.update(table_name, { id: order_id, status: 3 });
+                let sql = "update ? set succ_volume = succ_volume+1 where  id = ?";
+                let args = [other_name, status[0].goods_id]
+                await mysql.query(sql, args)
                 return data_back;
             } else {
                 throw new Error('订单状态异常');
@@ -266,15 +273,16 @@ class OrderService extends Service {
                 }
             }
             let result = await mysql.select('goods_order', rows);
+      
             if (result.length > 0) {
                 let order_no = [];
                 for (let i in result) {
                     order_no.push(result[i].order_no)
                 }
                 let order_info = await mysql.select('goods_order_info', {
-                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
+                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no','goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
                 });
-
+                console.log(order_info)
 
                 for (let i in result) {
                     let info = [];
@@ -294,14 +302,14 @@ class OrderService extends Service {
 
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid ,status:[0,1,2,3,4,5] }, columns: ['order_no', 'id', 'money', 'status', 'kuaidi_no', 'kuaidi', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
+                    where: { uid: uid, status: [0, 1, 2, 3, 4, 5] }, columns: ['order_no', 'id', 'money', 'status', 'kuaidi_no', 'kuaidi', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             } else {
                 rows = {
                     where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'kuaidi_no', 'kuaidi', 'status', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             }
-
+console.log(rows)
             let result = await mysql.select('join_order', rows);
             return result;
         }
