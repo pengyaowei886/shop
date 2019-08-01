@@ -424,7 +424,7 @@ class TeamService extends Service {
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
             if (now_gold / gold >= 0.6) {
-                let money = (gold - now_gold) / 100;
+                let money = gold - now_gold;
                 let order_no = new Date().getTime();
                 let huidiao_url = "https://caoxianyoushun.cn:8443/zlpt/app/user/join_myself/return";
                 let body_data = "补差价支付";
@@ -447,7 +447,7 @@ class TeamService extends Service {
             let gold = team_exist[0].gold;
             let now_gold = team_exist[0].now_gold;
             //判断能否包尾
-            if (now_gold / gold >= 0.8) {
+            if (now_gold / gold >= 0.6) {
 
                 data.money = gold - now_gold;
                 return data;
