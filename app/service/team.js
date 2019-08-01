@@ -156,7 +156,7 @@ class TeamService extends Service {
                 uid: uid[0].id,
                 pay_num: money / 100,
                 pay_no: wx_num,
-                order_no:order_no,
+                order_no: order_no,
                 kind: 1, //微信小程序支付
                 status: 2, //开团支付
                 ctime: new Date(),
@@ -220,7 +220,8 @@ class TeamService extends Service {
             let openid = reData.openid[0];
             // let order_no = reData.out_trade_no[0];
             let money = reData.total_fee[0];
-            let join_no = reData.attach[0]
+            let join_no = reData.attach[0];
+            let order_no = reData.out_trade_no[0];
             let wx_num = reData.transaction_id[0];
 
 
@@ -230,7 +231,7 @@ class TeamService extends Service {
             //判断此次加入是否成团
             if (team[0].now_gold + money >= team[0].gold) {
                 let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-                let join_args = [money, join_no];
+                let join_args = [money / 100, join_no];
                 await mysql.query(join_sql, join_args);
 
 
@@ -239,7 +240,7 @@ class TeamService extends Service {
 
             } else {
                 let join_sql = "update  join_team set now_gold = now_gold +? , now_join_num = now_join_num + 1, sum_gold= sum_gold +?   where order_no = ?";
-                let join_args = [money, money, join_no];
+                let join_args = [money / 100, money / 100, join_no];
                 await mysql.query(join_sql, join_args);
             }
             //更新 拼团信息
@@ -247,7 +248,7 @@ class TeamService extends Service {
             //生成用户参团记录
             await mysql.insert('user_join', {
                 uid: uid[0].id,
-                num: money,//预留
+                num: money/100,//预留
                 ctime: new Date(),
                 join_no: join_no
             });
@@ -265,6 +266,7 @@ class TeamService extends Service {
                 uid: uid[0].id,
                 pay_num: money / 100,
                 pay_no: wx_num,
+                order_no: order_no,
                 kind: 1, //微信小程序支付
                 status: 1, //参团支付
                 ctime: new Date(),
