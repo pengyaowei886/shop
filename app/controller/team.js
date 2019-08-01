@@ -91,7 +91,6 @@ class TeamController extends Controller {
             let goods_id = Number(this.ctx.query.goods_id);
             let spec_id = Number(this.ctx.query.spec_id);
             let address_id = Number(this.ctx.query.address_id);
-
             let uid = Number(this.ctx.query.uid);
             let data = await service.team.open_team(goods_id, spec_id, address_id, uid,youfei, openid, ip);
             return handerThis.succ(data);

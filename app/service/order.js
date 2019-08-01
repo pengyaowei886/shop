@@ -316,11 +316,11 @@ class OrderService extends Service {
         let rows = {}
         if (status == 100000) {
             rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, skip: skip
+                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, offset: skip
             }
         } else {
             rows = {
-                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, skip: skip
+                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, offset: skip
             }
         }
         let result = await mysql.select('join_order', rows);

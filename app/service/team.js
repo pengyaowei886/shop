@@ -40,43 +40,56 @@ class TeamService extends Service {
         let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
         let body_data = "开团支付";
         let order_no = new Date().getTime();
-        let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
 
-        let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
+        const conn = await app.mysql.beginTransaction(); // 初始化事务
 
-        let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
-        //生成预付款订单
+        try {
+            let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
 
-        let money = goods_info[0].join_xianjin + youfei;
-        await mysql.insert('join_order', {
-            uid: uid,
-            order_no: order_no, //订单号
-            goods_id: goods_id,
-            introduce: goods_info[0].introduce,
-            head_pic: goods_info[0].head_pic,
-            money: goods_info[0].join_xianjin,
-            gold: spec_info[0].leader_price,
-            youfei: youfei,
-            spec: spec_info[0].spec,
-            spec_id: spec_id,
-            address: address_info[0].address,
-            detailInfo: address_info[0].detailInfo,
-            shouhuoren: address_info[0].user_name,
-            phone: address_info[0].phone,
-            ctime: new Date(),
-            end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//订单付款截止时间
-            status: 0 //待付款
-        });
-        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
-        //放入redis 
-        let key = `pay:${uid}:${order_no}`;
-        await redis.hset(key, 'timeStamp', data.timeStamp);
-        await redis.hset(key, 'nonceStr', data.nonceStr);
-        await redis.hset(key, 'package', data.package);
-        await redis.hset(key, 'paySign', data.paySign);
-        await redis.hset(key, 'order_no', data.order_no);
-        await redis.expire(key, 2400);//40分钟后过期
-        return data;
+            let spec_info = await mysql.select('join_specs', { where: { id: spec_id }, columns: ['team_price', 'leader_price', 'spec'] });
+
+            let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
+            //生成预付款订单
+
+            let money = goods_info[0].join_xianjin + youfei;
+            await mysql.insert('join_order', {
+                uid: uid,
+                order_no: order_no, //订单号
+                goods_id: goods_id,
+                introduce: goods_info[0].introduce,
+                head_pic: goods_info[0].head_pic,
+                money: goods_info[0].join_xianjin,
+                gold: spec_info[0].leader_price,
+                youfei: youfei,
+                spec: spec_info[0].spec,
+                spec_id: spec_id,
+                address: address_info[0].address,
+                detailInfo: address_info[0].detailInfo,
+                shouhuoren: address_info[0].user_name,
+                phone: address_info[0].phone,
+                ctime: new Date(),
+                end_time: new Date(new Date().getTime() + 30 * 60 * 1000),//订单付款截止时间
+                status: 0 //待付款
+            });
+            let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+            await conn.commit();
+            //放入redis 
+            let key = `pay:${uid}:${order_no}`;
+
+            await redis.hset(key, 'timeStamp', data.timeStamp);
+            await redis.hset(key, 'nonceStr', data.nonceStr);
+            await redis.hset(key, 'package', data.package);
+            await redis.hset(key, 'paySign', data.paySign);
+            await redis.hset(key, 'order_no', data.order_no);
+            await redis.expire(key, 2400);//40分钟后过期
+            return data;
+        } catch (error) {
+            // error, rollback
+            await conn.rollback(); // 一定记得捕获异常后回滚事务！！
+            throw error;
+        }
+
+
     }
     //用户继续完成开团支付
     async open_team_again(order_no, uid) {
@@ -164,26 +177,35 @@ class TeamService extends Service {
     async join_team(openid, uid, join_no, money, ip) {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
-//开启事务
+        //开启事务
         const conn = await app.mysql.beginTransaction(); // 初始化事务
-        //判断团是否已经成团
-        let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
-        if (uid != team_exist[0].uid && team_exist[0].status == 0) {
-            let order_no = new Date().getTime();
-            let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
-            let body_data = "参团支付";
-            let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
-            let key = `pay:${uid}:${order_no}`;
-            await redis.hset(key, 'timeStamp', data.timeStamp);
-            await redis.hset(key, 'nonceStr', data.nonceStr);
-            await redis.hset(key, 'package', data.package);
-            await redis.hset(key, 'paySign', data.paySign);
-            await redis.hset(key, 'order_no', data.order_no);
-            await redis.expire(key, 2400);//40分钟后过期
-            return data;
-        } else {
-            throw new Error('不能参加自己的团或者此团已拼成功')
+        try {
+            let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
+            if (uid != team_exist[0].uid && team_exist[0].status == 0) {
+                let order_no = new Date().getTime();
+                let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
+                let body_data = "参团支付";
+                let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
+                await conn.commit();
+                let key = `pay:${uid}:${order_no}`;
+                await redis.hset(key, 'timeStamp', data.timeStamp);
+                await redis.hset(key, 'nonceStr', data.nonceStr);
+                await redis.hset(key, 'package', data.package);
+                await redis.hset(key, 'paySign', data.paySign);
+                await redis.hset(key, 'order_no', data.order_no);
+                await redis.expire(key, 2400);//40分钟后过期
+
+                return data;
+            } else {
+                throw new Error('不能参加自己的团或者此团已拼成功')
+            }
+
+        } catch (error) {
+            await conn.rollback(); // 一定记得捕获异常后回滚事务！！
+            throw error;
         }
+        //判断团是否已经成团
+
     }
     //参团支付回调
     async join_pay_return(body) {
@@ -272,7 +294,7 @@ class TeamService extends Service {
                 status: status
             }
         }
-        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no', 'join_num', 'status', 'end_time'], limit: limit, skip: skip });
+        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no', 'join_num', 'status', 'end_time'], limit: limit, offset: skip });
 
         if (result.length > 0) {
             let order_no = [];
