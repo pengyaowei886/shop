@@ -466,7 +466,7 @@ class TeamService extends Service {
 
         // 支付成功处理
         const mysql = this.app.mysql;
-        // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
+
         let databack = {};
         let reData = await this.ctx.service.tools.query_weixin_order(body);
         //支付成功处理
@@ -478,27 +478,28 @@ class TeamService extends Service {
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
         let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
-        let join_args = [order_no, money, join_no];
+        let join_args = [order_no, money / 100, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录
         await mysql.insert('user_join', {
             uid: uid[0].id,
-            num: money,//预留
+            num: money / 100,//预留
             ctime: new Date(),
             join_no: join_no
         });
         //修改订单状态
         await mysql.update('join_order', {
-            status: 1  }, {
-            where: {
-                order_no: order_no
-            }
+            status: 1
+        }, {
+                where: {
+                    order_no: join_no
+                }
             });
-
         //生成支付记录
         await mysql.insert('pay_record', {
             uid: uid[0].id,
-            pay_num: money,
+            pay_num: money / 100,
+            order_no: join_no,
             pay_no: wx_num,
             kind: 1, //微信小程序支付
             status: 1, //参团支付
