@@ -121,11 +121,11 @@ class ToolsService extends Service {
         let total_fee = Number(money * 100);
 
         let appid = this.app.config.info.appid;	//自己的小程序appid
-        console.log(appid)
+
 
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
         let business_secret = this.app.config.info.business_secret;
-        console.log(business_secret);
+
         let sign = createSign({	//签名
             appid: appid,
             mch_id: mch_id,
@@ -328,9 +328,9 @@ class ToolsService extends Service {
 
             //退款
             for (let i in order_info) {
-             
+
                 //退款
-                await this.weixin_refund(order_info[i].money, order_info[i].order_no)
+                await this.weixin_refund(order_info[i].order_no, order_info[i].money)
 
 
                 //修改状态
