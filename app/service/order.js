@@ -294,7 +294,7 @@ class OrderService extends Service {
 
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status', 'kuaidi_no', 'kuaidi', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
+                    where: { uid: uid ,status:[0,1,2,3,4,5] }, columns: ['order_no', 'id', 'money', 'status', 'kuaidi_no', 'kuaidi', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             } else {
                 rows = {
