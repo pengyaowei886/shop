@@ -201,14 +201,17 @@ class UserService extends Service {
         let return_data = {};
         if (action == "insert") {
             let is_exist = await mysql.select('collation', {
-                where: { uid: params.uid, goods_id: params.id, kind: params.kind }
+                where: { uid: params.uid, goods_id: params.goods_id, kind: params.kind }
             })
+            console.log(is_exist)
             if (is_exist.length >= 1) {
                 throw new Error("重复收藏");
             } else {
+                console.log("jinlaile")
                 let result = await mysql.insert('collation', {
                     'goods_id': params.goods_id, "uid": params.uid, "status": 1, ctime: new Date(), kind: params.kind
                 })
+                console.log(result)
                 if (result.affectedRows === 1) {
                     return return_data;
 
