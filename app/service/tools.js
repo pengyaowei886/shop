@@ -328,14 +328,16 @@ class ToolsService extends Service {
 
             //退款
             for (let i in order_info) {
+             
                 //退款
-                let result = await this.weixin_refund(Number(order_info[i].money) * 100, order_info[i].order_no)
+                await this.weixin_refund(order_info[i].money, order_info[i].order_no)
 
-                console.log(result);
+
                 //修改状态
                 await mysql.update('join_order', {
                     status: 8
                 }, { where: { order_no: order_no } })
+
                 //退积分
                 let user_sql = " update user set balance = balance + ? where  id = ?"
                 let user_args = [order_info[i].gold, order_info[i].uid];
