@@ -92,6 +92,7 @@ class TeamController extends Controller {
             let spec_id = Number(this.ctx.query.spec_id);
             let address_id = Number(this.ctx.query.address_id);
             let uid = Number(this.ctx.query.uid);
+            console.log("saj,n")
             let data = await service.team.open_team(goods_id, spec_id, address_id, uid,youfei, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
@@ -217,6 +218,7 @@ class TeamController extends Controller {
             let openid = this.ctx.query.openid
             let order_no = this.ctx.query.order_no;
             let ip = "1.193.64.69";
+            console.log("wdusgkj")
             let data = await service.team.join_myself(openid, order_no, ip);
             return handerThis.succ(data);
         } catch (error) {

@@ -41,7 +41,7 @@ class TeamService extends Service {
         let body_data = "开团支付";
         let order_no = new Date().getTime();
 
-        const conn = await app.mysql.beginTransaction(); // 初始化事务
+        const conn = await mysql.beginTransaction(); // 初始化事务
 
         try {
             let goods_info = await mysql.select('join_goods', { where: { id: goods_id }, columns: ['join_xianjin', 'introduce', 'head_pic'] });
@@ -178,7 +178,7 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
         //开启事务
-        const conn = await app.mysql.beginTransaction(); // 初始化事务
+        const conn = await mysql.beginTransaction(); // 初始化事务
         try {
             let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
             if (uid != team_exist[0].uid && team_exist[0].status == 0) {

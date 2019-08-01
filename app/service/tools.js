@@ -34,9 +34,12 @@ class ToolsService extends Service {
 
 
         let total_fee = Math.floor(money * 100);
-        console.log(total_fee)
+
+
         let appid = this.app.config.info.appid;	//自己的小程序appid
         let mch_id = this.app.config.info.mch_id;	//自己的商户号id
+        let key = this.app.config.info.business_secret;	//自己的商户号id
+
         let sign = createSign({	//签名
             appid: appid,
             attach: attach,
@@ -48,7 +51,7 @@ class ToolsService extends Service {
             out_trade_no: order_no,
             spbill_create_ip: ip,
             total_fee: total_fee,
-            key: this.app.config.info.business_secret,
+            key: key,
             trade_type: 'JSAPI'
         });
         let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
@@ -72,11 +75,11 @@ class ToolsService extends Service {
             data: formData
         })
         let responseData = {};
-        console.log(order_no);
+
 
         xml2js.parseString(result.data, function (error, res) {
             let reData = res.xml;
-            console.log(reData);
+            console.log(reData)
             if (reData.return_code[0] == 'SUCCESS') {
                 responseData = {
                     timeStamp: new Date().getTime(),
