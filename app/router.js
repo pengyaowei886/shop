@@ -119,7 +119,7 @@ module.exports = app => {
 
 
 //用户查看分享
-router.get('/zlpt/app/user/team/fenxiang',userVerify, controller.team.query_fenxiang);
+router.get('/zlpt/app/user/team/fenxiang', controller.team.query_fenxiang);
 
 
 };
