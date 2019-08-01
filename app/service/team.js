@@ -134,7 +134,7 @@ class TeamService extends Service {
                 uid: uid[0].id,
                 order_no: order_no, //订单号
                 goods_id: join_res[0].goods_id,
-                gold: Number(join_res[0].team_price),//成团需要的积分
+                gold: join_res[0].team_price,//成团需要的积分
                 join_num: join_res[0].join_number,
                 now_join_num: 0,
                 now_gold: 0, //现有积分
