@@ -318,16 +318,20 @@ class ToolsService extends Service {
                 order_no.push(info[i].order_no);
 
             }
+
             //修改状态
             await mysql.update('join_team', {
                 id: join_id, status: -1
             })
 
             let order_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['money', 'order_no', 'gold', 'uid'] })
+
             //退款
             for (let i in order_info) {
                 //退款
-                this.weixin_refund(Number(order_info[i].money) * 100, order_info[i].order_no)
+                let result = await this.weixin_refund(Number(order_info[i].money) * 100, order_info[i].order_no)
+
+                console.log(result);
                 //修改状态
                 await mysql.update('join_order', {
                     status: 8

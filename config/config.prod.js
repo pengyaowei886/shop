@@ -115,7 +115,7 @@ module.exports = appInfo => {
             hostname:  '172.31.242.17',
             https: {
                 key: "../.././https/https.key",
-                cert: "../../..//https/https.pem"
+                cert: "../../../https/https.pem"
             }
         },
 
