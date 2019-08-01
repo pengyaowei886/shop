@@ -307,27 +307,6 @@ class OrderService extends Service {
         }
     }
 
-    //用户查询拼团订单列表
-
-    async query_join_list(uid, status, limit, skip) {
-        const mysql = this.app.mysql;
-
-
-        let rows = {}
-        if (status == 100000) {
-            rows = {
-                where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status'], limit: limit, offset: skip
-            }
-        } else {
-            rows = {
-                where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money'], limit: limit, offset: skip
-            }
-        }
-        let result = await mysql.select('join_order', rows);
-
-        return result;
-    }
-
 
     //用户查询我的评价
 

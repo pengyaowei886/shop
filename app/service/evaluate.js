@@ -92,7 +92,7 @@ class EvaluateService extends Service {
 
         let result = await mysql.select('evaluate', {
             where: { uid: uid, kind: kind },
-            columns: ['evaluate_num', 'content','goods_id','spec', 'order_no', 'is_default'], orders: [['ctime', 'desc']]
+            columns: ['evaluate_num', 'content', 'goods_id', 'spec', 'order_no', 'is_default'], orders: [['ctime', 'desc']]
         })
 
 
@@ -114,10 +114,18 @@ class EvaluateService extends Service {
 
                 }
                 let join_info = await mysql.select('join_order', {
-                    where: { order_no: join_order_no }, columns: ['introduce', 'head_pic', 'order_no']
+                    where: { order_no: join_order_no }, columns: ['introduce', 'head_pic', 'order_no', 'goods_id']
                 })
-                console.log(join_info)
+                // let goods_id = [];
 
+                // for (let i in join_info) {
+                //  goods_id.push(join_info[i].goods_id)
+                // }
+
+                // let goods_info= await mysql.select('join_goods', {
+                //     where: { id: goods_id }, columns: ['introduce', 'head_pic', 'order_no', 'goods_id']
+                // })
+             
                 for (let i in result) {
                     for (let k in join_info) {
                         if (result[i].order_no == join_info[k].order_no) {
@@ -133,12 +141,12 @@ class EvaluateService extends Service {
             } else {
                 let goods_order_no = [];
 
-                for (let i in result) {    
-                        goods_order_no.push(result[i].order_no);          
+                for (let i in result) {
+                    goods_order_no.push(result[i].order_no);
                 }
 
                 let goods_info = await mysql.select('goods_order_info', {
-                    where: { order_no: goods_order_no }, columns: ['introduce','money', 'head_pic', 'goods_id', 'order_no']
+                    where: { order_no: goods_order_no }, columns: ['introduce', 'money', 'head_pic', 'goods_id', 'order_no']
                 })
                 for (let i in result) {
                     for (let k in goods_info) {
@@ -152,7 +160,7 @@ class EvaluateService extends Service {
                 }
                 return result;
             }
-        }else {
+        } else {
             return result;
         }
     }
