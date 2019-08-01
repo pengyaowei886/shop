@@ -391,7 +391,7 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         let result = await mysql.select('join_team', {
             where: { goods_id: goods_id, status: 0 },
-            columns: ['uid', 'end_time', 'order_no'], orders: [['ctime', 'desc']], limit: limit, offset: skip
+            columns: ['uid', 'end_time', 'order_no','gold','now_gold'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
         if (result.length > 0) {
             let id = [];

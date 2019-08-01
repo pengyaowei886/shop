@@ -21,8 +21,10 @@ module.exports = app => {
   router.get('/zlpt/tools/xieyi/query', controller.tools.get_xieyi);
   //获取后台设置的公告
   router.get('/zlpt/tools/gonggao/query', controller.tools.get_gonggao);
-    //获取后台设置的公告
-    router.get('/zlpt/tools/new/query', controller.tools.get_join_team) ;
+  //获取后台设置的公告
+  router.get('/zlpt/tools/new/query', controller.tools.get_join_team);
+  //获取后台设置的客服二维码
+  router.get('/zlpt/tools/erweima/query', controller.tools.get_erweima);
 
 
   //小程序登陆
@@ -30,7 +32,7 @@ module.exports = app => {
 
 
   //添加手机号
-  router.post('/zlpt/wx/add/phone',userVerify, controller.user.add_phone);
+  router.post('/zlpt/wx/add/phone', userVerify, controller.user.add_phone);
 
   //查询轮播图
   router.get('/zlpt/app/rotate_map/query', controller.user.query_rotate_map);
@@ -48,78 +50,78 @@ module.exports = app => {
   router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
 
   //查看用户具体信息
-  router.get('/zlpt/app/user/info',userVerify, controller.user.query_user_info);
+  router.get('/zlpt/app/user/info', userVerify, controller.user.query_user_info);
   //查询用户收获地址
-  router.get('/zlpt/app/user/address/query',userVerify, controller.address.query_address);
+  router.get('/zlpt/app/user/address/query', userVerify, controller.address.query_address);
   //编辑用户收货地址
-  router.post('/zlpt/app/user/address/edit', userVerify,controller.address.edit_address);
+  router.post('/zlpt/app/user/address/edit', userVerify, controller.address.edit_address);
 
   // 用户查看我的收藏
-  router.get('/zlpt/app/user/collation/query',userVerify, controller.user.query_collation);
+  router.get('/zlpt/app/user/collation/query', userVerify, controller.user.query_collation);
   //用户编辑我的收藏
-  router.post('/zlpt/app/user/collation/edit',userVerify, controller.user.edit_collation);
+  router.post('/zlpt/app/user/collation/edit', userVerify, controller.user.edit_collation);
   //用户查看我的购物车
-  router.get('/zlpt/app/user/trolley/query', userVerify,controller.trolley.query_trolley);
+  router.get('/zlpt/app/user/trolley/query', userVerify, controller.trolley.query_trolley);
   //用户编辑购物车
-  router.post('/zlpt/app/user/trolley/edit',userVerify, controller.trolley.edit_trolley);
+  router.post('/zlpt/app/user/trolley/edit', userVerify, controller.trolley.edit_trolley);
   //用户查看我的浏览历史
-  router.get('/zlpt/app/user/history/query', userVerify,controller.user.query_history);
+  router.get('/zlpt/app/user/history/query', userVerify, controller.user.query_history);
   //用户编辑我的浏览历史
-  router.post('/zlpt/app/user/history/edit', userVerify,controller.user.edit_history);
+  router.post('/zlpt/app/user/history/edit', userVerify, controller.user.edit_history);
 
   //用户发起拼团
-  router.post('/zlpt/app/user/team/start', userVerify,controller.team.start_team);
+  router.post('/zlpt/app/user/team/start', userVerify, controller.team.start_team);
 
   //用户支付拼团
-  router.get('/zlpt/app/user/team/pay', userVerify,controller.team.open_team_pay);
+  router.get('/zlpt/app/user/team/pay', userVerify, controller.team.open_team_pay);
   //用户继续支付拼团
-  router.get('/zlpt/app/user/team/pay/again',userVerify, controller.team.open_team_again);
+  router.get('/zlpt/app/user/team/pay/again', userVerify, controller.team.open_team_again);
   //支付拼团回调
-  router.get('/zlpt/app/user/team/return',userVerify, controller.team.open_pay_return);
+  router.get('/zlpt/app/user/team/return', userVerify, controller.team.open_pay_return);
 
   //用户参加拼团
-  router.get('/zlpt/app/user/team/join',userVerify, controller.team.join_team);
+  router.get('/zlpt/app/user/team/join', userVerify, controller.team.join_team);
   //支付参团回调
-  router.get('/zlpt/app/user/team/join/return', userVerify,controller.team.join_pay_return);
+  router.get('/zlpt/app/user/team/join/return', userVerify, controller.team.join_pay_return);
   //用户查询能否补差额
-  router.get('/zlpt/app/user/team/self/query', userVerify,controller.team.query_join_self);
+  router.get('/zlpt/app/user/team/self/query', userVerify, controller.team.query_join_self);
   //用户为自己的团支付剩余余额
-  router.get('/zlpt/app/user/team/self', userVerify,controller.team.join_self);
+  router.get('/zlpt/app/user/team/self', userVerify, controller.team.join_self);
   //b补差价回调
-  router.get('/zlpt/app/user/team/self/return',userVerify, controller.team.join_myself_return);
+  router.get('/zlpt/app/user/team/self/return', userVerify, controller.team.join_myself_return);
   //用户查询拼团列表
 
   //用户查询我的拼团
-  router.get('/zlpt/app/user/team/list', userVerify,controller.team.query_user_team);
+  router.get('/zlpt/app/user/team/list', userVerify, controller.team.query_user_team);
   //用户检索相同拼团
-  router.get('/zlpt/app/user/team/query/same', userVerify,controller.team.query_same_team);
+  router.get('/zlpt/app/user/team/query/same', userVerify, controller.team.query_same_team);
 
   //用户购买普通商品
-  router.post('/zlpt/app/user/goods/pay', userVerify,controller.order.trolley_pay);
+  router.post('/zlpt/app/user/goods/pay', userVerify, controller.order.trolley_pay);
   //用户继续购买普通商品
-  router.post('/zlpt/app/user/goods/pay/again',userVerify, controller.order.trolley_pay_again);
+  router.post('/zlpt/app/user/goods/pay/again', userVerify, controller.order.trolley_pay_again);
   //回调
-  router.get('/zlpt/app/user/team/pay/return', userVerify,controller.order.goods_pay_return);
+  router.get('/zlpt/app/user/team/pay/return', userVerify, controller.order.goods_pay_return);
 
   //查看订单角标
-  router.get('/zlpt/app/user/order/num',userVerify, controller.order.query_order_num);
+  router.get('/zlpt/app/user/order/num', userVerify, controller.order.query_order_num);
   //查看订单列表
-  router.post('/zlpt/app/user/order/list', userVerify,controller.order.query_order_list);
+  router.post('/zlpt/app/user/order/list', userVerify, controller.order.query_order_list);
 
   //用户编辑订单
-  router.post('/zlpt/app/user/order/edit', userVerify,controller.order.confire_order);
+  router.post('/zlpt/app/user/order/edit', userVerify, controller.order.confire_order);
 
   //用户查看商品评价
   router.get('/zlpt/app/user/evaluate/order/query', controller.evaluate.query_self_evaluate);
   //用户查看订单评价
-  router.get('/zlpt/app/user/evaluate/goods/query', userVerify,controller.evaluate.query_goods_evaluate);
+  router.get('/zlpt/app/user/evaluate/goods/query', userVerify, controller.evaluate.query_goods_evaluate);
 
   //用户发表评价
-  router.post('/zlpt/app/user/evaluate/edit',userVerify, controller.evaluate.edit_evaluate);
+  router.post('/zlpt/app/user/evaluate/edit', userVerify, controller.evaluate.edit_evaluate);
 
 
-//用户查看分享
-router.get('/zlpt/app/user/team/fenxiang', controller.team.query_fenxiang);
+  //用户查看分享
+  router.get('/zlpt/app/user/team/fenxiang', controller.team.query_fenxiang);
 
 
 };

@@ -161,6 +161,25 @@ class ToolsController extends Controller {
         }
 
     }
+    //获取二维码图片
+     
+      async get_erweima() {
+        //参数校验
+
+        let handerThis = this;
+        const { ctx, app, service } = handerThis;
+
+        try {
+            //获取token 
+            const redis = this.app.redis.get('access_token');
+            let erweima = await redis.get("erweima");
+            return handerThis.succ(erweima);
+        } catch (error) {
+            return handerThis.error('HANDLE_ERROR', error['message']);
+
+        }
+
+    }
 
 
 
