@@ -156,6 +156,7 @@ class TeamService extends Service {
                 uid: uid[0].id,
                 pay_num: money / 100,
                 pay_no: wx_num,
+                order_no:order_no,
                 kind: 1, //微信小程序支付
                 status: 2, //开团支付
                 ctime: new Date(),
