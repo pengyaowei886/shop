@@ -74,6 +74,8 @@ class OrderService extends Service {
         if (is_gold == 1) {
             if (gold_info[0].balance >= money * 10) {
                 gold = money * 10;
+
+                money = money- gold/100;
             } else {
                 gold = gold_info[0].balance
             }
@@ -273,16 +275,16 @@ class OrderService extends Service {
                 }
             }
             let result = await mysql.select('goods_order', rows);
-      
+
             if (result.length > 0) {
                 let order_no = [];
                 for (let i in result) {
                     order_no.push(result[i].order_no)
                 }
                 let order_info = await mysql.select('goods_order_info', {
-                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no','goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
+                    where: { order_no: order_no }, columns: ['introduce', 'head_pic', 'spec_name', 'money', 'num', 'order_no', 'goods_id'], group: ['order_no'], order: [['ctime', 'desc']]
                 });
-                console.log(order_info)
+
 
                 for (let i in result) {
                     let info = [];
@@ -309,7 +311,7 @@ class OrderService extends Service {
                     where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'kuaidi_no', 'kuaidi', 'status', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             }
-console.log(rows)
+            console.log(rows)
             let result = await mysql.select('join_order', rows);
             return result;
         }
