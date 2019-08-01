@@ -229,7 +229,7 @@ class TeamService extends Service {
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
             let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
             //判断此次加入是否成团
-            if (team[0].now_gold + money >= team[0].gold) {
+            if (team[0].now_gold + money/100 >= team[0].gold) {
                 let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
                 let join_args = [money / 100, join_no];
                 await mysql.query(join_sql, join_args);
