@@ -2,6 +2,7 @@
 const Service = require('egg').Service;
 const md5 = require('md5');
 const xml2js = require('xml2js');
+const fs = require('fs');
 class ToolsService extends Service {
 
 

@@ -258,11 +258,11 @@ class OrderService extends Service {
             let rows = {}
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'order_no', 'kuaidi','kuaidi_no','status'], limit: limit, skip: skip
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'order_no', 'kuaidi', 'kuaidi_no', 'status'], limit: limit, offset: skip
                 }
             } else {
                 rows = {
-                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money','order_no', 'kuaidi','kuaidi_no', 'status'], limit: limit, skip: skip
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'order_no', 'kuaidi', 'kuaidi_no', 'status'], limit: limit, offset: skip
                 }
             }
             let result = await mysql.select('goods_order', rows);
@@ -289,15 +289,16 @@ class OrderService extends Service {
             } else {
                 return result;
             }
-        }else{
+        } else {
             let rows = {}
+
             if (status.length == 0) {
                 rows = {
-                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status','kuaidi_no','kuaidi','introduce','head_pic','spec'], limit: limit, skip: skip
+                    where: { uid: uid }, columns: ['order_no', 'id', 'money', 'status', 'kuaidi_no', 'kuaidi', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             } else {
                 rows = {
-                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'kuaidi_no','kuaidi','status','introduce','head_pic','spec'], limit: limit, skip: skip
+                    where: { uid: uid, status: status }, columns: ['order_no', 'id', 'money', 'kuaidi_no', 'kuaidi', 'status', 'introduce', 'head_pic', 'spec'], limit: limit, offset: skip
                 }
             }
 

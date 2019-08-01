@@ -164,6 +164,8 @@ class TeamService extends Service {
     async join_team(openid, uid, join_no, money, ip) {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
+//开启事务
+        const conn = await app.mysql.beginTransaction(); // 初始化事务
         //判断团是否已经成团
         let team_exist = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['status', 'uid'] })
         if (uid != team_exist[0].uid && team_exist[0].status == 0) {
@@ -171,12 +173,13 @@ class TeamService extends Service {
             let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/join_team/return";
             let body_data = "参团支付";
             let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
-            await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
-            await redis.hset(`pay:${uid}:${order_no}`, 'nonceStr', data.nonceStr);
-            await redis.hset(`pay:${uid}:${order_no}`, 'package', data.package);
-            await redis.hset(`pay:${uid}}:${order_no}`, 'paySign', data.paySign);
-            await redis.hset(`pay:${uid}:${order_no}`, 'order_no', data.order_no);
-            await redis.expire(`pay:${uid}:${order_no}`, 2400);//40分钟后过期
+            let key = `pay:${uid}:${order_no}`;
+            await redis.hset(key, 'timeStamp', data.timeStamp);
+            await redis.hset(key, 'nonceStr', data.nonceStr);
+            await redis.hset(key, 'package', data.package);
+            await redis.hset(key, 'paySign', data.paySign);
+            await redis.hset(key, 'order_no', data.order_no);
+            await redis.expire(key, 2400);//40分钟后过期
             return data;
         } else {
             throw new Error('不能参加自己的团或者此团已拼成功')
@@ -189,7 +192,6 @@ class TeamService extends Service {
         // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
         let databack = {};
         let reData = await this.ctx.service.tools.query_weixin_order(body);
-        console.log(reData)
         if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
             //支付成功处理
             let openid = reData.openid[0];
