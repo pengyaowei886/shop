@@ -229,7 +229,7 @@ class TeamService extends Service {
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
             let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
             //判断此次加入是否成团
-            if (team[0].now_gold + money/100 >= team[0].gold) {
+            if (team[0].now_gold + money / 100 >= team[0].gold) {
                 let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
                 let join_args = [money / 100, join_no];
                 await mysql.query(join_sql, join_args);
@@ -248,7 +248,7 @@ class TeamService extends Service {
             //生成用户参团记录
             await mysql.insert('user_join', {
                 uid: uid[0].id,
-                num: money/100,//预留
+                num: money / 100,//预留
                 ctime: new Date(),
                 join_no: join_no
             });
@@ -391,7 +391,7 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         let result = await mysql.select('join_team', {
             where: { goods_id: goods_id, status: 0 },
-            columns: ['uid', 'end_time', 'order_no','gold','now_gold'], orders: [['ctime', 'desc']], limit: limit, offset: skip
+            columns: ['uid', 'end_time', 'order_no', 'gold', 'now_gold'], orders: [['ctime', 'desc']], limit: limit, offset: skip
         });
         if (result.length > 0) {
             let id = [];
@@ -487,6 +487,13 @@ class TeamService extends Service {
             ctime: new Date(),
             join_no: join_no
         });
+        //修改订单状态
+        await mysql.update('join_order', {
+            status: 1  }, {
+            where: {
+                order_no: order_no
+            }
+            });
 
         //生成支付记录
         await mysql.insert('pay_record', {
