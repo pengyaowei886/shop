@@ -56,7 +56,7 @@ class OrderController extends Controller {
             let uid = Number(this.ctx.request.body.uid);
             let address_id = Number(this.ctx.request.body.address_id);
             let is_gold = Number(this.ctx.request.body.is_gold);
-            let data = await service.order.trolley_pay(goods, uid, is_gold, youfei, address_id, openid, ip);
+            let data = await service.order.trolley_pay(goods, uid, is_gold, address_id, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
