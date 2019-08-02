@@ -96,8 +96,8 @@ class UserService extends Service {
             await redis.expire(`${phone}:code`, 60);
             //  console.log(result);
             return data;
-        }else{
-            return  result.data.reason;
+        } else {
+            return result.data.reason;
         }
 
     };
@@ -142,10 +142,10 @@ class UserService extends Service {
             let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             encryptedText.update(open_id);
             //更新微信头像和昵称
-            await mysql.update('user',{
-                id:is_exist[0].id,
-                wx_pic:head_pic,
-                wx_nickname:nick_name
+            await mysql.update('user', {
+                id: is_exist[0].id,
+                wx_pic: head_pic,
+                wx_nickname: nick_name
             })
             let token = encryptedText.final("hex");
             await redis.set(`${token}`, is_exist[0].id);
@@ -203,15 +203,15 @@ class UserService extends Service {
             let is_exist = await mysql.select('collation', {
                 where: { uid: params.uid, goods_id: params.goods_id, kind: params.kind }
             })
-            console.log(is_exist)
+
             if (is_exist.length >= 1) {
                 throw new Error("重复收藏");
             } else {
-                console.log("jinlaile")
+
                 let result = await mysql.insert('collation', {
                     'goods_id': params.goods_id, "uid": params.uid, "status": 1, ctime: new Date(), kind: params.kind
                 })
-                console.log(result)
+
                 if (result.affectedRows === 1) {
                     return return_data;
 
@@ -349,14 +349,14 @@ class UserService extends Service {
         if (result[0].phone) {
             throw new Error("已经绑定过");
         } else {
-            let re_code=await redis.get(`${phone}:code`);
-            if(re_code==code){
+            let re_code = await redis.get(`${phone}:code`);
+            if (re_code == code) {
                 await mysql.update('user', { id: uid, phone: phone });
                 return {};
-            }else{
+            } else {
                 throw new Error("验证码错误");
             }
-            
+
         }
     }
 

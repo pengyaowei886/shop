@@ -171,6 +171,7 @@ class OrderService extends Service {
                 uid: uid[0].id,
                 pay_num: money,
                 pay_no: wx_num,
+                order_no: order_no,
                 kind: 1, //微信小程序支付
                 status: 3, //商城商品支付
                 ctime: new Date(),
