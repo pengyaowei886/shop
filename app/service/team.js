@@ -111,6 +111,7 @@ class TeamService extends Service {
         //   console.log(res)
 
         let reData = await this.ctx.service.tools.query_weixin_order(body);
+        console.log(reData)
 
         let openid = reData.openid[0];
         let order_no = reData.out_trade_no[0];
@@ -295,7 +296,7 @@ class TeamService extends Service {
                 status: status
             }
         }
-        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no', 'join_num', 'status', 'end_time'], limit: limit, offset: skip });
+        let result = await mysql.select('join_team', { where: row, columns: ['now_gold', 'gold', 'order_no', 'join_num', 'status', 'end_time'],orders:[['ctime','desc']], limit: limit, offset: skip });
 
         if (result.length > 0) {
             let order_no = [];
