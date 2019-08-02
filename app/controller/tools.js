@@ -152,8 +152,13 @@ class ToolsController extends Controller {
         try {
             //获取token 
             const mysql = this.app.mysql;
-            let result = await mysql.select('join_team', { where: { status: 1 }, orders: [['ctime', 'desc']], limit: 10, skip: 0 })
-            return handerThis.succ(result);
+            let result = await mysql.select('join_team', { where: { status: 1 }, columns: ['uid'], orders: [['ctime', 'desc']], limit: 10, skip: 0 })
+            let uid = [];
+            for (let i in result) {
+                uid.push(result[i]);
+            }
+            let user_info = await mysql.select('user', { where:{ id :uid}, columns:['wx_nickname'] })
+            return handerThis.succ(user_info);
 
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
@@ -162,8 +167,7 @@ class ToolsController extends Controller {
 
     }
     //获取二维码图片
-     
-      async get_erweima() {
+    async get_erweima() {
         //参数校验
 
         let handerThis = this;

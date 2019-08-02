@@ -243,6 +243,30 @@ class ToolsService extends Service {
 
     }
 
+    //微信消息模版
+    async send(openid, template_id, formId, info) {
+        let opts = {
+            touser: openid,
+            template_id: template_id,
+            form_id: formId,
+            data: {
+                "keyword1": {
+                    "value": info.keyword1,
+                    "color": "#1d1d1d"
+                },
+                "keyword2": {
+                    "value": info.keyword2,
+                    "color": "#1d1d1d"
+                },
+                "keyword3": {
+                    "value": info.keyword3,
+                    "color": "#1d1d1d"
+                }
+            }
+        }
+
+    }
+
     //定时任务 清除未付款的订单
     async   pay_order() {
 

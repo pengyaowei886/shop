@@ -230,8 +230,8 @@ class TeamService extends Service {
             let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
             //判断此次加入是否成团
             if (team[0].now_gold + money / 100 >= team[0].gold) {
-                let join_sql = "update  join_team set now_gold = gold , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-                let join_args = [money / 100, join_no];
+                let join_sql = "update  join_team set now_gold = gold ,succ_time = ? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
+                let join_args = [ new Date(), money / 100, join_no];
                 await mysql.query(join_sql, join_args);
 
 
@@ -477,8 +477,8 @@ class TeamService extends Service {
         let wx_num = reData.transaction_id[0];
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
-        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
-        let join_args = [order_no, money / 100, join_no];
+        let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1,succ_time= ?, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
+        let join_args =  [new Date(), order_no, money / 100, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录
         await mysql.insert('user_join', {
