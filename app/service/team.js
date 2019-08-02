@@ -93,8 +93,7 @@ class TeamService extends Service {
     //用户继续完成开团支付
     async open_team_again(order_no, uid) {
         const redis = this.app.redis.get('pay');
-        let result = redis.hgetall(`pay:${uid[0].id}:${order_no}`);
-        console.log(result);
+        let result = redis.hgetall(`pay:${uid}:${order_no}`);
         return result;
     }
 
