@@ -75,7 +75,7 @@ class OrderService extends Service {
             if (gold_info[0].balance >= money * 10) {
                 gold = money * 10;
 
-                money = money- gold/100;
+                money = money - gold / 100;
             } else {
                 gold = gold_info[0].balance
             }
@@ -193,15 +193,22 @@ class OrderService extends Service {
         const mysql = this.app.mysql;
         let data_back = {};
         let table_name = "";
+
+
         if (kind == 1) {
             table_name = "join_order";
-            other_name = "join_goods";
+
+
+
         } else {
             table_name = "goods_order";
-            other_name = "goods";
+
+
         }
 
-        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['status', 'goods_id'] });
+        let status = await mysql.select(table_name, { where: { id: order_id }, columns: ['status', 'order_no'] });
+
+
         if (action == "quxiao") {
             if (status[0].status == 0) {
                 await mysql.delete(table_name, { id: order_id });
@@ -223,11 +230,26 @@ class OrderService extends Service {
 
         if (action == "shouhuo") {
             if (status[0].status == 2) {
-                await mysql.update(table_name, { id: order_id, status: 3 });
-                let sql = "update ? set succ_volume = succ_volume+1 where  id = ?";
-                let args = [other_name, status[0].goods_id]
-                await mysql.query(sql, args)
-                return data_back;
+                //await mysql.update(table_name, { id: order_id, status: 3 });
+                if (kind == 1) {
+                    let join_goods_info = await mysql.select('join_order', { where: { id: order_id }, columns: ['goods_id'] });
+                    let sql = "update  join_goods  set succ_volume = succ_volume+1 where  id = ?";
+                    let args = [join_goods_info[0].goods_id]
+                    await mysql.query(sql, args)
+                    return data_back;
+                }
+                if (kind == 2) {
+                    let goods_info = await mysql.select('goods_order_info', { where: { order_no: status[0].order_no }, columns: ['goods_id'] });
+
+                    for (let i in goods_info) {
+                        let real_sql = "update goods  set succ_volume = succ_volume+1 where  id    = ?";
+
+                        let args = [goods_info[0].goods_id]
+                        await mysql.query(real_sql, args);
+                    }
+                    return data_back;
+
+                }
             } else {
                 throw new Error('订单状态异常');
             }
