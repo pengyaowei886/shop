@@ -294,7 +294,7 @@ class TeamController extends Controller {
             // let ip=ip_arr[0];
 
             let ip = "1.193.64.69";
-            let uid = Number(this.ctx.query.openid);
+            let uid = Number(this.ctx.query.uid);
             let openid = this.ctx.query.openid;
             let money = this.ctx.query.money;
             let join_no = this.ctx.query.join_no;
