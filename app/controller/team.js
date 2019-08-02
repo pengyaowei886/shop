@@ -56,12 +56,9 @@ class TeamController extends Controller {
                 goods_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
-                youfei: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'string', required: true, allowEmpty: false
-                },
                 spec_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
-                }, 
+                },
                 uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
@@ -87,13 +84,13 @@ class TeamController extends Controller {
 
             let ip = "1.193.64.69";
             let openid = this.ctx.query.openid;
-            let youfei = Number(this.ctx.query.youfei);
+
             let goods_id = Number(this.ctx.query.goods_id);
             let spec_id = Number(this.ctx.query.spec_id);
             let address_id = Number(this.ctx.query.address_id);
             let uid = Number(this.ctx.query.uid);
             console.log("saj,n")
-            let data = await service.team.open_team(goods_id, spec_id, address_id, uid,youfei, openid, ip);
+            let data = await service.team.open_team(goods_id, spec_id, address_id, uid, openid, ip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
