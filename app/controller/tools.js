@@ -153,13 +153,15 @@ class ToolsController extends Controller {
             //获取uid
             const mysql = this.app.mysql;
             let result = await mysql.select('join_team', { where: { status: 1 }, columns: ['uid'], orders: [['ctime', 'desc']], limit: 10, skip: 0 })
+            console.log(result)
             if (result.length > 0) {
                 let uid = [];
 
                 for (let i in result) {
-                    uid.push(result[i]);
+                    uid.push(result[i].uid);
                 }
                 let user_info = await mysql.select('user', { where: { id: uid }, columns: ['wx_nickname'] })
+                console.log(user_info);
                 return handerThis.succ(user_info);
             } else {
                 return handerThis.succ(result);
