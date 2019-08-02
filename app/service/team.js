@@ -33,7 +33,7 @@ class TeamService extends Service {
         }
     }
     //用户确认开团
-    async open_team(goods_id, spec_id, address_id, uid, youfei, openid, ip) {
+    async open_team(goods_id, spec_id, address_id, uid, openid, ip) {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
         let attach = goods_id;
@@ -51,7 +51,7 @@ class TeamService extends Service {
             let address_info = await mysql.select('address', { where: { id: address_id }, columns: ['phone', 'address', 'user_name', 'detailInfo'] });
             //生成预付款订单
 
-            let money = goods_info[0].join_xianjin + youfei;
+            let money = goods_info[0].join_xianjin;
             await mysql.insert('join_order', {
                 uid: uid,
                 order_no: order_no, //订单号
@@ -60,7 +60,6 @@ class TeamService extends Service {
                 head_pic: goods_info[0].head_pic,
                 money: goods_info[0].join_xianjin,
                 gold: spec_info[0].leader_price,
-                youfei: youfei,
                 spec: spec_info[0].spec,
                 spec_id: spec_id,
                 address: address_info[0].address,
@@ -231,7 +230,7 @@ class TeamService extends Service {
             //判断此次加入是否成团
             if (team[0].now_gold + money / 100 >= team[0].gold) {
                 let join_sql = "update  join_team set now_gold = gold ,succ_time = ? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-                let join_args = [ new Date(), money / 100, join_no];
+                let join_args = [new Date(), money / 100, join_no];
                 await mysql.query(join_sql, join_args);
 
 
@@ -478,7 +477,7 @@ class TeamService extends Service {
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         //更新 拼团信息
         let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1,succ_time= ?, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
-        let join_args =  [new Date(), order_no, money / 100, join_no];
+        let join_args = [new Date(), order_no, money / 100, join_no];
         await mysql.query(join_sql, join_args);
         //生成用户参团记录
         await mysql.insert('user_join', {

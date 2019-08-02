@@ -22,9 +22,6 @@ class OrderController extends Controller {
                 goods: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'array', required: true, allowEmpty: false
                 },
-                youfei: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
-                    type: 'int', required: true, allowEmpty: false
-                },
                 uid: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'int', required: true, allowEmpty: false
                 },
@@ -55,7 +52,6 @@ class OrderController extends Controller {
 
             let ip = "1.193.64.69";
             let openid = this.ctx.request.body.openid;
-            let youfei = Number(this.ctx.request.body.youfei);
             let goods = this.ctx.request.body.goods;
             let uid = Number(this.ctx.request.body.uid);
             let address_id = Number(this.ctx.request.body.address_id);
@@ -98,7 +94,7 @@ class OrderController extends Controller {
 
             const { ctx, service } = handerThis;
 
-        
+
             let uid = this.ctx.request.body.uid;
             let order_no = this.ctx.request.body.order_no;
             let data = await service.order.trolley_pay_again(order_no, uid);
@@ -211,7 +207,7 @@ class OrderController extends Controller {
             let limit = this.ctx.request.body.limit;
             let skip = this.ctx.request.body.skip;
             let kind = this.ctx.request.body.kind;
-            let data = await service.order.query_order_list(uid, status,kind, limit, skip);
+            let data = await service.order.query_order_list(uid, status, kind, limit, skip);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
@@ -230,7 +226,7 @@ class OrderController extends Controller {
                 kind: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'int', required: true, allowEmpty: false
                 },
-                 action: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
+                action: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
                     type: 'string', required: true, allowEmpty: false
                 },
                 order_id: {//字符串 必填 不允许为空字符串 ， 小程序使用wx.login得到的 临时登录凭证code,开发者服务器使用,临时登录凭证code获取 session_key和openid
@@ -256,7 +252,7 @@ class OrderController extends Controller {
             let kind = this.ctx.request.body.kind;
             let action = this.ctx.request.body.action;
             let order_id = this.ctx.request.body.order_id;
-            let data = await service.order.confire_order(kind, order_id,action);
+            let data = await service.order.confire_order(kind, order_id, action);
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);

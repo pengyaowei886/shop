@@ -33,7 +33,7 @@ class OrderService extends Service {
 
 
     //用户结算购物车
-    async trolley_pay(goods, uid, is_gold, youfei, address_id, openid, ip) {
+    async trolley_pay(goods, uid, is_gold, address_id, openid, ip) {
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('pay');
         let goods_id = [];
@@ -89,7 +89,6 @@ class OrderService extends Service {
             uid: uid,
             money: money,
             gold: gold,
-            youfei: youfei,
             shouhuoren: address[0].user_name,
             phone: address[0].phone,
             address: address[0].address,
@@ -116,7 +115,7 @@ class OrderService extends Service {
         let body_data = "订单付款";
         let attach = order_no;
         //付款
-        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money + youfei, openid, ip, attach);
+        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
 
         //放入redis 
 
