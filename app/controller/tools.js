@@ -150,15 +150,21 @@ class ToolsController extends Controller {
         const { ctx, app, service } = handerThis;
 
         try {
-            //获取token 
+            //获取uid
             const mysql = this.app.mysql;
             let result = await mysql.select('join_team', { where: { status: 1 }, columns: ['uid'], orders: [['ctime', 'desc']], limit: 10, skip: 0 })
-            let uid = [];
-            for (let i in result) {
-                uid.push(result[i]);
+            if (result.length > 0) {
+                let uid = [];
+
+                for (let i in result) {
+                    uid.push(result[i]);
+                }
+                let user_info = await mysql.select('user', { where: { id: uid }, columns: ['wx_nickname'] })
+                return handerThis.succ(user_info);
+            } else {
+                return handerThis.succ(result);
             }
-            let user_info = await mysql.select('user', { where:{ id :uid}, columns:['wx_nickname'] })
-            return handerThis.succ(user_info);
+
 
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);
