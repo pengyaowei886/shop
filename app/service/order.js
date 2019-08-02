@@ -78,6 +78,7 @@ class OrderService extends Service {
                 money = money - gold / 100;
             } else {
                 gold = gold_info[0].balance
+                money = money - gold / 100;
             }
         } else {
             gold = 0;
@@ -115,7 +116,7 @@ class OrderService extends Service {
         let body_data = "订单付款";
         let attach = order_no;
         //付款
-        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, attach);
+        let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money + youfei, openid, ip, attach);
 
         //放入redis 
         await redis.hset(`pay:${uid}:${order_no}`, 'timeStamp', data.timeStamp);
