@@ -241,19 +241,22 @@ class UserService extends Service {
 
         if (kind == 1) { //普通商品
 
-            let sql = "select c.id, c.goods_id,g.head_pic,g.introduce ,s.sell_price,g.status from  collation c left join goods g on "
-                + " g.id = c.goods_id  left join specs s on s.goods_id = c.goods_id    where   c.uid= ? and  c.kind=1 and  s.is_default=1";
+            let sql = "select c.id, c.goods_id, g.head_pic, g.introduce ,s.sell_price, g.status from  collation c left join goods g on "
+                + " g.id = c.goods_id  left join specs s on s.goods_id = c.goods_id    where   c.uid= ? and  c.kind=1  and  s.is_default=1";
 
             args.push(uid);
             let result = await mysql.query(sql, args);
+
+
+
 
             return result;
         } else {
-            let sql = "select c.id,c.goods_id,g.head_pic,s.join_price,s.leader_price,s.join_number,g.introduce,g.status from collation c  left join " +
+            let sql = "select c.id,c.goods_id,g.head_pic,s.join_price,g.join_xianjin,s.join_number,g.introduce,g.status from collation c  left join " +
                 "join_goods g  on g.id= c.goods_id  left join join_specs s on c.goods_id=s.goods_id where  c.uid= ? and  c.kind=2  and  s.is_default=1 ";
             args.push(uid);
             let result = await mysql.query(sql, args);
-            console.log(result)
+
             return result;
 
         }
