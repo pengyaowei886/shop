@@ -230,7 +230,7 @@ class OrderService extends Service {
 
         if (action == "shouhuo") {
             if (status[0].status == 2) {
-                //await mysql.update(table_name, { id: order_id, status: 3 });
+                await mysql.update(table_name, { id: order_id, status: 3 });
                 if (kind == 1) {
                     let join_goods_info = await mysql.select('join_order', { where: { id: order_id }, columns: ['goods_id'] });
                     let sql = "update  join_goods  set succ_volume = succ_volume+1 where  id = ?";
