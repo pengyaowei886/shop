@@ -8,22 +8,22 @@ class Goodsservice extends Service {
 
 
     // 用户查询商品列表
-    async query_goods(limit, skip, name,is_recommend,class_class) {
+    async query_goods(limit, skip, name, is_recommend, class_class) {
         const mysql = this.app.mysql;
         //先查商品基本属性
         let sql = "select g.id,g.head_pic,s.sell_price, s.real_price, g.introduce,g.succ_volume  from goods g left join specs s  on g.id=s.goods_id " +
             " where g.status=1 and s.is_default=1 ";
-            if (name) {
-                sql += "and g.introduce like " + mysql.escape("%" + name + "%");
-            }
-            if (is_recommend) {
-                sql += "and g.is_recommend = 1 ";
-            }
-            if (class_class) {
-                sql += "and g.class = " + mysql.escape( class_class );
-    
-            }
-            sql += "  order by g.ctime  desc  limit ?  offset ? ";
+        if (name) {
+            sql += "and g.introduce like " + mysql.escape("%" + name + "%");
+        }
+        if (is_recommend) {
+            sql += "and g.is_recommend = 1 ";
+        }
+        if (class_class) {
+            sql += "and g.class = " + mysql.escape(class_class);
+
+        }
+        sql += "  order by g.ctime  desc  limit ?  offset ? ";
         let args = [limit, skip];
         let result = await mysql.query(sql, args);
         if (result.length >= 1) {
@@ -45,22 +45,22 @@ class Goodsservice extends Service {
         }
     }
     //用户查看商品具体详情
-    async query_goods_info(id) {
+    async query_goods_info(id, uid) {
         const mysql = this.app.mysql;
         //先查商品信息
 
         let result = await mysql.select('goods', {
-            where: { id: id }, columns: ['introduce', "head_pic", "pic",'spec_name', 'repertory', 'succ_volume', "details", "video", "goods_rotate"]
+            where: { id: id }, columns: ['introduce', "head_pic", "pic", 'spec_name', 'repertory', 'succ_volume', "details", "video", "goods_rotate"]
         });
 
         if (result.length > 0) {
             //再查商品规格信息
             let specs = await mysql.select('specs', {
-                where: { goods_id: id }, columns: ["id", 'spec', 'sell_price','real_price', 'pic', "repertory",'is_default']
+                where: { goods_id: id }, columns: ["id", 'spec', 'sell_price', 'real_price', 'pic', "repertory", 'is_default']
             });
             // 再查收藏记录
             let collation = await mysql.select('collation', {
-                where: { goods_id: id, kind: 1 }, columns: ["id"]
+                where: { goods_id: id, kind: 1, uid: uid }, columns: ["id"]
             });
             if (collation.length >= 1) { //已经收藏过
                 result[0].collation = 1;
@@ -85,7 +85,7 @@ class Goodsservice extends Service {
             sql += "and g.is_recommend = 1 ";
         }
         if (class_class) {
-            sql += "and g.class = " + mysql.escape( class_class );
+            sql += "and g.class = " + mysql.escape(class_class);
 
         }
         sql += "  order by g.ctime  desc  limit ?  offset ? ";
@@ -99,7 +99,7 @@ class Goodsservice extends Service {
         }
     }
     //用户查看拼团商品具体详情
-    async query_join_goods_info(id) {
+    async query_join_goods_info(id, uid) {
         const mysql = this.app.mysql;
         //先查商品信息
         let result = await mysql.select('join_goods', {
@@ -112,11 +112,11 @@ class Goodsservice extends Service {
         } else {
             //再查商品规格信息 
             let specs = await mysql.select('join_specs', {
-                where: { goods_id: id, status: 1 }, columns: ['id', 'spec','cost_price', 'join_price', "join_number", "leader_price",
-                    'repertory','is_default']
+                where: { goods_id: id, status: 1 }, columns: ['id', 'spec', 'cost_price', 'join_price', "join_number", "leader_price",
+                    'repertory', 'is_default']
             });
             let collation = await mysql.select('collation', {
-                where: { goods_id: id, kind: 2 }, columns: ["id"]
+                where: { goods_id: id, kind: 2, uid: uid }, columns: ["id"]
             });
 
             console.log(collation);

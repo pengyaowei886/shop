@@ -253,6 +253,7 @@ class UserService extends Service {
                 "join_goods g  on g.id= c.goods_id  left join join_specs s on c.goods_id=s.goods_id where  c.uid= ? and  c.kind=2  and  s.is_default=1 ";
             args.push(uid);
             let result = await mysql.query(sql, args);
+            console.log(result)
             return result;
 
         }
