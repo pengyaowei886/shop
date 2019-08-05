@@ -304,12 +304,13 @@ class TeamService extends Service {
                 order_no.push(result[i].order_no);
             }
 
-            let goods_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['order_no', 'introduce', 'spec', 'head_pic'] })
+            let goods_info = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['order_no', 'introduce', 'goods_id', 'spec', 'head_pic'] })
             for (let i in result) {
                 for (let j in goods_info) {
                     if (result[i].order_no == goods_info[j].order_no) {
                         result[i].head_pic = goods_info[j].head_pic;
                         result[i].spec = goods_info[j].spec;
+                        result[i].goods_id = goods_info[j].goods_id;
                         result[i].introduce = goods_info[j].introduce;
                         break;
                     }
