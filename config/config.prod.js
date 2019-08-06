@@ -21,7 +21,7 @@ module.exports = appInfo => {
       enable: false,
     },
     csrf: {
-      enable: true,
+      enable: false,
       useSession: false,
       ignoreJSON: false,
       headerName: 'token',
