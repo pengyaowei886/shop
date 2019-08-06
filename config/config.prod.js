@@ -91,6 +91,8 @@ module.exports = appInfo => {
       password: '159370pyw',
       // 数据库名
       database: 'zlpt',
+      charset: "utf8mb4"
+
     },
     // 是否加载到 app 上，默认开启
     app: true,

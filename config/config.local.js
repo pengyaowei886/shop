@@ -35,13 +35,13 @@ module.exports = appInfo => {
   config.redis = {
     clients: {
       user: {
-        host:'47.105.169.49',
+        host: '47.105.169.49',
         port: '6379',
         password: 'zlpt123456',
         db: 0,
       },
       trolley: { //购物车
-        host:'47.105.169.49',
+        host: '47.105.169.49',
         port: '6379',
         password: 'zlpt123456',
         db: 1,
@@ -59,13 +59,13 @@ module.exports = appInfo => {
         db: 3
       },
       pay: {
-        host:'47.105.169.49',
+        host: '47.105.169.49',
         port: '6379',
         password: 'zlpt123456',
         db: 4
       },
       duanxin: {
-        host:'47.105.169.49',
+        host: '47.105.169.49',
         port: '6379',
         password: 'zlpt123456',
         db: 5
@@ -78,22 +78,23 @@ module.exports = appInfo => {
   config.mysql = {
     // 单数据库信息配置
     client: {
-        // host
-        host: '47.105.169.49',
-        // 端口号
-        port: '3306',
-        // 用户名
-        user: 'root',
-        // 密码
-        password: '159370pyw',
-        // 数据库名
-        database: 'zlpt',
+      // host
+      host: '47.105.169.49',
+      // 端口号
+      port: '3306',
+      // 用户名
+      user: 'root',
+      // 密码
+      password: '159370pyw',
+      // 数据库名
+      database: 'zlpt',
+      charset: "utf8mb4"
     },
     // 是否加载到 app 上，默认开启
     app: true,
     // 是否加载到 agent 上，默认关闭
     agent: false,
-};
+  };
 
 
 
@@ -132,8 +133,8 @@ module.exports = appInfo => {
     openid: "oKvMN5Ef0LijcwlVkiLEOtv4urfg",
     business_secret: "GY32mgLScDLvLmJOfZFz74vmXorfULvr",//商户支付密钥
     key: "9vApxLk5G3PAsJrM",//16位 对称公钥
-    iv: "FnJL7EDzjqWjcaY9" ,//偏移量
-    duanxin_key:"e7e49d13bd28f80d191aaa8311f97371" //聚合数据短信key
+    iv: "FnJL7EDzjqWjcaY9",//偏移量
+    duanxin_key: "e7e49d13bd28f80d191aaa8311f97371" //聚合数据短信key
   };
   return config;
 };
