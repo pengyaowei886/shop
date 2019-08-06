@@ -142,6 +142,8 @@ class UserService extends Service {
             // let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             // encryptedText.update(open_id);
             //更新微信头像和昵称
+
+            await mysql.query('SET wx_nickname utf8mb4');
             await mysql.update('user', {
                 id: is_exist[0].id,
                 wx_pic: head_pic,
@@ -153,6 +155,7 @@ class UserService extends Service {
             databack.openid = open_id;
             return databack;
         } else {
+            await mysql.query('SET wx_nickname utf8mb4');
             let options = {
                 openid: open_id,
                 balance: 0,
