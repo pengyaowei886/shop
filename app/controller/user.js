@@ -98,7 +98,7 @@ class UserController extends Controller {
         nick_name: {//字符串 必填 不允许为空字符串 
           type: 'string', required: true, allowEmpty: false
         },
-      }, ctx.request.body);
+      }, ctx.request.query);
     } catch (e) {
       ctx.logger.warn(e);
       let logContent = e.code + ' ' + e.message + ',';
@@ -109,9 +109,9 @@ class UserController extends Controller {
     }
     //逻辑处理
     try {
-      let code = ctx.request.body.code;
-      let head_pic = ctx.request.body.head_pic;
-      let nick_name = ctx.request.body.nick_name;
+      let code = ctx.request.query.code;
+      let head_pic = ctx.request.query.head_pic;
+      let nick_name = ctx.request.query.nick_name;
       let data = await service.user.login(code, head_pic, nick_name);
       return handerThis.succ(data);
     } catch (error) {
@@ -368,7 +368,7 @@ class UserController extends Controller {
       let uid = this.ctx.request.body.uid;
       let phone = this.ctx.request.body.phone;
       let code = this.ctx.request.body.code;
-      let data = await service.user.add_phone(uid,phone,code);
+      let data = await service.user.add_phone(uid, phone, code);
       return handerThis.succ(data);
     } catch (error) {
       return handerThis.error('HANDLE_ERROR', error['message']);

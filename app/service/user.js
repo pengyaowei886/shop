@@ -170,7 +170,7 @@ class UserService extends Service {
             // let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             // encryptedText.update(open_id);
             // let token = encryptedText.final("hex");
-            let token = this.app.config.key;
+            let token = this.app.config.keys;
 
             // let user = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
             // let uid = user[0].id;

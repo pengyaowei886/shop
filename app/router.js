@@ -6,7 +6,7 @@
 module.exports = app => {
 
   const { router, controller, middleware } = app;
-  // let userVerify = middleware.userVerify({})//token 验证
+  let userVerify = middleware.userVerify({})//token 验证
 
 
   //tools工具类api***************tools工具类api
@@ -28,7 +28,7 @@ module.exports = app => {
 
 
   //小程序登陆
-  router.post('/zlpt/wx/login', controller.user.login);
+  router.get('/zlpt/wx/login',  controller.user.login);
 
 
   //添加手机号
@@ -50,7 +50,7 @@ module.exports = app => {
   router.get('/zlpt/app/join_goods/info', controller.goods.query_join_goods_info);
 
   //查看用户具体信息
-  router.get('/zlpt/app/user/info', controller.user.query_user_info);
+  router.get('/zlpt/app/user/info',userVerify, controller.user.query_user_info);
   //查询用户收获地址
   router.get('/zlpt/app/user/address/query', controller.address.query_address);
   //编辑用户收货地址
@@ -73,22 +73,22 @@ module.exports = app => {
   router.post('/zlpt/app/user/team/start', controller.team.start_team);
 
   //用户支付拼团
-  router.get('/zlpt/app/user/team/pay', controller.team.open_team_pay);
+  router.get('/zlpt/app/user/team/pay',  userVerify,controller.team.open_team_pay);
   //用户继续支付拼团
-  router.get('/zlpt/app/user/team/pay/again', controller.team.open_team_again);
+  router.get('/zlpt/app/user/team/pay/again', userVerify,controller.team.open_team_again);
   //支付拼团回调
-  router.get('/zlpt/app/user/team/return', controller.team.open_pay_return);
+  router.get('/zlpt/app/user/team/return', userVerify,controller.team.open_pay_return);
 
   //用户参加拼团
-  router.get('/zlpt/app/user/team/join', controller.team.join_team);
+  router.get('/zlpt/app/user/team/join', userVerify,controller.team.join_team);
   //支付参团回调
-  router.get('/zlpt/app/user/team/join/return', controller.team.join_pay_return);
+  router.get('/zlpt/app/user/team/join/return',userVerify, controller.team.join_pay_return);
   //用户查询能否补差额
   router.get('/zlpt/app/user/team/self/query', controller.team.query_join_self);
   //用户为自己的团支付剩余余额
-  router.get('/zlpt/app/user/team/self', controller.team.join_self);
+  router.get('/zlpt/app/user/team/self',userVerify, controller.team.join_self);
   //补差价回调
-  router.get('/zlpt/app/user/team/self/return', controller.team.join_myself_return);
+  router.get('/zlpt/app/user/team/self/return', userVerify,controller.team.join_myself_return);
   //用户查询拼团列表
 
   //用户查询我的拼团
@@ -97,7 +97,7 @@ module.exports = app => {
   router.get('/zlpt/app/user/team/query/same', controller.team.query_same_team);
 
   //用户购买普通商品
-  router.post('/zlpt/app/user/goods/pay', controller.order.trolley_pay);
+  router.post('/zlpt/app/user/goods/pay',controller.order.trolley_pay);
   //用户继续购买普通商品
   router.post('/zlpt/app/user/goods/pay/again', controller.order.trolley_pay_again);
   //回调
