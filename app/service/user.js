@@ -119,7 +119,7 @@ class UserService extends Service {
         let handerThis = this;
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
-        const redis = this.app.redis.get('user');
+
         // const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
         // const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
         let databack = {};
@@ -147,7 +147,7 @@ class UserService extends Service {
                 wx_pic: head_pic,
                 wx_nickname: nick_name
             })
-            let token = ths.app.config.key;
+            let token = this.app.config.key;
             databack.uid = is_exist[0].id;
             databack.token = token;
             databack.openid = open_id;
@@ -167,19 +167,17 @@ class UserService extends Service {
             // let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
             // encryptedText.update(open_id);
             // let token = encryptedText.final("hex");
-            let token = ths.app.config.key;
+            let token = this.app.config.key;
 
             // let user = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
             // let uid = user[0].id;
-            let result = await redis.set(`${token}`, uid_res.insertId);
-            if (result == "OK") {
-                databack.uid = uid_res.insertId;
-                databack.token = token;
-                databack.openid = open_id;
-                return databack;
-            } else {
-                throw new Error('redis插入失败');
-            }
+
+
+            databack.uid = uid_res.insertId;
+            databack.token = token;
+            databack.openid = open_id;
+            return databack;
+
         }
     }
     //查询轮播图
