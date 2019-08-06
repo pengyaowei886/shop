@@ -83,21 +83,19 @@ class ToolsService extends Service {
             if (reData.return_code[0] == 'SUCCESS') {
                 let shijiancuo = new Date().getTime();
 
-                let sign = createSign({	//签名
-                    appid: appid,
-                    timeStamp: shijiancuo,
-                    nonceStr: reData.nonce_str[0],
-                    package: reData.prepay_id[0],
-                    singType: "MD5",
-                    key: key,
+                let stringA = 'appid=' + appid + '&nonce_str=' + reData.nonce_str[0] + '&package=' + reData.prepay_id[0] + '&singType=' + "MD5" + '&timeStamp=' + shijiancuo;
+                let stringSignTemp = stringA + '&key=' + obj.key;
+                stringSignTemp = md5(stringSignTemp);
+                let signValue = stringSignTemp.toUpperCase();
 
-                });
+
+
                 responseData = {
                     appid: appid,
                     timeStamp: shijiancuo,
                     nonceStr: reData.nonce_str[0],
                     package: reData.prepay_id[0],
-                    paySign: sign,
+                    paySign: signValue,
                     order_no: order_no
                 }
             } else {
