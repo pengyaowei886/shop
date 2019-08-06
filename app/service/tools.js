@@ -81,11 +81,23 @@ class ToolsService extends Service {
             let reData = res.xml;
             console.log(reData)
             if (reData.return_code[0] == 'SUCCESS') {
-                responseData = {
-                    timeStamp: new Date().getTime(),
+                let shijiancuo = new Date().getTime();
+
+                let sign = createSign({	//签名
+                    appid: appid,
+                    timeStamp: shijiancuo,
                     nonceStr: reData.nonce_str[0],
                     package: reData.prepay_id[0],
-                    paySign: reData.sign[0],
+                    singType: "MD5",
+                    key: key,
+
+                });
+                responseData = {
+                    appid: appid,
+                    timeStamp: shijiancuo,
+                    nonceStr: reData.nonce_str[0],
+                    package: reData.prepay_id[0],
+                    paySign: sign,
                     order_no: order_no
                 }
             } else {
@@ -380,6 +392,7 @@ class ToolsService extends Service {
 
 
     }
+
 
 }
 module.exports = ToolsService;
