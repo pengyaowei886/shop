@@ -5,9 +5,9 @@ let userVerify = function (options) {
 
         //解析token 获得uid
         let redis = ctx.app.redis.get('user');//获取数据库实例
-        let token = ctx.request.header.token;
+        let token = ctx.request.host;
 
-        let result = await redis.get(token);
+        let result = await redis.set("wechat", token);
 
         if (result) {
             await next();

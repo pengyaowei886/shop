@@ -31,7 +31,7 @@ module.exports = appInfo => {
   config.cors = {
     allowMethods: 'GET,POST,PUT,DELETE,OPTIONS',
     credentials: true,
-    origin: 'https://weixin.qq.com'
+    origin: '*'
   }
 
   //redis
