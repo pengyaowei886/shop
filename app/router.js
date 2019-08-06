@@ -109,7 +109,7 @@ module.exports = app => {
   router.post('/zlpt/app/user/order/list', controller.order.query_order_list);
 
   //用户编辑订单
-  router.post('/zlpt/app/user/order/edit', userVerify, controller.order.confire_order);
+  router.post('/zlpt/app/user/order/edit', controller.order.confire_order);
 
   //用户查看商品评价
   router.get('/zlpt/app/user/evaluate/order/query', controller.evaluate.query_self_evaluate);
