@@ -83,8 +83,9 @@ class ToolsService extends Service {
             if (reData.return_code[0] == 'SUCCESS') {
                 let shijiancuo = new Date().getTime();
 
-                let stringA = 'appid=' + appid + '&nonce_str=' + reData.nonce_str[0] + '&package=' + reData.prepay_id[0] + '&singType=' + "MD5" + '&timeStamp=' + shijiancuo;
-                let stringSignTemp = stringA + '&key=' +key;
+                let stringA = 'appid=' + appid + '&nonce_str=' + reData.nonce_str[0] + '&package=' + `prepay_id=${reData.prepay_id[0]}` + '&signType=' + "MD5" + '&timeStamp=' + shijiancuo;
+                let stringSignTemp = stringA + '&key=' + key;
+                console.log(stringSignTemp);
                 stringSignTemp = md5(stringSignTemp);
                 let signValue = stringSignTemp.toUpperCase();
 
@@ -94,7 +95,7 @@ class ToolsService extends Service {
                     appid: appid,
                     timeStamp: shijiancuo,
                     nonceStr: reData.nonce_str[0],
-                    package: reData.prepay_id[0],
+                    package: `prepay_id=${reData.prepay_id[0]}`,
                     paySign: signValue,
                     order_no: order_no
                 }
