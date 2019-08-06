@@ -84,7 +84,7 @@ class ToolsService extends Service {
                 let shijiancuo = new Date().getTime();
 
                 let stringA = 'appid=' + appid + '&nonce_str=' + reData.nonce_str[0] + '&package=' + reData.prepay_id[0] + '&singType=' + "MD5" + '&timeStamp=' + shijiancuo;
-                let stringSignTemp = stringA + '&key=' + obj.key;
+                let stringSignTemp = stringA + '&key=' +key;
                 stringSignTemp = md5(stringSignTemp);
                 let signValue = stringSignTemp.toUpperCase();
 
