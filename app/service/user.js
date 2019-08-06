@@ -134,6 +134,7 @@ class UserService extends Service {
             dataType: "json"
         });
         let open_id = res1.data.openid;//open_id
+
         //判断用户是否存在
         let is_exist = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
         if (is_exist.length > 0) {
@@ -149,7 +150,7 @@ class UserService extends Service {
                 wx_pic: head_pic,
                 wx_nickname: nick_name
             })
-            let token = this.app.config.key;
+            let token = this.app.config.keys;
             databack.uid = is_exist[0].id;
             databack.token = token;
             databack.openid = open_id;
