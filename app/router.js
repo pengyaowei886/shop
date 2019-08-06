@@ -6,7 +6,7 @@
 module.exports = app => {
 
   const { router, controller, middleware } = app;
-  let userVerify = middleware.userVerify({})//token 验证
+  //let userVerify = middleware.userVerify({})//token 验证
 
 
   //tools工具类api***************tools工具类api
@@ -28,7 +28,7 @@ module.exports = app => {
 
 
   //小程序登陆
-  router.post('/zlpt/wx/login',userVerify, controller.user.login);
+  router.post('/zlpt/wx/login', controller.user.login);
 
 
   //添加手机号
