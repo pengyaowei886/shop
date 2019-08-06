@@ -1,7 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
-const crypto = require('crypto');
+// const crypto = require('crypto');
 
 // const WXBizDataCrypt = require('wxbizdatacrypt');
 class UserService extends Service {
@@ -120,8 +120,8 @@ class UserService extends Service {
         const { ctx, app } = handerThis;
         const mysql = this.app.mysql;
         const redis = this.app.redis.get('user');
-        const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
-        const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
+        // const key = Buffer.from(app.config.info.key, 'utf8');//16位 对称公钥
+        // const iv = Buffer.from(app.config.info.iv.toString(), 'utf8');  //偏移量
         let databack = {};
 
         //console.log("code:",code);
@@ -139,16 +139,15 @@ class UserService extends Service {
         if (is_exist.length > 0) {
             //查出token
 
-            let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
-            encryptedText.update(open_id);
+            // let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
+            // encryptedText.update(open_id);
             //更新微信头像和昵称
             await mysql.update('user', {
                 id: is_exist[0].id,
                 wx_pic: head_pic,
                 wx_nickname: nick_name
             })
-            let token = encryptedText.final("hex");
-            await redis.set(`${token}`, is_exist[0].id);
+            let token = ths.app.config.key;
             databack.uid = is_exist[0].id;
             databack.token = token;
             databack.openid = open_id;
@@ -165,9 +164,10 @@ class UserService extends Service {
             //插入数据库
             let uid_res = await mysql.insert('user', options);
             //  生成token
-            let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
-            encryptedText.update(open_id);
-            let token = encryptedText.final("hex");
+            // let encryptedText = crypto.createCipheriv("aes-128-cbc", key, iv);
+            // encryptedText.update(open_id);
+            // let token = encryptedText.final("hex");
+            let token = ths.app.config.key;
 
             // let user = await mysql.select('user', { where: { openid: open_id }, columns: ['id'] });
             // let uid = user[0].id;
