@@ -63,7 +63,7 @@ module.exports = app => {
   //用户查看我的购物车
   router.get('/zlpt/app/user/trolley/query', controller.trolley.query_trolley);
   //用户编辑购物车
-  router.post('/zlpt/app/user/trolley/edit', userVerify, controller.trolley.edit_trolley);
+  router.post('/zlpt/app/user/trolley/edit', controller.trolley.edit_trolley);
   // //用户查看我的浏览历史
   // router.get('/zlpt/app/user/history/query', controller.user.query_history);
   // //用户编辑我的浏览历史
