@@ -6,7 +6,7 @@ class TrolleyService extends Service {
 
         const redis = this.app.redis.get('trolley');
 
-        const mysql =this.app.mysql;
+        const mysql = this.app.mysql;
 
         let result = await redis.hgetall(`trolley:${uid}`);
         let goods_id = [];
@@ -16,40 +16,43 @@ class TrolleyService extends Service {
             goods_id.push(a[0]);
             spec_id.push(a[1]);
         }
-    
-        let spec_info = await mysql.select('specs', { where: { id: spec_id }, columns: ['id','sell_price', 'goods_id', 'spec','repertory',"status"] });
-    
-        let goods_info = await mysql.select('goods', { where: { id: goods_id }, columns: ['id','introduce', 'head_pic','status'] });
+
+        let spec_info = await mysql.select('specs', { where: { id: spec_id }, columns: ['id', 'sell_price', 'goods_id', 'spec', 'repertory', "status"] });
+        console.log(spec_info)
+
+        let goods_info = await mysql.select('goods', { where: { id: goods_id }, columns: ['id', 'introduce', 'head_pic', 'status'] });
+        console.log(goods_info)
         for (let i in goods_info) {
             if (goods_info[i].status == 1) {
-                for(let j in spec_info){
-                    if(goods_info[i].id==spec_info[j].goods_id){
-                        goods_info[i].spec_name=spec_info[j].spec;
-                        goods_info[i].sell_price=spec_info[j].sell_price;
-                        goods_info[i].spec_id=spec_info[j].id;
-                       let num =`${goods_info[i].id}:${spec_info[j].id}`;
-                       goods_info[i].num=result[`${num}`];
-                        if(spec_info[j].status!=1 ||spec_info[j].repertory<=0){
-                            goods_info[i].fujia="该规格已下架";
-                        }else{
-                            goods_info[i].fujia="";
+                for (let j in spec_info) {
+                    if (goods_info[i].id == spec_info[j].goods_id) {
+                        goods_info[i].spec_name = spec_info[j].spec;
+                        goods_info[i].sell_price = spec_info[j].sell_price;
+                        goods_info[i].spec_id = spec_info[j].id;
+                        let num = `${goods_info[i].id}:${spec_info[j].id}`;
+                        goods_info[i].num = result[`${num}`];
+                        if (spec_info[j].status != 1 || spec_info[j].repertory <= 0) {
+                            goods_info[i].fujia = "该规格已下架";
+                        } else {
+                            goods_info[i].fujia = "";
                         }
                         break;
                     }
-                   
+
                 }
 
-            }else{
-                for(let j in spec_info){
-                    if(goods_info[i].id==spec_info[j].goods_id){
-                        goods_info[i].spec_name=spec_info[j].spec;
-                        goods_info[i].sell_price=spec_info[j].sell_price
-                        goods_info[i].fujia="该商品已下架";
-                        let num =`${goods_info[i].id}:${spec_info[j].id}`;
-                        goods_info[i].num=result[`${num}`];
+            } else {
+                for (let j in spec_info) {
+                    if (goods_info[i].id == spec_info[j].goods_id) {
+                        goods_info[i].spec_name = spec_info[j].spec;
+                        goods_info[i].sell_price = spec_info[j].sell_price;
+                        goods_info[i].spec_id = spec_info[j].id;
+                        goods_info[i].fujia = "该商品已下架";
+                        let num = `${goods_info[i].id}:${spec_info[j].id}`;
+                        goods_info[i].num = result[`${num}`];
                         break;
                     }
-                   
+
                 }
             }
         }

@@ -101,7 +101,6 @@ class ToolsService extends Service {
 
 
                 responseData = {
-                    appId: appid,
                     timeStamp: shijiancuo,
                     nonceStr: reData.nonce_str[0],
                     package: `prepay_id=${reData.prepay_id[0]}`,
