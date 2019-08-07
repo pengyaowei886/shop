@@ -30,7 +30,6 @@ class ClassController extends Controller {
             const { ctx, service } = handerThis;
             let kind =Number(ctx.request.query.kind);
             let data = await service.class.query_class(kind);
-            console.log(this.app.config.keys)
             return handerThis.succ(data);
         } catch (error) {
             return handerThis.error('HANDLE_ERROR', error['message']);

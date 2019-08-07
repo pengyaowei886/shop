@@ -93,8 +93,15 @@ class TeamService extends Service {
     //用户继续完成开团支付
     async open_team_again(order_no, uid) {
         const redis = this.app.redis.get('pay');
-        let result = redis.hgetall(`pay:${uid}:${order_no}`);
-        return result;
+        const mysql = this.app.mysql;
+        let balance = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['gold'] })
+        let user_balance = await mysql.select('user', { where: { id: uid }, columns: ['balance'] });
+        if (balance[0].gold <= user_balance[0].balance) {
+            let result = redis.hgetall(`pay:${uid}:${order_no}`);
+            return result;
+        } else {
+            throw new Error('积分不足');
+        }
     }
 
     //开团微信回调
