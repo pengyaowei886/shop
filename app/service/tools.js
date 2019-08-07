@@ -306,7 +306,7 @@ class ToolsService extends Service {
         if (join_weifukuan.length > 0) {
             for (let i in join_weifukuan) {
 
-                await this.service.team.tongyong_join_order(join_weifukuan[i]);
+                await this.service.team.tongyong_join_order(join_weifukuan[i].order_no);
 
             }
         }
@@ -321,7 +321,7 @@ class ToolsService extends Service {
         let weifukuan = await mysql.select('goods_order', { where: { status: 0 }, columns: ['order_no'] });
         if (weifukuan.length > 0) {
             for (let i in weifukuan) {
-                await this.service.order.tongyong_goods_order(weifukuan[i]);
+                await this.service.order.tongyong_goods_order(weifukuan[i].order_no);
 
             }
         }
