@@ -111,15 +111,15 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
 
         let reData = await this.service.tools.query_weixin_order(order_no);
+        console.log(reData)
         if (reData) {
             let openid = reData.openid[0];
             // let order_no = reData.out_trade_no[0];
             let money = reData.total_fee[0];
             let wx_num = reData.transaction_id[0];
-            console.log(reData)
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
-            let order_res = await mysql.select('join_order', { where: { order_no: body }, columns: ['spec_id', 'goods_id', 'gold', 'ctime', 'status'] });
+            let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['spec_id', 'goods_id', 'gold', 'ctime', 'status'] });
             if (order_res[0].status == 0) {
                 let join_res = await mysql.select('join_specs', { where: { id: order_res[0].spec_id } });
                 let effectiv_time = await mysql.select('join_goods', { where: { id: order_res[0].goods_id }, columns: ['effectiv_time'] });
@@ -176,7 +176,7 @@ class TeamService extends Service {
         // // this.ctx.logger.error("微信返回值内容" + res);
         // let reData =res.xml;
         //   console.log(res)
-
+        console.log(body)
         await this.tongyong_join_order(body);
         return {};
 
