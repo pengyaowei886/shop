@@ -306,10 +306,8 @@ class ToolsService extends Service {
         if (join_weifukuan.length > 0) {
             for (let i in join_weifukuan) {
 
-                let reData = this.service.team.start_team(reData);
-                if (reData) {
-                    await this.tongyong_goods_order(reData);
-                }
+                await this.service.team.tongyong_join_order(join_weifukuan[i]);
+
             }
         }
         let sql = "delete from join_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
@@ -323,10 +321,8 @@ class ToolsService extends Service {
         let weifukuan = await mysql.select('goods_order', { where: { status: 0 }, columns: ['order_no'] });
         if (weifukuan.length > 0) {
             for (let i in weifukuan) {
-                let reData = this.service.order.tongyong_goods_order(weifukuan[i]);
-                if (reData) {
-                    await this.tongyong_goods_order(reData);
-                }
+                await this.service.order.tongyong_goods_order(weifukuan[i]);
+
             }
         }
         let other_sql = "delete from goods_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
