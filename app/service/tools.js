@@ -261,7 +261,7 @@ class ToolsService extends Service {
                 } else {
                     let reData = res.xml;
 
-                    if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
+                    if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS" && reData.trade_state[0] == "SUCCESS") {
 
                         resolve(res.xml);
                     } else {

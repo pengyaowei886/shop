@@ -135,7 +135,7 @@ class OrderService extends Service {
             let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
             let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold', 'id', 'ctime'] });
-
+            console.log(order_res)
             if (order_res[0].status == 0) {
                 //生成积分消费记录
                 await mysql.insert('gold_record', {
