@@ -167,7 +167,7 @@ class TeamService extends Service {
     //开团微信回调
     async open_pay_return(body) {
 
-
+        const mysql = this.app.mysql;
 
         // // this.ctx.logger.error("微信返回值内容" + body);
         // const xml2json = fxp.parse(body);
@@ -180,7 +180,7 @@ class TeamService extends Service {
         await this.tongyong_join_order(body);
         let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['gold', 'order_no'] });
         return order_res;
-        return {};
+
 
     }
     //用户参加拼团
