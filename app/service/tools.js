@@ -254,10 +254,18 @@ class ToolsService extends Service {
         return new Promise(function (resolve, reject) {
 
             xml2js.parseString(result.data, function (error, res) {
+
+
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(res.xml);
+                    let reData = res.xml;
+                    if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
+
+                        resolve(res.xml);
+                    } else {
+                        resolve(null);
+                    }
                 }
             })
         });
@@ -292,6 +300,17 @@ class ToolsService extends Service {
     async   pay_order() {
 
         const mysql = this.app.mysql;
+
+        let join_weifukuan = await mysql.select('join_order', { where: { status: 0 }, columns: ['order_no'] });
+
+        for (let i in join_weifukuan) {
+
+            let reData = this.service.team.start_team(reData);
+            if (reData) {
+                await this.tongyong_goods_order(reData);
+            }
+        }
+
         let sql = "delete from join_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
 
         let args = [new Date()]
@@ -299,9 +318,16 @@ class ToolsService extends Service {
         await mysql.query(sql, args);
 
 
+
+        let weifukuan = await mysql.select('goods_order', { where: { status: 0 }, columns: ['order_no'] });
+        for (let i in weifukuan) {
+            let reData = this.service.order.tongyong_goods_order(weifukuan[i]);
+            if (reData) {
+                await this.tongyong_goods_order(reData);
+            }
+        }
+
         let other_sql = "delete from goods_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
-
-
         await mysql.query(other_sql, args);
     }
     //自动收货

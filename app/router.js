@@ -82,13 +82,13 @@ module.exports = app => {
   //用户参加拼团
   router.get('/zlpt/app/user/team/join', userVerify, controller.team.join_team);
   //支付参团回调
-  // router.get('/zlpt/app/user/team/join/return', userVerify, controller.team.join_pay_return);
+  router.get('/zlpt/app/user/team/join/return', userVerify, controller.team.join_pay_return);
   //用户查询能否补差额
   router.get('/zlpt/app/user/team/self/query', controller.team.query_join_self);
   //用户为自己的团支付剩余余额
   router.get('/zlpt/app/user/team/self', userVerify, controller.team.join_self);
   //补差价回调
- // router.get('/zlpt/app/user/team/self/return', userVerify, controller.team.join_myself_return);
+  router.get('/zlpt/app/user/team/self/return', userVerify, controller.team.join_myself_return);
   //用户查询拼团列表
 
   //用户查询我的拼团
