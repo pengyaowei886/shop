@@ -171,8 +171,8 @@ class OrderService extends Service {
 
 
         await this.tongyong_goods_order(body);
-
-        return {};
+        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['gold', 'order_no'] });
+        return order_res;
     }
     //用户确认收货或者取消订单
     async confire_order(kind, order_id, action) {

@@ -178,6 +178,8 @@ class TeamService extends Service {
         //   console.log(res)
         console.log(body)
         await this.tongyong_join_order(body);
+        let order_res = await mysql.select('join_order', { where: { order_no: order_no }, columns: ['gold', 'order_no'] });
+        return order_res;
         return {};
 
     }
