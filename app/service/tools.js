@@ -105,7 +105,8 @@ class ToolsService extends Service {
                     nonceStr: reData.nonce_str[0],
                     package: `prepay_id=${reData.prepay_id[0]}`,
                     paySign: signValue,
-                    order_no: order_no
+                    order_no: order_no,
+                    money: total_fee
                 }
             } else {
                 throw new Error(reData.err_code_des[0]);

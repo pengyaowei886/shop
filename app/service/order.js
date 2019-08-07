@@ -1,35 +1,7 @@
 const Service = require('egg').Service;
 class OrderService extends Service {
 
-    // //用户发起购买
-    // async start_pay_goods(goods) {
 
-    //     let goods_id = [];
-    //     let spec_id = [];
-    //     let return_data = {
-    //         money: 0,
-    //         gold: 0,
-    //         goods_info
-    //     }
-    //     for (let i in goods) {
-    //         goods_id.push(goods[i].goods_id);
-    //         spec_id.push(goods[i].spec_id);
-    //     }
-    //     let goods_info = await mysql.select('goods', { where: { id: goods_id }, columns: ['id', 'introduce', 'head_pic'] });
-    //     let spec_info = await mysql.select('specs', { where: { id: spec_id }, columns: ['cost_price', 'goods_id', 'spec'] });
-    //     for (let i in goods_info) {
-    //         for (let j in spec_info) {
-    //             if (goods_info[i].id == spec_info[i].goods_info) {
-    //                 goods_info[i].sell_price = spec_info[i].sell_price;
-    //                 goods_info[i].spec_name = spec_info[i].spec;
-    //                 return_data.money += spec_info[i].sell_price;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return_data.gold = Math.floor(return_data.cost_price);
-    //     return goods_info;
-    // }
 
 
     //用户结算购物车
@@ -111,7 +83,7 @@ class OrderService extends Service {
             }
         }
         await mysql.query(sql, args);
-        let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/return";
+        let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/goods/pay/return";
         let body_data = "订单付款";
         let attach = order_no;
         //付款
@@ -131,65 +103,76 @@ class OrderService extends Service {
 
     //用户继续完成 支付
     async trolley_pay_again(order_no, uid) {
+        // const redis = this.app.redis.get('pay');
+        // let result = redis.hgetall(`pay:${uid}:${order_no}`);
+        // console.log(result);
+        // return result;
+
         const redis = this.app.redis.get('pay');
-        let result = redis.hgetall(`pay:${uid}:${order_no}`);
-        console.log(result);
-        return result;
+        const mysql = this.app.mysql;
+        let balance = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['gold'] })
+        let user_balance = await mysql.select('user', { where: { id: uid }, columns: ['balance'] });
+        if (balance[0].gold <= user_balance[0].balance) {
+            let result = redis.hgetall(`pay:${uid}:${order_no}`);
+            return result;
+        } else {
+            throw new Error('积分不足');
+        }
     }
 
     //用户完成购买
     async goods_pay_return(body) {
         const mysql = this.app.mysql;
 
-        let reData = await this.ctx.service.tools.query_weixin_order(body);
+        // let reData = await this.ctx.service.tools.query_weixin_order(body);
 
-        let openid = reData.openid[0];
-        let order_no = reData.out_trade_no[0];
-        let money = reData.total_fee[0];
-        let wx_num = reData.transaction_id[0];
+        // let openid = reData.openid[0];
+        // let order_no = reData.out_trade_no[0];
+        // let money = reData.total_fee[0];
+        // let wx_num = reData.transaction_id[0];
 
 
         let databack = {};
 
-        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+        // let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
-        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['status', 'gold', 'id'] });
+        let order_res = await mysql.select('goods_order', { where: { order_no: body }, columns: ['status', 'gold', 'id', 'ctime'] });
 
         if (order_res[0].status == 0) {
             //生成积分消费记录
-            await mysql.insert('gold_record', {
-                uid: uid[0].id,
-                num: -order_res[0].gold,
-                source: 3, //商店抵扣
-                ctime: new Date(),
-            });
-            //修改订单状态
-            await mysql.update('goods_order', {
-                id: order_res[0].id,
-                status: 1,
-                pay_time: new Date()
-            });
-            //生成支付记录
-            await mysql.insert('pay_record', {
-                uid: uid[0].id,
-                pay_num: money,
-                pay_no: wx_num,
-                order_no: order_no,
-                kind: 1, //微信小程序支付
-                status: 3, //商城商品支付
-                ctime: new Date(),
-            });
-            //扣除开团积分
-            let sql = "update  user set balance = balance - ? where id= ?";
-            let args = [order_res[0].gold, uid[0].id];
-            await mysql.query(sql, args);
+            // await mysql.insert('gold_record', {
+            //     uid: uid[0].id,
+            //     num: -order_res[0].gold,
+            //     source: 3, //商店抵扣
+            //     ctime: new Date(),
+            // });
+            // //修改订单状态
+            // await mysql.update('goods_order', {
+            //     id: order_res[0].id,
+            //     status: 1,
+            //     pay_time: new Date()
+            // });
+            // //生成支付记录
+            // await mysql.insert('pay_record', {
+            //     uid: uid[0].id,
+            //     pay_num: money,
+            //     pay_no: wx_num,
+            //     order_no: order_no,
+            //     kind: 1, //微信小程序支付
+            //     status: 3, //商城商品支付
+            //     ctime: new Date(),
+            // });
+            // //扣除开团积分
+            // let sql = "update  user set balance = balance - ? where id= ?";
+            // let args = [order_res[0].gold, uid[0].id];
+            // await mysql.query(sql, args);
             databack.ctime = order_res[0].ctime;
             databack.gold = order_res[0].gold;
-            databack.order_no = order_no;
-            databack.wx_no = wx_num;
+            databack.order_no = body;
+            // databack.wx_no = wx_num;
             return databack;
         } else {
-            throw new Error('订单状态异常');
+            throw new Error('微信到账延迟请稍等');
         }
     }
     //用户确认收货或者取消订单
