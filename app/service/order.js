@@ -171,7 +171,7 @@ class OrderService extends Service {
         const mysql = this.app.mysql;
 
         await this.tongyong_goods_order(body);
-        let order_res = await mysql.select('goods_order', { where: { order_no: order_no }, columns: ['gold', 'order_no'] });
+        let order_res = await mysql.select('goods_order', { where: { order_no: body }, columns: ['gold', 'order_no'] });
         return order_res;
     }
     //用户确认收货或者取消订单
