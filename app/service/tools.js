@@ -302,15 +302,15 @@ class ToolsService extends Service {
         const mysql = this.app.mysql;
 
         let join_weifukuan = await mysql.select('join_order', { where: { status: 0 }, columns: ['order_no'] });
+        if (join_weifukuan.length > 0) {
+            for (let i in join_weifukuan) {
 
-        for (let i in join_weifukuan) {
-
-            let reData = this.service.team.start_team(reData);
-            if (reData) {
-                await this.tongyong_goods_order(reData);
+                let reData = this.service.team.start_team(reData);
+                if (reData) {
+                    await this.tongyong_goods_order(reData);
+                }
             }
         }
-
         let sql = "delete from join_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
 
         let args = [new Date()]
@@ -320,13 +320,14 @@ class ToolsService extends Service {
 
 
         let weifukuan = await mysql.select('goods_order', { where: { status: 0 }, columns: ['order_no'] });
-        for (let i in weifukuan) {
-            let reData = this.service.order.tongyong_goods_order(weifukuan[i]);
-            if (reData) {
-                await this.tongyong_goods_order(reData);
+        if (weifukuan.length > 0) {
+            for (let i in weifukuan) {
+                let reData = this.service.order.tongyong_goods_order(weifukuan[i]);
+                if (reData) {
+                    await this.tongyong_goods_order(reData);
+                }
             }
         }
-
         let other_sql = "delete from goods_order where  status = 0  and unix_timestamp(end_time) < unix_timestamp( ? )  ";
         await mysql.query(other_sql, args);
     }
