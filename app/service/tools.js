@@ -260,6 +260,7 @@ class ToolsService extends Service {
                     reject(error);
                 } else {
                     let reData = res.xml;
+
                     if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS") {
 
                         resolve(res.xml);

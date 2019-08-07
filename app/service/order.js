@@ -120,59 +120,59 @@ class OrderService extends Service {
         }
     }
 
-    async  tongyong_goods_order(reData) {
-        let openid = reData.openid[0];
-        let order_no = reData.out_trade_no[0];
-        let money = reData.total_fee[0];
-        let wx_num = reData.transaction_id[0];
+    async  tongyong_goods_order(order_no) {
 
-        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
 
-        let order_res = await mysql.select('goods_order', { where: { order_no: body }, columns: ['status', 'gold', 'id', 'ctime'] });
+        let reData = await this.service.tools.query_weixin_order(order_no);
+        console.log(reData)
+        if (reData) {
+            let openid = reData.openid[0];
 
-        if (order_res[0].status == 0) {
-            //生成积分消费记录
-            await mysql.insert('gold_record', {
-                uid: uid[0].id,
-                num: -order_res[0].gold,
-                source: 3, //商店抵扣
-                ctime: new Date(),
-            });
-            //修改订单状态
-            await mysql.update('goods_order', {
-                id: order_res[0].id,
-                status: 1,
-                pay_time: new Date()
-            });
-            //生成支付记录
-            await mysql.insert('pay_record', {
-                uid: uid[0].id,
-                pay_num: money,
-                pay_no: wx_num,
-                order_no: order_no,
-                kind: 1, //微信小程序支付
-                status: 3, //商城商品支付
-                ctime: new Date(),
-            });
-            //扣除开团积分
-            let sql = "update  user set balance = balance - ? where id= ?";
-            let args = [order_res[0].gold, uid[0].id];
-            await mysql.query(sql, args);
+            let money = reData.total_fee[0];
+            let wx_num = reData.transaction_id[0];
+
+            let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+
+            let order_res = await mysql.select('goods_order', { where: { order_no: body }, columns: ['status', 'gold', 'id', 'ctime'] });
+
+            if (order_res[0].status == 0) {
+                //生成积分消费记录
+                await mysql.insert('gold_record', {
+                    uid: uid[0].id,
+                    num: -order_res[0].gold,
+                    source: 3, //商店抵扣
+                    ctime: new Date(),
+                });
+                //修改订单状态
+                await mysql.update('goods_order', {
+                    id: order_res[0].id,
+                    status: 1,
+                    pay_time: new Date()
+                });
+                //生成支付记录
+                await mysql.insert('pay_record', {
+                    uid: uid[0].id,
+                    pay_num: money,
+                    pay_no: wx_num,
+                    order_no: order_no,
+                    kind: 1, //微信小程序支付
+                    status: 3, //商城商品支付
+                    ctime: new Date(),
+                });
+                //扣除开团积分
+                let sql = "update  user set balance = balance - ? where id= ?";
+                let args = [order_res[0].gold, uid[0].id];
+                await mysql.query(sql, args);
+            }
         }
-
     }     //用户完成购买
     async goods_pay_return(body) {
 
 
-        let reData = await this.ctx.service.tools.query_weixin_order(body);
-        if (reData) {
 
-            await this.tongyong_goods_order(reData);
-            return databack;
+        await this.tongyong_goods_order(body);
 
-        } else {
-            throw new Error('异常订单');
-        }
+        return {};
     }
     //用户确认收货或者取消订单
     async confire_order(kind, order_id, action) {
@@ -264,13 +264,12 @@ class OrderService extends Service {
 
 
             let weifukuan = await mysql.select('join_order', { where: { status: 0 }, columns: ['order_no'] });
+            console.log(weifukuan);
             if (weifukuan.length > 0) {
                 for (let i in weifukuan) {
 
-                    let reData = this.goods_pay_return(weifukuan[i]);
-                    if (reData) {
-                        await this.tongyong_goods_order(reData);
-                    }
+                    await this.tongyong_goods_order(weifukuan[i]);
+
                 }
             }
 
@@ -285,10 +284,8 @@ class OrderService extends Service {
             if (weifukuan.length > 0) {
                 for (let i in weifukuan) {
 
-                    let reData = this.service.team.tongyong_join_order(weifukuan[i]);
-                    if (reData) {
-                        await this.tongyong_goods_order(reData);
-                    }
+                    await this.service.team.tongyong_join_order(weifukuan[i]);
+
                 }
             }
             let sql = "select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
