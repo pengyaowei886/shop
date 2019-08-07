@@ -265,11 +265,11 @@ class OrderService extends Service {
 
 
             let weifukuan = await mysql.select('join_order', { where: { status: 0 }, columns: ['order_no'] });
-            console.log(weifukuan);
+
             if (weifukuan.length > 0) {
                 for (let i in weifukuan) {
 
-                    await this.tongyong_goods_order(weifukuan[i]);
+                    await this.service.team.tongyong_join_order(weifukuan[i]);
 
                 }
             }
@@ -284,9 +284,7 @@ class OrderService extends Service {
             let weifukuan = await mysql.select('goods_order', { where: { status: 0 }, columns: ['order_no'] });
             if (weifukuan.length > 0) {
                 for (let i in weifukuan) {
-
-                    await this.service.team.tongyong_join_order(weifukuan[i]);
-
+                    await this.tongyong_goods_order(weifukuan[i]);
                 }
             }
             let sql = "select count (*)   as sum  ,status  from goods_order where uid= ? group by status order by ctime ";
