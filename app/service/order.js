@@ -122,6 +122,7 @@ class OrderService extends Service {
 
     async  tongyong_goods_order(order_no) {
 
+        const mysql = this.app.mysql;
 
         let reData = await this.service.tools.query_weixin_order(order_no);
         console.log(reData)
