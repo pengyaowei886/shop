@@ -346,7 +346,7 @@ class UserService extends Service {
             }
         }
 
-        let user_join_pay = await mysql.select('user_join_pay', {
+        let user_join_pay = await mysql.select('join_pay', {
             where: { uid: uid, status: 0 }, columns: ['order_no']
         });
         if (user_join_pay.length > 0) {
