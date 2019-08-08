@@ -456,7 +456,7 @@ class TeamService extends Service {
                     where: { openid: openid }, columns: ['id']
                 })
 
-                await mysql.insert('serf_gold', {
+                await mysql.insert('self_gold', {
                     uid: uid[0].id,
                     order_no: order_no,
                     join_no: join_no,
