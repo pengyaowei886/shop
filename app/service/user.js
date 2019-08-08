@@ -336,6 +336,25 @@ class UserService extends Service {
     //查询用户基本信息
     async query_user_info(uid) {
         const mysql = this.app.mysql;
+
+        let self_gold = await mysql.select('self_gold', {
+            where: { uid: uid, status: 0 }, columns: ['order_no']
+        });
+        if (self_gold.length > 0) {
+            for (let i in self_gold) {
+                await this.service.team.tongyong_join_myself(self_gold[i].order_no)
+            }
+        }
+
+        let user_join_pay = await mysql.select('user_join_pay', {
+            where: { uid: uid, status: 0 }, columns: ['order_no']
+        });
+        if (user_join_pay.length > 0) {
+            for (let i in user_join_pay) {
+                await this.service.team.tongyong_join_myself(user_join_pay[i].order_no)
+            }
+        }
+
         let result = await mysql.select('user', {
             where: { id: uid }, columns: ['wx_pic', 'wx_nickname', 'balance', 'phone']
         });

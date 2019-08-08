@@ -22,6 +22,8 @@ class Order extends Subscription {
     await this.ctx.service.tools.pingjia_order();
     //清除规定时间未拼成的团
     await this.ctx.service.tools.team_order();
+    //查询订单
+    await this.ctx.service.tools.query_order()
 
   }
 }

@@ -273,29 +273,6 @@ class ToolsService extends Service {
 
     }
 
-    //微信消息模版
-    async send(openid, template_id, formId, info) {
-        let opts = {
-            touser: openid,
-            template_id: template_id,
-            form_id: formId,
-            data: {
-                "keyword1": {
-                    "value": info.keyword1,
-                    "color": "#1d1d1d"
-                },
-                "keyword2": {
-                    "value": info.keyword2,
-                    "color": "#1d1d1d"
-                },
-                "keyword3": {
-                    "value": info.keyword3,
-                    "color": "#1d1d1d"
-                }
-            }
-        }
-
-    }
 
     //定时任务 清除未付款的订单
     async   pay_order() {
@@ -424,6 +401,27 @@ class ToolsService extends Service {
 
 
 
+    }
+
+    async query_order() {
+        const mysql = this.app.mysql;
+        let self_gold = await mysql.select('self_gold', {
+            where: { uid: uid, status: 0 }, columns: ['order_no']
+        });
+        if (self_gold.length > 0) {
+            for (let i in self_gold) {
+                await this.service.team.tongyong_join_myself(self_gold[i].order_no)
+            }
+        }
+
+        let user_join_pay = await mysql.select('user_join_pay', {
+            where: { uid: uid, status: 0 }, columns: ['order_no']
+        });
+        if (user_join_pay.length > 0) {
+            for (let i in user_join_pay) {
+                await this.service.team.tongyong_join_myself(user_join_pay[i].order_no)
+            }
+        }
     }
 
 

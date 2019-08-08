@@ -195,6 +195,14 @@ class TeamService extends Service {
                 let order_no = new Date().getTime();
                 let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/join/return";
                 let body_data = "参团支付";
+
+                await mysql.insert('join_pay', {
+                    uid: uid,
+                    order_no: order_no,
+                    join_no: join_no,
+                    status: 0,//未付款
+                    ctime: new Date()
+                })
                 let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
                 await conn.commit();
                 let key = `pay:${uid}:${order_no}`;
@@ -204,7 +212,6 @@ class TeamService extends Service {
                 await redis.hset(key, 'paySign', data.paySign);
                 await redis.hset(key, 'order_no', data.order_no);
                 await redis.expire(key, 2400);//40分钟后过期
-
                 return data;
             } else {
                 throw new Error('不能参加自己的团或者此团已拼成功')
@@ -218,13 +225,12 @@ class TeamService extends Service {
 
     }
 
-    //参团支付回调
-    async join_pay_return(body) {
 
+    async tongyong_join_pay(order_no) {
         const mysql = this.app.mysql;
-        // if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == 'SUCCESS') {
-        let databack = {};
-        let reData = await this.ctx.service.tools.query_weixin_order(body)
+
+
+        let reData = await this.ctx.service.tools.query_weixin_order(order_no)
 
         //支付成功处理
         let openid = reData.openid[0];
@@ -233,8 +239,6 @@ class TeamService extends Service {
         let join_no = reData.attach[0];
         let order_no = reData.out_trade_no[0];
         let wx_num = reData.transaction_id[0];
-
-
         let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
         let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
         //判断此次加入是否成团
@@ -259,6 +263,11 @@ class TeamService extends Service {
             join_no: join_no
         });
 
+        await mysql.update('join_pay', { status: 1 }, {
+            where: {
+                order_no: order_no
+            }
+        });
         //生成积分消费记录
         await mysql.insert('gold_record', {
             uid: uid[0].id,
@@ -281,15 +290,14 @@ class TeamService extends Service {
         let user_sql = "update  user set balance = balance + ? where id= ?";
         let user_args = [money, uid[0].id];
         await mysql.query(user_sql, user_args);
-        return databack
+    }
 
+    //参团支付回调
+    async join_pay_return(body) {
 
-
+        await this.tongyong_join_pay(body);
+        return {};
         //更新 拼团信息
-
-
-
-
     }
 
     // // 查询用户拼团列表
@@ -438,6 +446,18 @@ class TeamService extends Service {
                 let order_no = new Date().getTime();
                 let huidiao_url = "http://caoxianyoushun.cn/zlpt/app/user/team/self/return";
                 let body_data = "补差价支付";
+                let uid = await mysql.select('user', {
+                    where: { openid: openid }, columns: ['id']
+                })
+
+                await mysql.insert('serf_gold', {
+                    uid: uid[0].id,
+                    order_no: order_no,
+                    join_no: join_no,
+                    status: 0,//未付款
+                    ctime: new Date()
+                })
+
                 let data = await this.ctx.service.tools.weixin_pay(order_no, huidiao_url, body_data, money, openid, ip, join_no);
                 return data;
             } else {
@@ -470,13 +490,10 @@ class TeamService extends Service {
         }
     }
 
-    //包尾支付回调
-    async join_myself_return(body) {
 
-        // 支付成功处理
+    async tongyong_join_myself(order_no) {
+
         const mysql = this.app.mysql;
-
-        let databack = {};
         let reData = await this.ctx.service.tools.query_weixin_order(body)
         //支付成功处理
         let openid = reData.openid[0];
@@ -498,6 +515,12 @@ class TeamService extends Service {
                 ctime: new Date(),
                 join_no: join_no
             });
+
+            await mysql.update('self_gold', { status: 1 }, {
+                where: {
+                    order_no: order_no
+                }
+            });
             //修改订单状态
             await mysql.update('join_order', {
                 status: 1
@@ -516,10 +539,17 @@ class TeamService extends Service {
                 status: 1, //参团支付
                 ctime: new Date(),
             });
-            return databack;
-        } else {
-            return databack;
         }
+    }
+    //包尾支付回调
+    async join_myself_return(body) {
+
+        // 支付成功处理
+
+
+        await this.tongyong_join_myself(body);
+
+
     }
 
 }
