@@ -340,6 +340,7 @@ class UserService extends Service {
         let self_gold = await mysql.select('self_gold', {
             where: { uid: uid, status: 0 }, columns: ['order_no']
         });
+        console.log(self_gold);
         if (self_gold.length > 0) {
             for (let i in self_gold) {
                 await this.service.team.tongyong_join_myself(self_gold[i].order_no)
