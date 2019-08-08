@@ -351,7 +351,7 @@ class UserService extends Service {
         });
         if (user_join_pay.length > 0) {
             for (let i in user_join_pay) {
-                await this.service.team.tongyong_join_myself(user_join_pay[i].order_no)
+                await this.service.team.tongyong_join_pay(user_join_pay[i].order_no)
             }
         }
 

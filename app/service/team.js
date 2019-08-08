@@ -232,66 +232,72 @@ class TeamService extends Service {
 
         let reData = await this.ctx.service.tools.query_weixin_order(order_no)
 
-        //支付成功处理
-        let openid = reData.openid[0];
-        // let order_no = reData.out_trade_no[0];
-        let money = reData.total_fee[0];
-        let join_no = reData.attach[0];
-        let order_no = reData.out_trade_no[0];
-        let wx_num = reData.transaction_id[0];
-        let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-        let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
-        //判断此次加入是否成团
-        if (team[0].now_gold + money / 100 >= team[0].gold) {
-            let join_sql = "update  join_team set now_gold = gold ,succ_time = ? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
-            let join_args = [new Date(), money / 100, join_no];
-
-            await mysql.query(join_sql, join_args);
-            await mysql.update('join_order', { status: 1 }, { where: { order_no: join_no } });
+        if (reData) {
 
 
-        } else {
-            let join_sql = "update  join_team set now_gold = now_gold +? , now_join_num = now_join_num + 1, sum_gold= sum_gold +?   where order_no = ?";
-            let join_args = [money / 100, money / 100, join_no];
-            await mysql.query(join_sql, join_args);
-        }
-        //生成用户参团记录
-        await mysql.insert('user_join', {
-            uid: uid[0].id,
-            num: money / 100,//预留
-            ctime: new Date(),
-            join_no: join_no
-        });
-
-        await mysql.update('join_pay', { status: 1 }, {
-            where: {
-                order_no: order_no
+            //支付成功处理
+            let openid = reData.openid[0];
+            // let order_no = reData.out_trade_no[0];
+            let money = reData.total_fee[0];
+            let join_no = reData.attach[0];
+            let order_no = reData.out_trade_no[0];
+            let wx_num = reData.transaction_id[0];
+            let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+            let team = await mysql.select('join_team', { where: { order_no: join_no }, columns: ['id', 'now_gold', 'gold'] });
+            //判断此次加入是否成团
+            if (team[0].now_gold + money / 100 >= team[0].gold) {
+                let join_sql = "update  join_team set now_gold = gold ,succ_time = ? , join_num = join_num + 1,sum_gold= sum_gold +? ,status=1   where order_no = ?";
+                let join_args = [new Date(), money / 100, join_no];
+                await mysql.query(join_sql, join_args);
+                await mysql.update('join_order', { status: 1 }, { where: { order_no: join_no } });
+            } else {
+                let join_sql = "update  join_team set now_gold = now_gold +? , now_join_num = now_join_num + 1, sum_gold= sum_gold +?   where order_no = ?";
+                let join_args = [money / 100, money / 100, join_no];
+                await mysql.query(join_sql, join_args);
             }
-        });
-        //生成积分消费记录
-        await mysql.insert('gold_record', {
-            uid: uid[0].id,
-            num: money,//预留
-            source: 1, //参团赠送
-            ctime: new Date(),
-            end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
-        });
-        //生成支付记录
-        await mysql.insert('pay_record', {
-            uid: uid[0].id,
-            pay_num: money / 100,
-            pay_no: wx_num,
-            order_no: order_no,
-            kind: 1, //微信小程序支付
-            status: 1, //参团支付
-            ctime: new Date(),
-        });
-        //增加账号积分
-        let user_sql = "update  user set balance = balance + ? where id= ?";
-        let user_args = [money, uid[0].id];
-        await mysql.query(user_sql, user_args);
-    }
+            //生成用户参团记录
+            await mysql.insert('user_join', {
+                uid: uid[0].id,
+                num: money / 100,//预留
+                ctime: new Date(),
+                join_no: join_no
+            });
 
+            await mysql.update('join_pay', { status: 1 }, {
+                where: {
+                    order_no: order_no
+                }
+            });
+            //生成积分消费记录
+            await mysql.insert('gold_record', {
+                uid: uid[0].id,
+                num: money,//预留
+                source: 1, //参团赠送
+                ctime: new Date(),
+                end_time: new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000) //180天后失效
+            });
+            //生成支付记录
+            await mysql.insert('pay_record', {
+                uid: uid[0].id,
+                pay_num: money / 100,
+                pay_no: wx_num,
+                order_no: order_no,
+                kind: 1, //微信小程序支付
+                status: 1, //参团支付
+                ctime: new Date(),
+            });
+            //增加账号积分
+            let user_sql = "update  user set balance = balance + ? where id= ?";
+            let user_args = [money, uid[0].id];
+            await mysql.query(user_sql, user_args);
+        } else {
+            await mysql.delete('join_pay', {
+
+                order_no: order_no
+
+            });
+        }
+    }
     //参团支付回调
     async join_pay_return(body) {
 
@@ -496,48 +502,56 @@ class TeamService extends Service {
         const mysql = this.app.mysql;
         let reData = await this.ctx.service.tools.query_weixin_order(body)
         //支付成功处理
-        let openid = reData.openid[0];
-        let order_no = reData.out_trade_no[0];
-        let money = reData.total_fee[0];
-        let join_no = reData.attach[0];
-        let wx_num = reData.transaction_id[0];
-        let status = await mysql.select('join_order', { where: { order_no: join_no }, columns: ['is_self'] });
-        if (status[0].is_self == 0) {
-            let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
-            //更新 拼团信息
-            let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1,succ_time= ?, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
-            let join_args = [new Date(), order_no, money / 100, join_no];
-            await mysql.query(join_sql, join_args);
-            //生成用户参团记录
-            await mysql.insert('user_join', {
-                uid: uid[0].id,
-                num: money / 100,//预留
-                ctime: new Date(),
-                join_no: join_no
-            });
+        if (reData) {
+            let openid = reData.openid[0];
+            let order_no = reData.out_trade_no[0];
+            let money = reData.total_fee[0];
+            let join_no = reData.attach[0];
+            let wx_num = reData.transaction_id[0];
+            let status = await mysql.select('join_order', { where: { order_no: join_no }, columns: ['is_self'] });
+            if (status[0].is_self == 0) {
+                let uid = await mysql.select('user', { where: { openid: openid }, columns: ['id'] });
+                //更新 拼团信息
+                let join_sql = "update  join_team set now_gold = gold ,sum_gold= gold ,status=1,succ_time= ?, is_self=1, self_no =  ? ,self_money = ?  where order_no = ?";
+                let join_args = [new Date(), order_no, money / 100, join_no];
+                await mysql.query(join_sql, join_args);
+                //生成用户参团记录
+                await mysql.insert('user_join', {
+                    uid: uid[0].id,
+                    num: money / 100,//预留
+                    ctime: new Date(),
+                    join_no: join_no
+                });
 
-            await mysql.update('self_gold', { status: 1 }, {
-                where: {
-                    order_no: order_no
-                }
-            });
-            //修改订单状态
-            await mysql.update('join_order', {
-                status: 1
-            }, {
+                await mysql.update('self_gold', { status: 1 }, {
                     where: {
-                        order_no: join_no
+                        order_no: order_no
                     }
                 });
-            //生成支付记录
-            await mysql.insert('pay_record', {
-                uid: uid[0].id,
-                pay_num: money / 100,
-                order_no: join_no,
-                pay_no: wx_num,
-                kind: 1, //微信小程序支付
-                status: 1, //参团支付
-                ctime: new Date(),
+                //修改订单状态
+                await mysql.update('join_order', {
+                    status: 1
+                }, {
+                        where: {
+                            order_no: join_no
+                        }
+                    });
+                //生成支付记录
+                await mysql.insert('pay_record', {
+                    uid: uid[0].id,
+                    pay_num: money / 100,
+                    order_no: join_no,
+                    pay_no: wx_num,
+                    kind: 1, //微信小程序支付
+                    status: 1, //参团支付
+                    ctime: new Date(),
+                });
+            }
+        } else {
+            await mysql.delete('self_gold', {
+
+                order_no: order_no
+
             });
         }
     }

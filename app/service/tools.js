@@ -263,6 +263,9 @@ class ToolsService extends Service {
 
                     if (reData.return_code[0] == 'SUCCESS' && reData.result_code[0] == "SUCCESS" && reData.trade_state[0] == "SUCCESS") {
 
+                        //验证签名
+                        
+
                         resolve(res.xml);
                     } else {
                         resolve(null);
@@ -404,6 +407,7 @@ class ToolsService extends Service {
     }
 
     async query_order() {
+
         const mysql = this.app.mysql;
         let self_gold = await mysql.select('self_gold', {
             where: { uid: uid, status: 0 }, columns: ['order_no']
